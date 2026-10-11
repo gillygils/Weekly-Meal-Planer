@@ -352,6 +352,9 @@ route('PATCH', '/api/weeks/:key/slots/:slot', ({ params, body }) => {
   if (!slot) throw new HttpError(404, 'Slot not found');
   if ('recipeId' in body) {
     if (body.recipeId !== null && !store.recipe(body.recipeId)) throw new HttpError(404, 'Recipe not found');
+    // Only an explicit "choose for this meal" may replace a locked meal.
+    if (slot.locked && body.recipeId !== slot.recipeId && !body.replaceLocked) throw new HttpError(409, 'That meal is locked. Unlock it first to replace it.');
+    if (slot.off && body.recipeId) throw new HttpError(409, 'That meal is set to fend for yourself. Tap "Plan anyway" first.');
     slot.recipeId = body.recipeId;
     if (!slot.recipeId) slot.locked = false;
   }

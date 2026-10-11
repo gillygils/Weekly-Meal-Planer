@@ -1065,10 +1065,15 @@ async function openRecipe(id, slotId) {
   let r;
   try { r = await api('GET', `/api/recipes/${encodeURIComponent(id)}`); } catch (e) { toast(e.message, 'error'); return; }
   const s = state.settings;
-  const slotOptions = state.plan.slots.map((slot) => {
+  const target = defaultSlotFor(r, slotId);
+  const usable = state.plan.slots.filter((slot) => !slot.off).sort((a, b) => a.day - b.day || MEALS.indexOf(a.meal) - MEALS.indexOf(b.meal));
+  const slotOptions = usable.map((slot) => {
     const date = addDays(parseKey(state.weekKey), slot.day);
     const cur = slot.recipeId && state.byId.get(slot.recipeId);
-    return `<option value="${slot.id}" ${slot.id === slotId ? 'selected' : ''}>${DAY_NAMES[date.getDay()]} ${slot.meal}${cur ? ` (replace ${esc(cur.name.slice(0, 28))})` : ''}</option>`;
+    const label = `${DAY_NAMES[date.getDay()]} ${slot.meal}`;
+    // Locked meals can't be replaced from here; unlock them on the plan first.
+    if (slot.locked) return `<option value="${slot.id}" disabled>${label} (locked${cur ? `: ${esc(cur.name.slice(0, 24))}` : ''})</option>`;
+    return `<option value="${slot.id}" ${slot.id === target?.id ? 'selected' : ''}>${label}${cur ? ` (replace ${esc(cur.name.slice(0, 26))})` : ' (open)'}</option>`;
   }).join('');
   const scaleNote = r.servings !== s.householdSize ? `Recipe serves ${r.servings}; your grocery list scales it to ${s.householdSize}.` : `Serves ${r.servings}.`;
   openModal(`
@@ -1085,10 +1090,11 @@ async function openRecipe(id, slotId) {
         </div>
       </div>
 
+      ${target ? `
       <form class="inline-form" data-form="add-to-plan">
         <select class="input" name="slot" aria-label="Day and meal">${slotOptions}</select>
         <button class="btn primary">${icon('calendar')}Add to ${esc(relativeWeek(state.weekKey).toLowerCase())}</button>
-      </form>
+      </form>` : `<p class="subtle">Every meal ${esc(relativeWeek(state.weekKey).toLowerCase())} is locked. Unlock one on the plan to swap this recipe in.</p>`}
 
       ${nutritionPanel(r)}
 
@@ -1124,6 +1130,22 @@ async function openRecipe(id, slotId) {
         </div>
       </details>
     </div>`);
+}
+
+/**
+ * Best slot to drop a recipe into: the one it was opened from, otherwise the
+ * first open (empty, unlocked) meal it suits, starting from today. Never a
+ * locked meal or a "fend for yourself" one.
+ */
+function defaultSlotFor(r, slotId) {
+  const open = state.plan.slots.filter((s) => !s.off && !s.locked);
+  const from = open.find((s) => s.id === slotId);
+  if (from) return from;
+  const start = parseKey(state.weekKey);
+  const today = Math.max(0, Math.round((parseKey(isoDate(new Date())) - start) / 864e5));
+  const suits = (s) => !r.mealTypes?.length || r.mealTypes.includes(s.meal);
+  const score = (s) => (s.recipeId ? 4 : 0) + (suits(s) ? 0 : 2) + (s.day >= today ? 0 : 1);
+  return [...open].sort((a, b) => score(a) - score(b) || a.day - b.day || MEALS.indexOf(a.meal) - MEALS.indexOf(b.meal))[0] || null;
 }
 
 function nutritionPanel(r) {
@@ -1284,7 +1306,7 @@ const actions = {
   pick: async (el) => {
     const slotId = $('[data-picker]', modalBody).dataset.picker;
     modal.close();
-    await setPlan(await api('PATCH', `/api/weeks/${state.weekKey}/slots/${slotId}`, { recipeId: el.dataset.id, locked: true }));
+    await setPlan(await api('PATCH', `/api/weeks/${state.weekKey}/slots/${slotId}`, { recipeId: el.dataset.id, locked: true, replaceLocked: true }));
     toast('Added and locked in');
   },
   fav: (el) => toggleFavorite(el.dataset.id),
@@ -1718,7 +1740,9 @@ document.addEventListener('submit', (e) => {
       const id = $('[data-recipe]', modalBody).dataset.recipe;
       modal.close();
       await setPlan(await api('PATCH', `/api/weeks/${state.weekKey}/slots/${data.slot}`, { recipeId: id, locked: true }));
-      toast('Added to the plan and locked in');
+      const slot = state.plan.slots.find((x) => x.id === data.slot);
+      const day = slot ? DAY_NAMES[addDays(parseKey(state.weekKey), slot.day).getDay()] : '';
+      toast(`Added to ${day} ${slot?.meal || ''} and locked in`);
     },
     price: async () => {
       const id = $('[data-recipe]', modalBody).dataset.recipe;
