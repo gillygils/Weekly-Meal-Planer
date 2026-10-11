@@ -11,10 +11,22 @@ A self-hostable weekly meal planner for your household. Randomize a week of meal
   - Mouse: drag the tile.
   - Phone or tablet: press and hold the tile, or drag the ⠿ handle on its photo.
   - Keyboard or TV remote: focus the handle and use the arrow keys.
+- **Macros and healthier meals.** Every recipe shows calories, protein, carbs, fat and fiber per serving, plus a 0–100 health score.
+  - Each day on the plan shows its total per person, with a protein/carbs/fat bar and optional daily calorie and protein targets.
+  - **Healthier meals** mode only randomizes recipes with a good health score and favors the healthiest. You can also cap calories or require a minimum amount of protein per serving.
+  - Macros come from the recipe itself when it publishes them; otherwise they're estimated from the ingredients.
 - **Grocery list tab.** The week's ingredients are merged, scaled to your household size, and sorted by aisle. You can check items off, add your own (paper towels, snacks…), hide checked items, and copy or share the list.
+- **Store prices and the cheapest shop.** Pick the two stores you use (Meijer, Aldi, Walmart, Target, Kroger, Costco and more).
+  - **Compare prices:** each item's price at both stores, and which one is cheaper.
+  - **Shopping plan:** compares "all at store A", "all at store B" and splitting the trip. A split is only recommended when it saves at least the amount you set. Each store gets its own list, sorted by aisle.
+  - Tap any price to enter the real price and aisle. It's saved and used every week from then on.
+  - Prices start as estimates (see Notes): typical US prices for the package size you need, adjusted by each store's usual price level, which you can tune.
 - **840+ recipes are included**, pulled from [TheMealDB](https://www.themealdb.com) and [DummyJSON](https://dummyjson.com/docs/recipes).
-  - **Pull more recipes** fetches anything new from those sources.
-  - **Import from URL** grabs a recipe from almost any recipe site that publishes standard recipe data (BBC Good Food, blogs, etc.).
+  - **Pull from recipe databases** fetches anything new from those sources.
+  - **Import link / TikTok** grabs a recipe from almost any recipe page, including creator blogs without standard recipe data.
+  - **TikTok videos:** paste a video link and the app pulls in the caption, creator and cover image. If the caption has the ingredients, it imports straight away. Otherwise the recipe editor opens so you can finish it while you watch.
+  - **Creators:** follow a creator's recipe website and pull in their newest recipes. Hunt4Shredz and AmateurProChef are set up by default. Chef Zealand and Aussie Fitness don't post free recipes online, so save their TikToks by link.
+  - **New recipe / Edit:** type in your own recipes or fix any recipe, with optional macros.
   - Different versions of the same dish are kept as separate recipes, so "Lasagne" can be a different recipe from week to week.
 - **Favorites** ♥. Favorited recipes are 3× more likely to be randomized (you can turn this off). You can filter the recipe library to favorites only.
 - **Target price per serving.** The randomizer only picks recipes at or under your target. Each recipe gets an estimated cost, and you can set your own price on any recipe.
@@ -60,7 +72,12 @@ If your server reaches the internet through an HTTP proxy, start Node with `NODE
 
 ## Notes
 
-- **Costs are estimates.** They come from a simple per-ingredient price table, so they're good for comparing recipes, not exact. Set your own price on any recipe (open it → *Edit price…*).
+- **Costs are estimates.** Meijer, Aldi, Walmart and Target don't publish prices for other apps, so store prices start from typical US prices for each package size, adjusted by a rough price level per store (Settings → Stores & prices).
+  - Estimates are good for comparing, not exact. With estimates alone one store usually wins everything; the split plan gets useful as you enter real prices.
+  - Tap a price on the Groceries tab to save the real one and its aisle. You can also set your own cost per serving on any recipe (open it → *Edit price…*).
+- **Macros are estimates** unless the recipe publishes its own. They're calculated from the ingredient amounts using standard nutrition values. When TheMealDB doesn't say how many a recipe serves, servings are estimated from the total amount of food.
+- **TikTok** doesn't let other apps read creators' videos or recipes, so the app uses TikTok's public embed info for a single video link (caption, creator, cover). Cover images from TikTok expire after a while; a placeholder shows instead.
+- **Creator websites** are read one page at a time with a pause between pages, following each site's robots.txt.
 - **Protein and allergen detection** reads each recipe's ingredients. Fish sauce, oyster sauce and Worcestershire don't count as fish/shellfish, but anchovies do. If you're avoiding a protein because of an **allergy**, still check the ingredients yourself.
 - The bundled recipes live in `server/seed/recipes.json`. You can regenerate them with `npm run fetch-recipes`. New seed recipes are added to an existing database on startup, and your favorites and edits are never overwritten.
 - Removing a recipe hides it, so a later refresh won't bring it back.
@@ -80,6 +97,10 @@ server/store.js        JSON-file storage
 server/lib/planner.js  randomizer
 server/lib/grocery.js  ingredient parsing + grocery list
 server/lib/recipes.js  protein / meal-type / cost detection
-server/lib/sources.js  TheMealDB, DummyJSON, URL import
+server/lib/sources.js  TheMealDB, DummyJSON, URL / TikTok import, creator websites
+server/lib/nutrition.js macros + health score
+server/lib/ingredients.js ingredient nutrition, weights and typical prices
+server/lib/pricing.js  store price comparison + cheapest shopping plan
+server/lib/custom.js   recipes added or edited by hand
 public/                frontend (vanilla JS, no build step)
 ```
