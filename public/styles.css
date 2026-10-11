@@ -355,13 +355,14 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select:
 .meal.drop-target { outline: 2px dashed var(--accent); outline-offset: 3px; }
 
 .meal.off-slot {
-  display: grid; justify-items: center; gap: .25rem; padding: 1rem .8rem; text-align: center;
+  display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: .25rem; padding: 1rem .8rem; text-align: center;
   background: repeating-linear-gradient(135deg, var(--surface-2) 0 10px, transparent 10px 20px); border: 1px dashed var(--border); color: var(--muted);
 }
 .meal.off-slot > svg { width: 1.6rem; height: 1.6rem; color: var(--muted); }
 .meal.off-slot b { color: var(--text); font-size: 1rem; }
 .meal.off-slot span { font-size: .82rem; }
-.meal.off-slot .btn { margin-top: .3rem; }
+.meal.off-slot .btn { margin-top: .3rem; max-width: 100%; white-space: normal; text-align: center; line-height: 1.25; }
+.meal.off-slot span { max-width: 100%; overflow-wrap: anywhere; }
 .meal-days { display: grid; grid-template-columns: auto repeat(7, minmax(0, 1fr)); gap: .35rem; align-items: center; }
 .md-head { text-align: center; font-size: .75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
 .md-meal { font-weight: 650; text-transform: capitalize; padding-right: .4rem; font-size: .9rem; }

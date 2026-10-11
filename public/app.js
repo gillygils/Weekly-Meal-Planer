@@ -449,8 +449,8 @@ function renderSlot(s) {
       <div class="meal off-slot" data-day="${s.day}" data-meal="${s.meal}">
         ${icon('moon')}
         <b>Fend for yourself</b>
-        <span>${oneOff ? `No ${s.meal} planned this week` : `No ${s.meal} on ${DAY_NAMES[(parseKey(state.weekKey).getDay() + s.day) % 7]}s (Settings)`}</span>
-        <button class="btn sm ghost" data-action="skip-slot" data-slot="${s.id}" data-skip="${oneOff ? 'null' : 'false'}">${icon('plus')}Plan ${s.meal} anyway</button>
+        <span>${oneOff ? 'Skipped this week' : `No ${s.meal} on ${DAY_NAMES[(parseKey(state.weekKey).getDay() + s.day) % 7]}s`}</span>
+        <button class="btn sm ghost" data-action="skip-slot" data-slot="${s.id}" data-skip="${oneOff ? 'null' : 'false'}" title="Plan ${s.meal} for this day anyway">${icon('plus')}Plan anyway</button>
       </div>`;
   }
   const r = s.recipeId && state.byId.get(s.recipeId);
