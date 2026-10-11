@@ -337,7 +337,7 @@ function render() {
   $('#weekbar').hidden = !['plan', 'groceries'].includes(state.tab);
   $('#week-range').textContent = weekRange(state.weekKey);
   $('#week-sub').textContent = relativeWeek(state.weekKey);
-  const remaining = state.grocery ? state.grocery.items.filter((i) => !i.checked).length + state.grocery.extras.filter((e) => !e.checked).length : 0;
+  const remaining = state.grocery ? state.grocery.items.filter((i) => !i.checked && !i.have).length + state.grocery.extras.filter((e) => !e.checked).length : 0;
   const badge = $('#grocery-badge');
   badge.hidden = !remaining;
   badge.textContent = remaining > 99 ? '99+' : remaining;
@@ -485,8 +485,8 @@ function renderSlot(s) {
 }
 
 function renderGroceries() {
-  const views = [['list', 'List', 'cart'], ['compare', 'Compare prices', 'tag'], ['plan', 'Shopping plan', 'route']];
-  const body = { list: renderGroceryList, compare: renderPriceCompare, plan: renderShoppingPlan }[state.groceryView] || renderGroceryList;
+  const views = [['list', 'List', 'cart'], ['pantry', 'Pantry', 'jar'], ['compare', 'Prices', 'tag'], ['plan', 'Shop plan', 'route']];
+  const body = { list: renderGroceryList, pantry: renderPantry, compare: renderPriceCompare, plan: renderShoppingPlan }[state.groceryView] || renderGroceryList;
   return `
     <div class="segmented" role="tablist" aria-label="Grocery view">
       ${views.map(([k, label, ic]) => `<button role="tab" aria-selected="${state.groceryView === k}" data-action="grocery-view" data-view="${k}">${icon(ic)}<span>${label}</span></button>`).join('')}
@@ -525,7 +525,7 @@ function renderPriceCompare() {
   const pr = g.pricing;
   const none = priceSummary();
   if (none) return none;
-  const items = g.items.filter((i) => i.price && !(state.hideChecked && i.checked));
+  const items = g.items.filter((i) => i.price && !i.have);
   const [a, b] = pr.stores.map((s) => s.key);
   const pantry = items.filter((i) => i.price.pantry);
   const main = items.filter((i) => !i.price.pantry);
@@ -536,7 +536,7 @@ function renderPriceCompare() {
   }
   const row = (i) => `
     <div class="pr-row ${i.checked ? 'done' : ''}">
-      <div class="pr-item"><b>${esc(i.name)}</b><small>${esc(qtyText(i.price.buy))}${i.amount ? ` · needs ${esc(i.amount)}` : ''}</small></div>
+      <label class="pr-item pr-check"><input type="checkbox" data-action="check" data-key="${esc(i.key)}" ${i.checked ? 'checked' : ''}><span class="g-box">${icon('check')}</span><span><b>${esc(i.name)}</b><small>${esc(qtyText(i.price.buy))}${i.amount ? ` · needs ${esc(i.amount)}` : ''}</small></span></label>
       ${pr.stores.map((s) => priceCell(i, s.key)).join('')}
       ${b ? `<div class="pr-best">${i.price.best ? `<span class="store-chip s-${i.price.best === a ? 'a' : 'b'}">${esc(storeName(i.price.best))}</span><small>saves ${money(Math.abs(i.price.at[a].cost - i.price.at[b].cost))}</small>` : '<small>same</small>'}</div>` : ''}
     </div>`;
@@ -553,9 +553,9 @@ function renderPriceCompare() {
         ${b ? `<div class="pc-head best"><b>Cheapest</b><span>${money(pr.plan.split)}</span></div>` : ''}
       </div>
     </div>
-    <p class="subtle pr-note">${icon('tag')} Tap any price to enter what it really costs (and its aisle). Your prices are saved and replace estimates from then on. Estimates use typical US prices for the package size you need, adjusted by each store's usual price level.${state.settings.countPantry ? '' : ' Pantry staples are left out of the totals.'}</p>
+    <p class="subtle pr-note">${icon('tag')} Tap any price to enter what it really costs (and its aisle). Your prices are saved and replace estimates from then on. Estimates use typical US prices for the package size you need, adjusted by each store's usual price level.${state.settings.countPantry ? '' : ' Spices and staples (oil, flour, sauces) are left out of the totals, and so is anything in your pantry.'}</p>
     ${[...groups].map(([aisle, list]) => section(aisle, list)).join('')}
-    ${section('Pantry staples', pantry, state.settings.countPantry ? '' : 'not in totals')}
+    ${section('Spices & staples', pantry, state.settings.countPantry ? '' : 'not in totals')}
   </div>`;
 }
 
@@ -630,23 +630,29 @@ function openPriceEditor(key, storeKey) {
   setTimeout(() => $('#pe-price', modalBody)?.focus(), 50);
 }
 
+const placeFor = (aisle) => (/Spices/.test(aisle) ? 'spices' : /Meat|Frozen/.test(aisle) ? 'freezer' : /Dairy|Produce/.test(aisle) ? 'fridge' : 'pantry');
+const PLACE_LABEL = { pantry: 'Pantry', spices: 'Spices', fridge: 'Fridge', freezer: 'Freezer' };
+
 function renderGroceryList() {
   const g = state.grocery;
-  const total = g.items.length + g.extras.length;
-  const done = g.items.filter((i) => i.checked).length + g.extras.filter((e) => e.checked).length;
+  const need = g.items.filter((i) => !i.have);
+  const have = g.items.filter((i) => i.have);
+  const toBuy = need.filter((i) => !i.checked);
+  const inCart = need.filter((i) => i.checked);
+  const extrasToBuy = g.extras.filter((e) => !e.checked);
+  const extrasInCart = g.extras.filter((e) => e.checked);
+  const total = need.length + g.extras.length;
+  const done = inCart.length + extrasInCart.length;
   const pct = total ? Math.round((done / total) * 100) : 0;
-  const hide = state.hideChecked;
   const groups = new Map();
-  for (const item of g.items) {
-    if (hide && item.checked) continue;
+  for (const item of toBuy) {
     if (!groups.has(item.aisle)) groups.set(item.aisle, []);
     groups.get(item.aisle).push(item);
   }
-  const extras = g.extras.filter((e) => !(hide && e.checked));
 
   const itemRow = (i) => `
     <label class="g-item ${i.checked ? 'done' : ''}">
-      <input type="checkbox" data-action="check" data-key="${esc(i.key)}" ${i.checked ? 'checked' : ''}>
+      <input type="checkbox" data-action="check" data-key="${esc(i.key)}" ${i.checked ? 'checked' : ''} aria-label="${esc(i.name)} in the cart">
       <span class="g-box">${icon('check')}</span>
       <span class="g-text">
         <span class="g-name">${esc(i.name)}</span>
@@ -654,35 +660,96 @@ function renderGroceryList() {
         <span class="g-for" title="${esc(i.recipes.join(', '))}">${esc(i.recipes.join(' · '))}</span>
       </span>
       ${bestPrice(i) && !i.price.pantry ? `<span class="g-price"><b>${money(bestPrice(i).cost)}</b><small>${esc(storeName(bestPrice(i).store))}</small></span>` : ''}
+      ${i.checked ? '' : `<button class="icon-btn sm have-btn" data-action="have-it" data-name="${esc(i.name)}" data-where="${placeFor(i.aisle)}" title="I already have this (adds it to your pantry)" aria-label="I already have ${esc(i.name)}">${icon('jar')}</button>`}
     </label>`;
 
   const extraRow = (e) => `
     <label class="g-item ${e.checked ? 'done' : ''}">
-      <input type="checkbox" data-action="check-extra" data-id="${esc(e.id)}" ${e.checked ? 'checked' : ''}>
+      <input type="checkbox" data-action="check-extra" data-id="${esc(e.id)}" ${e.checked ? 'checked' : ''} aria-label="${esc(e.name)} in the cart">
       <span class="g-box">${icon('check')}</span>
       <span class="g-text"><span class="g-name">${esc(e.name)}</span></span>
       <button class="icon-btn sm" data-action="remove-extra" data-id="${esc(e.id)}" aria-label="Remove ${esc(e.name)}">${icon('x')}</button>
     </label>`;
 
+  const haveRow = (i) => `
+    <div class="g-item have">
+      <span class="g-box on">${icon('check')}</span>
+      <span class="g-text">
+        <span class="g-name">${esc(i.name)}</span>
+        <span class="g-for">${PLACE_LABEL[i.have.where] || 'Pantry'}: ${esc(i.have.name)}${i.amount ? ` · recipes need ${esc(i.amount)}` : ''}</span>
+      </span>
+      <button class="btn sm ghost" data-action="need-anyway" data-key="${esc(i.key)}" title="You're out: put it back on the list this week">Need to buy</button>
+    </div>`;
+
+  const cartOpen = !state.hideChecked;
   return `
     <div class="toolbar">
-      <div class="stats"><span><strong>${done}</strong>/${total} items</span></div>
+      <div class="stats"><span><strong>${done}</strong> of ${total} in the cart</span>${have.length ? `<span><strong>${have.length}</strong> already have</span>` : ''}</div>
       <div class="progress" aria-hidden="true"><i style="width:${pct}%"></i></div>
       <span class="spacer"></span>
-      <button class="btn ghost" data-action="toggle-hide" aria-pressed="${hide}">${icon('eye')}${hide ? 'Show checked' : 'Hide checked'}</button>
-      <button class="btn ghost" data-action="uncheck-all">${icon('broom')}Uncheck all</button>
+      <button class="btn ghost" data-action="uncheck-all">${icon('broom')}Empty cart</button>
       <button class="btn" data-action="copy-list">${icon('copy')}Copy list</button>
     </div>
     <form class="add-item" data-form="add-extra" style="margin-bottom:1rem">
       <input class="input" name="name" placeholder="Add an item (paper towels, snacks…)" autocomplete="off" maxlength="120" aria-label="Add grocery item">
       <button class="btn primary">${icon('plus')}Add</button>
     </form>
-    ${total === 0 ? `<div class="panel empty"><h2>Your list is empty</h2><p>Plan some meals for this week and their ingredients show up here automatically.</p><a class="btn primary" href="#plan">${icon('calendar')}Go to plan</a></div>` : ''}
+    ${total + have.length === 0 ? `<div class="panel empty"><h2>Your list is empty</h2><p>Plan some meals for this week and their ingredients show up here automatically.</p><a class="btn primary" href="#plan">${icon('calendar')}Go to plan</a></div>` : ''}
+    ${total && !toBuy.length && !extrasToBuy.length ? `<div class="panel empty" style="margin-bottom:1rem"><h2>Everything's in the cart 🎉</h2><p>Nothing left to grab.</p></div>` : ''}
     <div class="aisles">
-      ${extras.length ? `<section class="panel aisle"><h3><span>My items</span><span>${extras.length}</span></h3>${extras.map(extraRow).join('')}</section>` : ''}
+      ${extrasToBuy.length ? `<section class="panel aisle"><h3><span>My items</span><span>${extrasToBuy.length}</span></h3>${extrasToBuy.map(extraRow).join('')}</section>` : ''}
       ${[...groups].map(([aisle, items]) => `<section class="panel aisle"><h3><span>${esc(aisle)}</span><span>${items.length}</span></h3>${items.map(itemRow).join('')}</section>`).join('')}
     </div>
-    ${total && hide && done === total ? `<div class="panel empty"><h2>All done 🎉</h2><p>Everything's checked off.</p></div>` : ''}`;
+    ${done ? `
+      <section class="panel aisle cart-section">
+        <h3><button class="linkish" data-action="toggle-hide" aria-expanded="${cartOpen}">${icon('cart')}<span>In the cart</span></button><span>${done}</span></h3>
+        ${cartOpen ? [...extrasInCart.map(extraRow), ...inCart.map(itemRow)].join('') : ''}
+      </section>` : ''}
+    ${have.length ? `
+      <section class="panel aisle have-section">
+        <h3><span>${icon('jar')}Already have</span><span>${have.length}</span></h3>
+        <p class="subtle">These match your pantry, so they're left off the list and out of the price totals.</p>
+        ${have.map(haveRow).join('')}
+        <button class="btn sm ghost" data-action="grocery-view" data-view="pantry">${icon('jar')}Manage pantry</button>
+      </section>` : ''}`;
+}
+
+function renderPantry() {
+  const pantry = state.pantry;
+  if (!pantry) {
+    busy(null, async () => { state.pantry = await api('GET', '/api/pantry'); render(); });
+    return '<div class="skeleton"></div>';
+  }
+  const used = new Map();
+  for (const i of state.grocery.items) if (i.have) used.set(i.have.id, [...(used.get(i.have.id) || []), i.name]);
+  const byPlace = new Map(pantry.places.map((p) => [p, []]));
+  for (const it of pantry.items) byPlace.get(it.where)?.push(it);
+  const names = new Set(pantry.items.map((p) => p.name.toLowerCase()));
+  const staples = pantry.staples.filter(([n]) => !names.has(n));
+  return `
+    <section class="panel pantry-add">
+      <h2>What do you already have?</h2>
+      <p class="subtle">Anything listed here is checked off the grocery list automatically whenever a meal needs it: spices, rice, meat in the freezer, anything. "Rice" covers basmati or jasmine; "chicken" covers breasts or thighs. Remove things when you run out.</p>
+      <form class="inline-form" data-form="add-pantry">
+        <input id="pantry-in" class="input" name="name" placeholder="e.g. chicken thighs, rice, cumin" autocomplete="off" maxlength="200" aria-label="Item you have" required>
+        <select class="input" name="where" aria-label="Where it is">
+          ${pantry.places.map((p) => `<option value="${p}">${PLACE_LABEL[p]}</option>`).join('')}
+        </select>
+        <button class="btn primary">${icon('plus')}Add</button>
+      </form>
+      ${staples.length ? `<div class="chips suggest"><span class="subtle">Common staples:</span>${staples.map(([n, w]) => `<button class="chip-toggle" data-action="add-staple" data-name="${esc(n)}" data-where="${w}">${icon('plus')}${esc(n)}</button>`).join('')}</div>` : ''}
+    </section>
+    <div class="pantry-grid">
+      ${[...byPlace].map(([place, items]) => `
+        <section class="panel aisle">
+          <h3><span>${PLACE_LABEL[place]}</span><span>${items.length}</span></h3>
+          ${items.length ? items.sort((a, b) => a.name.localeCompare(b.name)).map((it) => `
+            <div class="g-item pantry-item">
+              <span class="g-text"><span class="g-name">${esc(it.name)}</span>${used.has(it.id) ? `<span class="g-for used">Covers this week: ${esc(used.get(it.id).join(', '))}</span>` : ''}</span>
+              <button class="icon-btn sm" data-action="remove-pantry" data-id="${esc(it.id)}" aria-label="Remove ${esc(it.name)} (used up)" title="Used up">${icon('x')}</button>
+            </div>`).join('') : '<p class="subtle" style="margin:.2rem .7rem .6rem">Nothing here yet.</p>'}
+        </section>`).join('')}
+    </div>`;
 }
 
 function filteredRecipes() {
@@ -861,7 +928,7 @@ function renderSettings() {
           <label for="trip">Worth a second trip if it saves at least</label>
           <div class="money"><span>${esc(s.currency)}</span><input id="trip" class="input" type="number" min="0" step="1" data-setting="tripThreshold" value="${s.tripThreshold}"></div>
         </div>
-        <label class="switch"><span><b>Count pantry staples</b><br><small class="subtle">Include spices, oils and sauces in price totals and the shopping plan.</small></span><input type="checkbox" data-setting="countPantry" ${s.countPantry ? 'checked' : ''}></label>
+        <label class="switch"><span><b>Count spices &amp; staples</b><br><small class="subtle">Include spices, oils and sauces in price totals and the shopping plan.</small></span><input type="checkbox" data-setting="countPantry" ${s.countPantry ? 'checked' : ''}></label>
         <small class="subtle">Meijer, Aldi, Walmart and Target don't publish prices for other apps to use, so the app starts with estimates (typical US prices adjusted by each store's usual price level, which you can tune above). Tap any price on the Groceries tab to save the real one and the aisle; your prices are remembered and used every week.</small>
       </section>
 
@@ -1232,6 +1299,28 @@ const actions = {
     render();
     toast('Back to the estimated price');
   },
+  'have-it': async (el, e) => {
+    e.preventDefault();
+    state.pantry = await api('POST', '/api/pantry', { name: el.dataset.name, where: el.dataset.where });
+    state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
+    render();
+    toast(`Added ${el.dataset.name} to your ${PLACE_LABEL[el.dataset.where].toLowerCase()}`, '', 'pantry');
+  },
+  'need-anyway': async (el) => {
+    state.grocery = await api('PATCH', `/api/weeks/${state.weekKey}/grocery`, { needAnyway: el.dataset.key, value: true });
+    render();
+    toast('Back on the list for this week', '', 'pantry');
+  },
+  'add-staple': async (el) => {
+    state.pantry = await api('POST', '/api/pantry', { name: el.dataset.name, where: el.dataset.where });
+    state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
+    render();
+  },
+  'remove-pantry': async (el) => {
+    state.pantry = await api('DELETE', `/api/pantry/${encodeURIComponent(el.dataset.id)}`);
+    state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
+    render();
+  },
   'toggle-hide': () => { state.hideChecked = !state.hideChecked; saveLocal('hideChecked', state.hideChecked); render(); },
   'uncheck-all': async () => { state.grocery = await api('PATCH', `/api/weeks/${state.weekKey}/grocery`, { uncheckAll: true }); render(); },
   'remove-extra': async (el, e) => {
@@ -1243,7 +1332,7 @@ const actions = {
     const g = state.grocery;
     const lines = [`Groceries · ${weekRange(state.weekKey)}`, ''];
     let aisle = null;
-    for (const i of g.items.filter((x) => !x.checked)) {
+    for (const i of g.items.filter((x) => !x.checked && !x.have)) {
       if (i.aisle !== aisle) { aisle = i.aisle; lines.push('', `${aisle.toUpperCase()}`); }
       lines.push(`☐ ${i.name}${i.amount ? ` — ${i.amount}` : ''}`);
     }
@@ -1570,6 +1659,12 @@ document.addEventListener('submit', (e) => {
       if (!terms.length) return;
       await updateSettings({ avoidIngredients: [...state.settings.avoidIngredients, ...terms] });
       $('#avoid-in')?.focus();
+    },
+    'add-pantry': async () => {
+      state.pantry = await api('POST', '/api/pantry', { name: data.name, where: data.where });
+      state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
+      render();
+      $('#pantry-in')?.focus();
     },
     'add-extra': async () => {
       if (!data.name.trim()) return;

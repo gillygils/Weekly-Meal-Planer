@@ -6,6 +6,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { Store, sanitizeSettings } from './store.js';
 import { ensureSlots, randomizePlan, moveMeal, activeSlots } from './lib/planner.js';
+import { pantryMatch, PLACES, STAPLES } from './lib/pantry.js';
 import { buildGroceryList } from './lib/grocery.js';
 import { fetchAllSources, importLink, normalizeUrl, pullCreatorSite, SUGGESTED_CREATORS } from './lib/sources.js';
 import { buildCustomRecipe } from './lib/custom.js';
@@ -124,8 +125,12 @@ function summary(r) {
 
 function groceryFor(plan) {
   const byId = new Map(store.db.recipes.map((r) => [r.id, r]));
+  plan.needAnyway ||= {};
   const list = buildGroceryList(activeSlots(plan), byId, store.db.settings.householdSize)
-    .map((i) => ({ ...i, checked: Boolean(plan.checked[i.key]) }));
+    .map((i) => {
+      const p = plan.needAnyway[i.key] ? null : pantryMatch(i.key, store.db.pantry);
+      return { ...i, checked: Boolean(plan.checked[i.key]), have: p ? { id: p.id, name: p.name, where: p.where } : null };
+    });
   const pricing = priceGroceryList(list, store.db.settings, store.db.priceBook);
   const byKey = new Map(pricing.items.map((p) => [p.key, p]));
   const items = list.map(({ totals, ...i }) => {
@@ -392,6 +397,28 @@ route('PUT', '/api/prices', ({ body }) => {
   return book[key] || null;
 });
 
+// Pantry / fridge / freezer: things you already have.
+const pantryState = () => ({ items: store.db.pantry, places: PLACES, staples: STAPLES });
+route('GET', '/api/pantry', pantryState);
+route('POST', '/api/pantry', ({ body }) => {
+  const where = PLACES.includes(body.where) ? body.where : 'pantry';
+  const names = String(body.name || '').split(',').map((n) => n.trim().slice(0, 60)).filter(Boolean);
+  if (!names.length) throw new HttpError(400, 'Type what you have.');
+  const have = new Set(store.db.pantry.map((p) => p.name.toLowerCase()));
+  for (const name of names) {
+    if (have.has(name.toLowerCase()) || store.db.pantry.length >= 500) continue;
+    store.db.pantry.push({ id: crypto.randomUUID(), name, where, addedAt: new Date().toISOString() });
+    have.add(name.toLowerCase());
+  }
+  store.save();
+  return pantryState();
+});
+route('DELETE', '/api/pantry/:id', ({ params }) => {
+  store.db.pantry = store.db.pantry.filter((p) => p.id !== params.id);
+  store.save();
+  return pantryState();
+});
+
 route('GET', '/api/weeks/:key/grocery', ({ params }) => groceryFor(getWeek(params.key)));
 route('PATCH', '/api/weeks/:key/grocery', ({ params, body }) => {
   const plan = getWeek(params.key);
@@ -402,6 +429,12 @@ route('PATCH', '/api/weeks/:key/grocery', ({ params, body }) => {
   if (typeof body.key === 'string') {
     if (body.checked) plan.checked[body.key] = true;
     else delete plan.checked[body.key];
+  }
+  if (typeof body.needAnyway === 'string') {
+    // "I'm out of it": buy this item this week even though the pantry has it.
+    plan.needAnyway ||= {};
+    if (body.value) plan.needAnyway[body.needAnyway] = true;
+    else delete plan.needAnyway[body.needAnyway];
   }
   if (typeof body.extraId === 'string') {
     const e = plan.extras.find((x) => x.id === body.extraId);

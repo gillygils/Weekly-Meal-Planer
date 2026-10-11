@@ -98,9 +98,10 @@ export class Store {
       db.recipes ||= [];
       db.weeks ||= {};
       db.priceBook ||= {};
+      db.pantry ||= [];
       return db;
     }
-    return { version: 1, settings: { ...DEFAULT_SETTINGS }, recipes: [], weeks: {}, priceBook: {} };
+    return { version: 1, settings: { ...DEFAULT_SETTINGS }, recipes: [], weeks: {}, priceBook: {}, pantry: [] };
   }
 
   /** Add any bundled recipes that aren't in the database yet (never overwrites user edits). */

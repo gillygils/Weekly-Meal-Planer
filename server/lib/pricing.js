@@ -86,7 +86,8 @@ export function priceGroceryList(items, settings, priceBook = {}) {
     priced.push({ ...item, buy, at, best, pantry: buy.pantry });
   }
 
-  const counted = priced.filter((p) => !p.checked && (settings.countPantry || !p.pantry));
+  // Items you already have aren't bought; ticked items are in the cart, so they still count.
+  const counted = priced.filter((p) => !p.have && (settings.countPantry || !p.pantry));
   const totals = Object.fromEntries(stores.map((k) => [k, round(counted.reduce((a, p) => a + p.at[k].cost, 0))]));
   let plan = null;
   if (stores.length === 2) {

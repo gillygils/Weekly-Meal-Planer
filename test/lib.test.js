@@ -284,3 +284,18 @@ test('meal days: off nights are skipped by the randomizer and groceries', async 
   moveMeal(plan, 'dinner', 0, 4);
   assert.equal(plan.slots[4].recipeId, before);
 });
+
+test('pantry matching', async () => {
+  const { pantryMatch } = await import('../server/lib/pantry.js');
+  const pantry = [{ name: 'rice' }, { name: 'Chicken' }, { name: 'garlic' }, { name: 'salt' }, { name: 'olive oil' }, { name: 'chicken thighs' }];
+  const m = (k) => pantryMatch(k, pantry)?.name || null;
+  assert.equal(m('basmati rice'), 'rice');
+  assert.equal(m('chicken breast'), 'Chicken');
+  assert.equal(m('chicken thigh'), 'chicken thighs', 'most specific wins');
+  assert.equal(m('chicken stock'), null, 'meat does not cover stock');
+  assert.equal(m('garlic powder'), null, 'fresh garlic does not cover garlic powder');
+  assert.equal(m('garlic clove'), 'garlic');
+  assert.equal(m('salted butter'), null);
+  assert.equal(m('extra virgin olive oil'), 'olive oil');
+  assert.equal(m('onion'), null);
+});
