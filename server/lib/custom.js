@@ -39,6 +39,7 @@ export function buildCustomRecipe(input, existing = null) {
     mealTypes: mealTypes && mealTypes.length ? mealTypes : existing?.mealTypes || mealTypesFor('', [], name),
     reportedNutrition: manual,
     addedAt: existing?.addedAt,
+    easy: input.easy == null ? existing?.easy ?? null : Boolean(input.easy),
   });
   r.favorite = existing?.favorite || false;
   r.costOverride = existing?.costOverride ?? null;

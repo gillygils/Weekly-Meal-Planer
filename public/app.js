@@ -216,6 +216,7 @@ function avoidHits(r) {
 }
 const HEALTHY = 65;
 const isHealthy = (r) => (r.healthScore ?? 0) >= HEALTHY;
+const isEasy = (r) => Boolean(r.easy ?? r.easyFlag);
 function meetsHealthGoals(r) {
   const s = state.settings;
   const n = r.nutrition;
@@ -352,6 +353,7 @@ function chips(r) {
   const out = [`<span class="chip">${PROTEIN_EMOJI[p] || ''} ${esc(PROTEIN_LABEL[p] || p)}</span>`];
   out.push(`<span class="chip price ${overBudget(r) ? 'over' : ''}" title="Estimated cost per serving">${money(cost(r))}/serving</span>`);
   if (r.totalMinutes) out.push(`<span class="chip">${icon('clock')}${r.totalMinutes} min</span>`);
+  if (isEasy(r)) out.push(`<span class="chip easy" title="Easy: few ingredients, little effort">${icon('bolt')}Easy</span>`);
   const n = r.nutrition;
   if (n?.kcal) {
     const tip = `Per serving${isHealthy(r) ? ` · healthy (score ${r.healthScore}/100)` : ''}`;
@@ -382,7 +384,7 @@ function renderPlan() {
     days.push(`
       <section class="panel day ${isoDate(date) === todayKey ? 'today' : ''} ${thisWeek && isoDate(date) < todayKey ? 'past' : ''}" data-day="${d}" aria-label="${DAY_NAMES[date.getDay()]}">
         <div class="day-head">
-          <h2>${DAY_NAMES[date.getDay()]}</h2>
+          <h2>${DAY_NAMES[date.getDay()]}${(settings.easyDays || []).includes(date.getDay()) && slots.some((s) => !s.off) ? ` <span class="easy-pill" title="Easy meals day (Settings)">${icon('bolt')}Easy</span>` : ''}</h2>
           <span class="dh-right">${date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
             ${slots.some((s) => !s.locked && !s.off) ? `<button class="icon-btn sm day-dice" data-action="reroll-day" data-day="${d}" title="New recipes for ${DAY_NAMES[date.getDay()]} (locked meals stay)" aria-label="Randomize ${DAY_NAMES[date.getDay()]}'s unlocked meals">${icon('dice')}</button>` : ''}
           </span>
@@ -766,6 +768,7 @@ function filteredRecipes() {
     if (f.meal === 'other' ? r.mealTypes.length : f.meal && !r.mealTypes.includes(f.meal)) return false;
     if (f.budget && !fitsSettings(r)) return false;
     if (f.healthy && !isHealthy(r)) return false;
+    if (f.easy && !isEasy(r)) return false;
     if (f.source && recipeSource(r) !== f.source) return false;
     if (q && !`${r.name} ${r.cuisine} ${r.category} ${r.tags.join(' ')} ${r.source}`.toLowerCase().includes(q)) return false;
     return true;
@@ -828,6 +831,7 @@ function renderRecipes() {
         <option value="newest" ${f.sort === 'newest' ? 'selected' : ''}>Newest first</option>
       </select>
       <button class="chip-toggle" data-action="filter-fav" aria-pressed="${f.favorites}">${icon(f.favorites ? 'heart-fill' : 'heart')}Favorites</button>
+      <button class="chip-toggle" data-action="filter-easy" aria-pressed="${Boolean(f.easy)}">${icon('bolt')}Easy</button>
       <button class="chip-toggle" data-action="filter-healthy" aria-pressed="${Boolean(f.healthy)}">${icon('leaf')}Healthy</button>
       <button class="chip-toggle" data-action="filter-budget" aria-pressed="${f.budget}" title="Only recipes the randomizer is allowed to pick (price, health goals, proteins, allergies & dislikes)">${icon('check')}Fits my settings</button>
     </div>
@@ -885,8 +889,14 @@ function renderSettings() {
                 const on = (s.mealDays?.[m] || [0, 1, 2, 3, 4, 5, 6]).includes(d);
                 return `<button class="md-cell" data-action="toggle-meal-day" data-meal="${m}" data-weekday="${d}" aria-pressed="${on}" aria-label="${m} on ${DAY_NAMES[d]}: ${on ? 'planned' : 'fend for yourself'}">${on ? icon('check') : icon('moon')}</button>`;
               }).join('')}`).join('')}
+            <span class="md-meal md-easy">${icon('bolt')}Easy</span>
+            ${weekOrder().map((d) => {
+              const on = (s.easyDays || []).includes(d);
+              return `<button class="md-cell easy" data-action="toggle-easy-day" data-weekday="${d}" aria-pressed="${on}" aria-label="Easy meals on ${DAY_NAMES[d]}: ${on ? 'yes' : 'no'}">${on ? icon('bolt') : ''}</button>`;
+            }).join('')}
           </div>
-          <small>Tap a day to turn that meal off, like dinner on nights you work. Those become "fend for yourself": no recipe, nothing on the grocery list. You can also skip a single meal from the plan.</small>
+          <small>Tap a day to turn that meal off, like dinner on nights you work. Those become "fend for yourself": no recipe, nothing on the grocery list. You can also skip a single meal from the plan. The ⚡ row marks easy-meal days.</small>
+          <label class="switch"><span><b>Easy meals on weekends</b><br><small class="subtle">Saturday and Sunday get quick, low-effort meals (grilled cheese, tacos, wraps…). Locked meals are never changed. Pick other easy days in the bottom row above.</small></span><input type="checkbox" data-action="easy-weekends" ${[0, 6].every((d) => (s.easyDays || []).includes(d)) ? 'checked' : ''}></label>
         </div>
         <div class="field">
           <label for="week-start">Week starts on</label>
@@ -1217,7 +1227,8 @@ function openEditor(d = {}, id = null) {
       </div>
       <div class="field">
         <span class="label">Good for</span>
-        <div class="chips">${MEALS.map((m) => `<label class="chip-toggle check" data-meal="${m}"><input type="checkbox" name="meal" value="${m}" ${meals.includes(m) ? 'checked' : ''}>${m}</label>`).join('')}</div>
+        <div class="chips">${MEALS.map((m) => `<label class="chip-toggle check" data-meal="${m}"><input type="checkbox" name="meal" value="${m}" ${meals.includes(m) ? 'checked' : ''}>${m}</label>`).join('')}
+          <label class="chip-toggle check"><input type="checkbox" name="easy" value="1" ${d.easy ?? d.easyFlag ? 'checked' : ''}>${icon('bolt')}Easy meal</label></div>
       </div>
       <div class="field"><label for="ed-ing">Ingredients <small class="subtle">one per line, e.g. "500g chicken breast"</small></label><textarea id="ed-ing" class="input" name="ingredientsText" rows="8" required>${esc(d.ingredientsText || '')}</textarea></div>
       <div class="field"><label for="ed-steps">Steps <small class="subtle">one per line</small></label><textarea id="ed-steps" class="input" name="instructionsText" rows="6">${esc(d.instructionsText || '')}</textarea></div>
@@ -1266,6 +1277,16 @@ function openImport() {
 modal.addEventListener('click', (e) => { if (e.target === modal) modal.close(); });
 
 // ---------- actions ----------
+
+// Change the easy days, then swap this week's unlocked meals on those days for easy ones.
+async function setEasyDays(days) {
+  const added = days.filter((d) => !(state.settings.easyDays || []).includes(d));
+  await updateSettings({ easyDays: days });
+  if (!added.length) return;
+  const res = await api('POST', `/api/weeks/${state.weekKey}/apply-easy`);
+  await setPlan(res);
+  toast(res.changed ? `Swapped in ${res.changed} easy meal${res.changed > 1 ? 's' : ''} (locked meals untouched)` : 'Easy days saved', '', 'easy');
+}
 
 async function updateSettings(patch) {
   state.settings = await api('PUT', '/api/settings', { ...state.settings, ...patch });
@@ -1378,6 +1399,7 @@ const actions = {
   },
   more: () => { state.recipeFilters.limit += PAGE * 2; render(); },
   'filter-fav': () => { state.recipeFilters.favorites = !state.recipeFilters.favorites; state.recipeFilters.limit = PAGE; render(); },
+  'filter-easy': () => { state.recipeFilters.easy = !state.recipeFilters.easy; state.recipeFilters.limit = PAGE; render(); },
   'filter-healthy': () => { state.recipeFilters.healthy = !state.recipeFilters.healthy; state.recipeFilters.limit = PAGE; render(); },
   'filter-budget': () => { state.recipeFilters.budget = !state.recipeFilters.budget; state.recipeFilters.limit = PAGE; render(); },
   'import-url': () => openImport(),
@@ -1386,6 +1408,11 @@ const actions = {
     if (modal.open) modal.close();
     await setPlan(await api('PATCH', `/api/weeks/${state.weekKey}/slots/${el.dataset.slot}`, { skip }));
     toast(skip ? 'Marked as fend for yourself' : 'Back on the plan');
+  },
+  'toggle-easy-day': (el) => {
+    const d = Number(el.dataset.weekday);
+    const cur = state.settings.easyDays || [];
+    return setEasyDays(cur.includes(d) ? cur.filter((x) => x !== d) : [...cur, d]);
   },
   'toggle-meal-day': (el) => {
     const { meal } = el.dataset;
@@ -1631,6 +1658,9 @@ document.addEventListener('change', (e) => {
       state.grocery = await api('PATCH', `/api/weeks/${state.weekKey}/grocery`, { extraId: el.dataset.id, checked: el.checked });
       render();
     });
+  } else if (el.dataset.action === 'easy-weekends') {
+    const cur = (state.settings.easyDays || []).filter((d) => d !== 0 && d !== 6);
+    busy(null, () => setEasyDays(el.checked ? [...cur, 0, 6] : cur));
   } else if (el.dataset.action === 'theme') {
     saveLocal('theme', el.value);
     document.documentElement.dataset.theme = el.value;
@@ -1726,6 +1756,7 @@ document.addEventListener('submit', (e) => {
       const payload = {
         ...data,
         mealTypes: fd.getAll('meal'),
+        easy: fd.get('easy') === '1',
         nutrition: { kcal: data.kcal, protein: data.protein, carbs: data.carbs, fat: data.fat },
       };
       const saved = await api(id ? 'PUT' : 'POST', id ? `/api/recipes/${encodeURIComponent(id)}` : '/api/recipes', payload);

@@ -312,3 +312,19 @@ test('re-rolling one day leaves every other day alone', () => {
     else assert.equal(s.recipeId, before[s.id], `${s.id} untouched`);
   }
 });
+
+test('easy days pick easy meals and never touch locked ones', async () => {
+  const { isEasy } = await import('../server/lib/planner.js');
+  const hard = (i) => finalizeRecipe({ id: `hard${i}`, name: `Hard ${i}`, category: 'Beef', totalMinutes: 120, ingredients: Array.from({ length: 12 }, (_, k) => ({ name: `beef ${k}`, measure: '1' })), instructions: Array(9).fill('Step') });
+  const easy = (i) => finalizeRecipe({ id: `easy${i}`, name: `Easy ${i}`, category: 'Beef', totalMinutes: 15, ingredients: [{ name: 'bread', measure: '2' }, { name: 'cheese', measure: '2' }], instructions: ['Toast.'] });
+  const recipes = [...Array.from({ length: 20 }, (_, i) => hard(i)), ...Array.from({ length: 20 }, (_, i) => easy(i))];
+  assert.equal(isEasy(recipes[0]), false);
+  assert.equal(isEasy(recipes[25]), true);
+  // Week of Monday 2026-10-05: Saturday is day 5, Sunday day 6.
+  const plan = ensureSlots({ key: '2026-10-05', slots: [] }, ['dinner']);
+  plan.slots[6].recipeId = 'hard3';
+  plan.slots[6].locked = true;
+  randomizePlan(plan, recipes, { meals: ['dinner'], excludedProteins: [], easyDays: [0, 6] });
+  assert.ok(plan.slots[5].recipeId.startsWith('easy'), 'Saturday gets an easy meal');
+  assert.equal(plan.slots[6].recipeId, 'hard3', 'locked Sunday meal stays');
+});

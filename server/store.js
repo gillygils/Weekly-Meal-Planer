@@ -4,6 +4,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { withNutrition, NUTRITION_VERSION } from './lib/nutrition.js';
+import { finalizeRecipe, isEasyRecipe } from './lib/recipes.js';
+import { parseIngredientLine } from './lib/grocery.js';
+import { easyMealDrafts } from './lib/easy-meals.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const SEED_FILE = path.join(here, 'seed', 'recipes.json');
@@ -33,6 +36,7 @@ export const DEFAULT_SETTINGS = {
   ],
   currency: '$',
   weekStartsOn: 1, // 0 = Sunday, 1 = Monday
+  easyDays: [], // weekdays (0 = Sunday) where the randomizer picks easy meals
 };
 
 export function sanitizeSettings(input, base = DEFAULT_SETTINGS) {
@@ -75,6 +79,7 @@ export function sanitizeSettings(input, base = DEFAULT_SETTINGS) {
   if (input.countPantry != null) s.countPantry = Boolean(input.countPantry);
   if (input.favoritesBoost != null) s.favoritesBoost = Boolean(input.favoritesBoost);
   if (input.currency != null) s.currency = String(input.currency).slice(0, 4) || '$';
+  if (Array.isArray(input.easyDays)) s.easyDays = [...new Set(input.easyDays.map(Number).filter((d) => Number.isInteger(d) && d >= 0 && d <= 6))].sort();
   if (input.weekStartsOn != null) s.weekStartsOn = Number(input.weekStartsOn) === 0 ? 0 : 1;
   return s;
 }
@@ -108,13 +113,15 @@ export class Store {
   mergeSeed() {
     if (!fs.existsSync(SEED_FILE)) return 0;
     const seed = JSON.parse(fs.readFileSync(SEED_FILE, 'utf8'));
-    return this.addRecipes(seed);
+    const easy = easyMealDrafts(parseIngredientLine).map((d) => withNutrition(finalizeRecipe(d)));
+    return this.addRecipes([...seed, ...easy]);
   }
 
   /** Add or refresh macros on recipes saved before nutrition existed (or an older estimate). */
   backfillNutrition() {
     let n = 0;
     for (const r of this.db.recipes) {
+      if (typeof r.easyFlag !== 'boolean') r.easyFlag = isEasyRecipe(r);
       if (r.nutrition?.version === NUTRITION_VERSION || r.nutrition?.source === 'manual') continue;
       // Older TheMealDB imports assumed 4 servings; let the estimator correct that.
       if (r.id.startsWith('mealdb-') && r.servingsEstimated == null) r.servingsEstimated = true;

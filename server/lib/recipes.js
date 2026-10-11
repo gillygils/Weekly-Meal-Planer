@@ -12,7 +12,7 @@ export const MEAL_TYPES = ['breakfast', 'lunch', 'dinner'];
 const PROTEIN_RULES = {
   chicken: { words: ['chicken'], not: ['chicken stock', 'chicken broth', 'chicken bouillon', 'chicken stock cube'] },
   beef: { words: ['beef', 'steak', 'brisket', 'veal', 'oxtail', 'minced meat', 'mince', 'sirloin', 'ribeye', 'meatball'], not: ['beef stock', 'beef broth', 'beef bouillon', 'beef stock cube', 'beef gravy', 'pork mince', 'lamb mince', 'turkey mince', 'chicken mince', 'tuna steak', 'salmon steak'] },
-  pork: { words: ['pork', 'bacon', 'ham', 'sausage', 'chorizo', 'prosciutto', 'pancetta', 'salami', 'pepperoni', 'lardons', 'gammon', 'spare ribs'], not: ['chicken sausage', 'turkey sausage', 'vegetarian sausage', 'turkey bacon', 'hamburger bun', 'graham'] },
+  pork: { words: ['pork', 'bacon', 'ham', 'sausage', 'kielbasa', 'hot dog', 'frankfurter', 'bratwurst', 'chorizo', 'prosciutto', 'pancetta', 'salami', 'pepperoni', 'lardons', 'gammon', 'spare ribs'], not: ['chicken sausage', 'turkey sausage', 'vegetarian sausage', 'turkey bacon', 'hamburger bun', 'graham'] },
   lamb: { words: ['lamb', 'mutton'], not: ["lamb's lettuce"] },
   goat: { words: ['goat'], not: ['goat cheese', 'goats cheese', "goat's cheese", 'goat milk'] },
   turkey: { words: ['turkey'], not: [] },
@@ -194,8 +194,23 @@ export function finalizeRecipe(r) {
     addedAt: r.addedAt || new Date().toISOString(),
     reportedNutrition: r.reportedNutrition || null,
     servingsEstimated: Boolean(r.servingsEstimated),
+    easy: r.easy ?? null,
+    easyFlag: isEasyRecipe({ ...r, ingredients, instructions: r.instructions || [] }),
     creator: r.creator || '',
   };
+}
+
+/**
+ * Easy = low effort: tagged easy, or short (few ingredients, few steps, quick).
+ * Used for "easy weekends" and the Easy filter.
+ */
+export function isEasyRecipe(r) {
+  if (r.easy != null) return Boolean(r.easy);
+  if ((r.tags || []).some((t) => /^(easy|quick)$/i.test(t))) return true;
+  const n = (r.ingredients || []).length;
+  const steps = (r.instructions || []).length;
+  const mins = Number(r.totalMinutes) || 0;
+  return n > 0 && n <= 8 && steps <= 6 && (!mins || mins <= 35);
 }
 
 export function recipeCost(r) {

@@ -109,7 +109,7 @@ const DB = [
   [['cooked rice', 'microwave rice', 'leftover rice'], 130, 2.7, 28, 0.3, 0.4, { cup: 158, buy: [250, 'g', 1.8, 'pouch'] }],
   [['pasta', 'spaghetti', 'penne', 'fusilli', 'rigatoni', 'linguine', 'fettuccine', 'tagliatelle', 'macaroni', 'farfalle', 'orzo', 'lasagne sheets', 'lasagna noodles', 'lasagne', 'lasagna', 'shells', 'orecchiette', 'pappardelle', 'conchiglie', 'ziti', 'bucatini'], 371, 13, 75, 1.5, 3.2, { cup: 100, buy: [454, 'g', 1.6, '1 lb box'] }],
   [['protein pasta', 'chickpea pasta', 'lentil pasta'], 350, 20, 55, 6, 8, { cup: 100, buy: [227, 'g', 2.8, '8 oz box'] }],
-  [['egg noodles', 'noodles', 'ramen', 'udon', 'soba', 'lo mein', 'chow mein noodles', 'rice noodles', 'vermicelli', 'glass noodles', 'rice vermicelli'], 360, 10, 75, 2, 2.5, { cup: 100, buy: [340, 'g', 2.2, 'pack'] }],
+  [['egg noodles', 'noodles', 'ramen', 'udon', 'soba', 'lo mein', 'chow mein noodles', 'rice noodles', 'vermicelli', 'glass noodles', 'rice vermicelli', 'instant ramen'], 360, 10, 75, 2, 2.5, { each: 85, cup: 100, buy: [340, 'g', 2.2, 'pack'] }],
   [['couscous', 'bulgur', 'bulghur', 'quinoa', 'pearl barley', 'barley', 'farro', 'freekeh', 'millet', 'polenta', 'cornmeal', 'grits'], 365, 12, 70, 3, 6, { cup: 175, buy: [454, 'g', 3.5, '1 lb'] }],
   [['oats', 'rolled oats', 'porridge oats', 'oatmeal', 'quick oats'], 379, 13, 68, 6.5, 10, { cup: 81, buy: [1190, 'g', 4.5, '42 oz canister'] }],
   [['bread', 'sliced bread', 'white bread', 'wholemeal bread', 'sourdough', 'whole wheat bread', 'toast'], 265, 9, 49, 3.2, 2.7, { each: 30, cup: 45, buy: [567, 'g', 3, 'loaf'] }],
@@ -162,7 +162,23 @@ const DB = [
   // ---- Spices & seasonings (pantry) ----
   [['salt', 'sea salt', 'kosher salt', 'table salt', 'flaky salt'], 0, 0, 0, 0, 0, { cup: 290, buy: [737, 'g', 1.5, 'canister'], pantry: true }],
   [['black pepper', 'pepper', 'ground black pepper', 'white pepper', 'peppercorns', 'salt and pepper', 'cracked black pepper'], 250, 10, 64, 3.3, 25, { cup: 110, buy: [85, 'g', 4, 'jar'], pantry: true }],
-  [['cumin', 'ground cumin', 'cumin seeds', 'paprika', 'smoked paprika', 'sweet paprika', 'turmeric', 'ground turmeric', 'cinnamon', 'ground cinnamon', 'cinnamon stick', 'nutmeg', 'ground coriander', 'coriander seeds', 'garam masala', 'curry powder', 'chili powder', 'chilli powder', 'chilli flakes', 'chili flakes', 'red pepper flakes', 'cayenne', 'cayenne pepper', 'cloves', 'ground cloves', 'cardamom', 'cardamom pods', 'allspice', 'star anise', 'fennel seeds', 'mustard seeds', 'oregano', 'dried oregano', 'dried thyme', 'dried basil', 'italian seasoning', 'mixed herbs', 'herbes de provence', 'garlic powder', 'onion powder', 'ginger powder', 'ground ginger', 'cajun seasoning', 'taco seasoning', 'chinese five spice', 'five spice', 'za\'atar', 'sumac', 'saffron', 'fenugreek', 'kasuri methi', 'chaat masala', 'tandoori masala', 'everything bagel seasoning', 'old bay', 'seasoning', 'spice', 'spices', 'msg', 'dried parsley', 'dill weed', 'dried rosemary'], 300, 12, 55, 10, 30, { cup: 100, buy: [60, 'g', 3, 'jar'], pantry: true }],
+  [['cumin', 'ground cumin', 'cumin seeds', 'paprika', 'smoked paprika', 'sweet paprika', 'turmeric', 'ground turmeric', 'cinnamon', 'ground cinnamon', 'cinnamon stick', 'nutmeg', 'ground coriander', 'coriander seeds', 'garam masala', 'curry powder', 'chili powder', 'chilli powder', 'chilli flakes', 'chili flakes', 'red pepper flakes', 'cayenne', 'cayenne pepper', 'cloves', 'ground cloves', 'cardamom', 'cardamom pods', 'allspice', 'star anise', 'fennel seeds', 'mustard seeds', 'oregano', 'dried oregano', 'dried thyme', 'dried basil', 'italian seasoning', 'mixed herbs', 'herbes de provence', 'garlic powder', 'onion powder', 'ginger powder', 'ground ginger', 'cajun seasoning', 'taco seasoning', 'chinese five spice', 'five spice', 'za\'atar', 'sumac', 'saffron', 'fenugreek', 'kasuri methi', 'chaat masala', 'tandoori masala', 'everything bagel seasoning', 'old bay', 'seasoning', 'spice', 'spices', 'msg', 'dried parsley', 'dill weed', 'dried rosemary', 'fajita seasoning'], 300, 12, 55, 10, 30, { each: 28, cup: 100, buy: [60, 'g', 3, 'jar'], pantry: true }],
+
+  // ---- Convenience foods ----
+  [['hot dog', 'hot dogs', 'frankfurter', 'frankfurters', 'wiener'], 290, 10.5, 2.5, 26, 0, { each: 45, buy: [8, 'each', 4, '8 pack'] }],
+  [['kielbasa', 'smoked sausage', 'polish sausage'], 300, 12, 3, 27, 0, { each: 400, buy: [397, 'g', 4.5, '14 oz link'] }],
+  [['alfredo sauce', 'jar alfredo sauce'], 150, 2.5, 4, 14, 0, { cup: 250, each: 425, buy: [425, 'g', 3.5, '15 oz jar'] }],
+  [['pizza sauce'], 50, 2, 9, 1, 2, { cup: 250, buy: [397, 'g', 2.3, '14 oz jar'] }],
+  [['ranch dressing', 'ranch', 'caesar dressing', 'dressing', 'honey mustard', 'thousand island', 'blue cheese dressing', 'italian dressing'], 450, 1, 6, 47, 0, { cup: 240, buy: [473, 'ml', 3.5, '16 oz bottle'], pantry: true }],
+  [['relish', 'pickle relish', 'sweet relish'], 130, 0.5, 35, 0.5, 1, { cup: 245, buy: [296, 'ml', 2.5, 'jar'], pantry: true }],
+  [['french fries', 'frozen french fries', 'fries', 'tater tots', 'hash browns'], 150, 2.5, 24, 5, 2.5, { cup: 80, buy: [907, 'g', 3.5, '2 lb bag'] }],
+  [['stir fry vegetables', 'frozen stir fry vegetables', 'mixed vegetables', 'frozen vegetables', 'peas and carrots', 'frozen peas and carrots'], 45, 2.5, 8, 0.3, 3, { cup: 130, buy: [340, 'g', 2.3, '12 oz bag'] }],
+  [['pierogies', 'pierogi', 'frozen pierogies', 'potstickers', 'dumplings'], 200, 5, 32, 5, 1.5, { each: 40, buy: [454, 'g', 3.5, '16 oz box'] }],
+  [['pancake mix', 'waffle mix', 'biscuit mix', 'bisquick'], 360, 8, 72, 4, 2, { cup: 120, buy: [907, 'g', 3.5, '32 oz box'], pantry: true }],
+  [['granola', 'cereal'], 470, 10, 64, 20, 6, { cup: 120, buy: [340, 'g', 4, 'bag'] }],
+  [['tomato soup', 'condensed tomato soup', 'cream of mushroom soup', 'cream of chicken soup'], 75, 1.5, 15, 1, 1, { cup: 250, each: 305, buy: [305, 'g', 1.3, '10.75 oz can'] }],
+  [['shaved steak', 'sliced steak'], 190, 21, 0, 11, 0, { buy: [LB, 'g', 8.5, 'per lb'], loose: true }],
+  [['tortilla chips', 'corn chips'], 490, 7, 63, 23, 5, { cup: 28, buy: [369, 'g', 4, '13 oz bag'] }],
 
   // ---- Drinks / misc ----
   [['water', 'ice', 'boiling water', 'cold water', 'warm water', 'hot water', 'ice cubes'], 0, 0, 0, 0, 0, { cup: 240, free: true }],
@@ -218,7 +234,10 @@ export function toGrams(qty, unit, entry) {
   if (VOLUME_ML[unit]) return (qty * VOLUME_ML[unit] / 236.6) * (entry?.cup || 240);
   if (unit === '' || unit === 'piece') return qty * (entry?.each || (unit === 'piece' ? 100 : 50));
   if (unit === 'clove') return qty * (entry?.words.includes('garlic') ? 5 : entry?.each || 5);
-  if (unit === 'can') return qty * 400;
+  if (unit === 'can') return qty * (entry?.each && entry.each >= 150 ? entry.each : 400);
+  if (unit === 'pack' && entry?.each) return qty * entry.each;
+  if (unit === 'loaf') return qty * 450;
+  if (unit === 'jar') return qty * (entry?.each && entry.each >= 150 ? entry.each : 680);
   if (unit === 'stick' && entry?.words.includes('butter')) return qty * 113;
   if (COUNT_GRAMS[unit]) return qty * (unit === 'slice' && entry?.each ? entry.each : COUNT_GRAMS[unit]);
   return null;
@@ -231,7 +250,7 @@ export function toBuyUnits(qty, unit, entry) {
   if (buyUnit === 'each') {
     // Garlic is bought by the head (~10 cloves) but recipes count cloves.
     if (entry.words.includes('garlic') && (unit === 'clove' || unit === '')) return qty / 10;
-    if (['', 'piece', 'head', 'bunch', 'fillet', 'pack', 'stalk'].includes(unit)) return qty;
+    if (['', 'piece', 'head', 'bunch', 'fillet', 'pack', 'stalk', 'jar', 'loaf'].includes(unit)) return qty;
     if (unit === 'sprig' || unit === 'handful') return qty / 8; // a bunch has plenty
     const g = toGrams(qty, unit, entry);
     return g != null && entry.each ? g / entry.each : null;

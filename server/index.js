@@ -5,7 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { Store, sanitizeSettings } from './store.js';
-import { ensureSlots, randomizePlan, moveMeal, activeSlots } from './lib/planner.js';
+import { ensureSlots, randomizePlan, moveMeal, activeSlots, isEasy, wantsEasy } from './lib/planner.js';
 import { pantryMatch, PLACES, STAPLES } from './lib/pantry.js';
 import { buildGroceryList } from './lib/grocery.js';
 import { fetchAllSources, importLink, normalizeUrl, pullCreatorSite, SUGGESTED_CREATORS } from './lib/sources.js';
@@ -345,6 +345,16 @@ route('POST', '/api/weeks/:key/slots/:slot/reroll', ({ params }) => {
   randomizePlan(plan, store.db.recipes, store.db.settings, { recentIds: recentIds(plan.key), onlySlotId: slot.id });
   store.save();
   return plan;
+});
+// After turning on easy days: swap any unlocked, not-yet-easy meals on those days.
+route('POST', '/api/weeks/:key/apply-easy', ({ params }) => {
+  const plan = getWeek(params.key);
+  const settings = store.db.settings;
+  const swap = (s) => wantsEasy(plan, s, settings) && !(s.recipeId && isEasy(store.recipe(s.recipeId) || {}));
+  const changed = plan.slots.filter((s) => !s.locked && !s.off && swap(s)).length;
+  randomizePlan(plan, store.db.recipes, settings, { recentIds: recentIds(plan.key), onlyIf: swap });
+  store.save();
+  return { ...plan, changed };
 });
 route('POST', '/api/weeks/:key/days/:day/reroll', ({ params }) => {
   const plan = getWeek(params.key);

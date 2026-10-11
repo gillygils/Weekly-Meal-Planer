@@ -23,7 +23,7 @@ const UNITS = {
   stick: ['stick', 1], sticks: ['stick', 1],
   pinch: ['pinch', 1], pinches: ['pinch', 1], dash: ['dash', 1],
   packet: ['pack', 1], packets: ['pack', 1], pack: ['pack', 1], packs: ['pack', 1], package: ['pack', 1], packages: ['pack', 1], pkg: ['pack', 1],
-  head: ['head', 1], heads: ['head', 1], stalk: ['stalk', 1], stalks: ['stalk', 1],
+  head: ['head', 1], heads: ['head', 1], loaf: ['loaf', 1], loaves: ['loaf', 1], jar: ['jar', 1], jars: ['jar', 1], bag: ['pack', 1], bags: ['pack', 1], box: ['pack', 1], boxes: ['pack', 1], stalk: ['stalk', 1], stalks: ['stalk', 1],
   fillet: ['fillet', 1], fillets: ['fillet', 1], piece: ['piece', 1], pieces: ['piece', 1],
 };
 

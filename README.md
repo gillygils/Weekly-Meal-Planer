@@ -40,6 +40,9 @@ A self-hostable weekly meal planner for your household. Randomize a week of meal
   - Allergen groups catch hidden sources too, like butter for dairy or soy sauce for gluten.
   - Common alternative names are matched as well (cilantro/coriander, eggplant/aubergine, shrimp/prawn…).
 - **Meals per day.** Plan breakfast, lunch and/or dinner (dinner only by default).
+- **Easy meals.** About 50 low-effort meals are built in (grilled cheese, quesadillas, tacos, sloppy joes, wraps, fried rice, breakfast burritos…), and any short, quick recipe counts as easy too. Filter by **Easy** on the Recipes tab, or tick **Easy meal** on your own recipes.
+  - **Easy meals on weekends** (Settings) makes the randomizer pick easy meals on Saturday and Sunday. Use the ⚡ row in the days grid to choose other easy days.
+  - Turning it on swaps this week's unlocked meals on those days for easy ones. Locked meals are never changed.
 - **Meal days.** In Settings, switch off any meal on any weekday (e.g. no dinner on Wednesdays). Those become "fend for yourself": nothing is planned and nothing goes on the grocery list. You can also skip a single meal, or plan one anyway, for just this week from the plan.
 - **PIN lock.** You set a PIN (4–8 digits) the first time you open the app; after that each device asks for it once every 24 hours. Wrong guesses are slowed down (5 tries, then waits that grow), so a PIN can't be guessed. Change the PIN, lock a device or sign out every device in Settings.
 - **Responsive, modern UI.** It scales smoothly from phone to 4K TV, has a black, dark grey and orange theme (a light theme is available in Settings), can be installed to a phone's home screen (PWA), and can be driven with a keyboard or TV remote.

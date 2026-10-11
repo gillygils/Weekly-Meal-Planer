@@ -3,7 +3,7 @@ import { lookupIngredient, toGrams } from './ingredients.js';
 import { parseMeasure } from './grocery.js';
 
 // Bump when the estimate logic changes so stored recipes get recalculated.
-export const NUTRITION_VERSION = 4;
+export const NUTRITION_VERSION = 5;
 
 const NEGLIGIBLE = /^(to taste|pinch|dash|garnish|to serve|for serving|for garnish|as needed|as required|optional|sprinkl|drizzle|splash|spray|few|a little)/i;
 
