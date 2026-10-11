@@ -328,3 +328,23 @@ test('easy days pick easy meals and never touch locked ones', async () => {
   assert.ok(plan.slots[5].recipeId.startsWith('easy'), 'Saturday gets an easy meal');
   assert.equal(plan.slots[6].recipeId, 'hard3', 'locked Sunday meal stays');
 });
+
+test('re-rolling keeps offering new dishes before repeating', async () => {
+  const { sameDish, dishWords } = await import('../server/lib/planner.js');
+  assert.ok(sameDish(dishWords({ name: 'Chicken Alfredo' }), dishWords({ name: 'Fettucine alfredo' })));
+  assert.ok(!sameDish(dishWords({ name: 'Chicken Alfredo' }), dishWords({ name: 'Chicken Tacos' })));
+  const names = ['Chicken Alfredo', 'Fettuccine Alfredo', 'Chicken Alfredo Pasta', 'Tacos', 'Grilled Cheese', 'Chili', 'BLT', 'Quesadillas'];
+  const recipes = names.map((name, i) => ({ id: `r${i}`, name, mealTypes: ['dinner'], proteins: [], ingredients: [] }));
+  const plan = ensureSlots({ key: '2026-10-12', slots: [] }, ['dinner']);
+  const seen = [];
+  // Plenty of distinct dishes: six clicks never show the same dish twice (all three Alfredos count as one).
+  for (let i = 0; i < 6; i++) {
+    randomizePlan(plan, recipes, { meals: ['dinner'], excludedProteins: [] }, { onlySlotId: '5-dinner', rng: () => 0 });
+    seen.push(dishWords(recipes.find((r) => r.id === plan.slots[5].recipeId)));
+  }
+  // Day 5 starts empty, other days are empty too, so the six picks are six different dishes.
+  for (let i = 0; i < seen.length; i++) for (let j = i + 1; j < seen.length; j++) assert.ok(!sameDish(seen[i], seen[j]), `repeat at ${i},${j}`);
+  // Once every dish has been shown it still picks something instead of giving up.
+  for (let i = 0; i < 4; i++) randomizePlan(plan, recipes, { meals: ['dinner'], excludedProteins: [] }, { onlySlotId: '5-dinner' });
+  assert.ok(plan.slots[5].recipeId);
+});

@@ -87,6 +87,28 @@ function nameKey(r) {
   return r.name.toLowerCase().replace(/[^a-z]/g, '');
 }
 
+// Words that don't tell dishes apart ("Chicken Alfredo" and "Fettuccine Alfredo" are the same idea).
+const FILLER = new Set(('a an and the with of in on for to my easy quick simple homemade best classic style recipe one pot pan sheet skillet '
+  + 'minute healthy chicken beef pork turkey shrimp fish salmon tuna tofu sausage steak ground pasta rice').split(' '));
+
+/** The words that make a dish what it is, e.g. "Chicken Alfredo Pasta" -> {alfredo}. */
+export function dishWords(r) {
+  const words = r.name.toLowerCase().normalize('NFD').replace(/[^a-z\s]/g, ' ').split(/\s+/)
+    .filter((w) => w.length > 1 && !FILLER.has(w))
+    .map((w) => w.replace(/(?<=[^s])s$/, '').replace(/^fettucine$/, 'fettuccine'));
+  return new Set(words.length ? words : [nameKey(r)]);
+}
+
+/** Two dishes are "the same thing" when they share at least half of their key words. */
+export function sameDish(a, b) {
+  let shared = 0;
+  for (const w of a) if (b.has(w)) shared++;
+  return shared > 0 && shared / Math.max(a.size, b.size) >= 0.5;
+}
+
+// How many recent picks per week the randomizer remembers so it doesn't keep offering them again.
+const SEEN_LIMIT = 40;
+
 function weightedPick(candidates, settings, rng, preferEasy = false) {
   const weights = candidates.map((r) => {
     let w = settings.favoritesBoost && r.favorite ? 3 : 1;
@@ -109,19 +131,24 @@ function weightedPick(candidates, settings, rng, preferEasy = false) {
  * Pick a recipe for one slot. Tries strict rules first (unique in week, not
  * used last week, within budget) and relaxes them only when nothing fits.
  */
-export function pickRecipe({ meal, recipes, settings, usedIds, usedNames, recentIds, rng = Math.random, preferEasy = false }) {
+export function pickRecipe({ meal, recipes, settings, usedIds, usedNames, recentIds, usedDishes = [], seenIds = new Set(), seenDishes = [], rng = Math.random, preferEasy = false }) {
+  // `seen` = shown recently in this week (re-rolls), `dupNames` = the same dish elsewhere this week.
   const passes = [
-    { budget: true, health: true, recent: true, dupNames: true },
-    { budget: true, health: true, recent: false, dupNames: true },
-    { budget: true, health: true, recent: false, dupNames: false },
-    { budget: true, health: false, recent: false, dupNames: false },
-    { budget: false, health: false, recent: false, dupNames: false },
+    { budget: true, health: true, recent: true, dupNames: true, seen: true },
+    { budget: true, health: true, recent: false, dupNames: true, seen: true },
+    { budget: true, health: true, recent: false, dupNames: true, seen: false },
+    { budget: true, health: true, recent: false, dupNames: false, seen: false },
+    { budget: true, health: false, recent: false, dupNames: false, seen: false },
+    { budget: false, health: false, recent: false, dupNames: false, seen: false },
   ];
+  const dish = new Map();
+  const dishOf = (r) => dish.get(r.id) || dish.set(r.id, dishWords(r)).get(r.id);
   for (const pass of passes) {
     const candidates = recipes.filter((r) =>
       matchesFilters(r, meal, settings, { ignoreBudget: !pass.budget, ignoreHealth: !pass.health }) &&
       !usedIds.has(r.id) &&
-      !(pass.dupNames && usedNames.has(nameKey(r))) &&
+      !(pass.dupNames && (usedNames.has(nameKey(r)) || usedDishes.some((d) => sameDish(d, dishOf(r))))) &&
+      !(pass.seen && (seenIds.has(r.id) || seenDishes.some((d) => sameDish(d, dishOf(r))))) &&
       !(pass.recent && recentIds.has(r.id)));
     if (candidates.length) {
       if (!pass.budget) {
@@ -135,13 +162,12 @@ export function pickRecipe({ meal, recipes, settings, usedIds, usedNames, recent
   return null;
 }
 
-/** Fill all unlocked slots (or just `onlySlotId`) with random recipes. */
-/** Fill unlocked meals with random recipes: the whole week, one day (`onlyDay`) or one meal (`onlySlotId`). */
 export const isEasy = (r) => (typeof r.easyFlag === 'boolean' ? r.easyFlag : isEasyRecipe(r));
 
 /** True when this slot falls on one of the "easy meals" days in Settings. */
 export const wantsEasy = (plan, s, settings) => (settings.easyDays || []).includes(weekdayOf(plan.key, s.day));
 
+/** Fill unlocked meals with random recipes: the whole week, one day (`onlyDay`) or one meal (`onlySlotId`). */
 export function randomizePlan(plan, recipes, settings, { recentIds = new Set(), onlySlotId = null, onlyDay = null, onlyIf = null, rng = Math.random } = {}) {
   const byId = new Map(recipes.map((r) => [r.id, r]));
   // Allergies & dislikes are a hard rule: those recipes are never candidates.
@@ -150,11 +176,18 @@ export function randomizePlan(plan, recipes, settings, { recentIds = new Set(), 
   const easyPool = pool.filter(isEasy);
   const usedIds = new Set();
   const usedNames = new Set();
+  const usedDishes = [];
+  // Recipes this week has already shown, so repeated clicks keep bringing up something new.
+  plan.seen = (plan.seen || []).filter((id) => byId.has(id));
+  for (const s of plan.slots) if (s.recipeId && byId.has(s.recipeId) && !plan.seen.includes(s.recipeId)) plan.seen.push(s.recipeId);
+  const seenIds = new Set(plan.seen);
+  const seenDishes = plan.seen.map((id) => dishWords(byId.get(id)));
   const reroll = (s) => !s.locked && !s.off && (onlySlotId ? s.id === onlySlotId : onlyDay != null ? s.day === onlyDay : onlyIf ? onlyIf(s) : true);
   for (const s of plan.slots) {
     if (!reroll(s) && s.recipeId && byId.has(s.recipeId)) {
       usedIds.add(s.recipeId);
       usedNames.add(nameKey(byId.get(s.recipeId)));
+      usedDishes.push(dishWords(byId.get(s.recipeId)));
     }
   }
   for (const s of plan.slots) {
@@ -162,14 +195,17 @@ export function randomizePlan(plan, recipes, settings, { recentIds = new Set(), 
     // Re-rolling a single slot should give something different from what's there now.
     if ((onlySlotId || onlyDay != null) && s.recipeId) usedIds.add(s.recipeId);
     // Easy days pick from the easy recipes first, and only fall back if none fit.
-    const args = { meal: s.meal, settings, usedIds, usedNames, recentIds, rng };
+    const args = { meal: s.meal, settings, usedIds, usedNames, usedDishes, seenIds, seenDishes, recentIds, rng };
     const pick = (wantsEasy(plan, s, settings) && pickRecipe({ ...args, recipes: easyPool, preferEasy: true })) || pickRecipe({ ...args, recipes: pool });
     s.recipeId = pick ? pick.id : null;
     if (pick) {
       usedIds.add(pick.id);
       usedNames.add(nameKey(pick));
+      usedDishes.push(dishWords(pick));
+      plan.seen.push(pick.id);
     }
   }
+  plan.seen = [...new Set(plan.seen)].slice(-SEEN_LIMIT);
   plan.updatedAt = new Date().toISOString();
   return plan;
 }
