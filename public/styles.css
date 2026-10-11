@@ -354,6 +354,21 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select:
 .day.drop-target { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow); }
 .meal.drop-target { outline: 2px dashed var(--accent); outline-offset: 3px; }
 
+.meal.off-slot {
+  display: grid; justify-items: center; gap: .25rem; padding: 1rem .8rem; text-align: center;
+  background: repeating-linear-gradient(135deg, var(--surface-2) 0 10px, transparent 10px 20px); border: 1px dashed var(--border); color: var(--muted);
+}
+.meal.off-slot > svg { width: 1.6rem; height: 1.6rem; color: var(--muted); }
+.meal.off-slot b { color: var(--text); font-size: 1rem; }
+.meal.off-slot span { font-size: .82rem; }
+.meal.off-slot .btn { margin-top: .3rem; }
+.meal-days { display: grid; grid-template-columns: auto repeat(7, minmax(0, 1fr)); gap: .35rem; align-items: center; }
+.md-head { text-align: center; font-size: .75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.md-meal { font-weight: 650; text-transform: capitalize; padding-right: .4rem; font-size: .9rem; }
+.md-cell { display: grid; place-items: center; height: 2.6rem; border-radius: var(--radius-sm); border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent-strong); }
+.md-cell[aria-pressed="false"] { border: 1px dashed var(--border); background: transparent; color: var(--muted); }
+.md-cell svg { width: 1.1rem; height: 1.1rem; }
+
 .meal.empty-slot { border: 2px dashed var(--border); background: transparent; padding: 1rem; gap: .6rem; align-items: center; text-align: center; color: var(--muted); }
 .meal.empty-slot .row { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; }
 
@@ -551,8 +566,8 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select:
 .macros-in label { display: grid; gap: .3rem; font-size: .85rem; color: var(--muted); }
 
 /* PIN lock */
-body.locked > :not(.lock):not(svg):not(script) { visibility: hidden; }
-.lock {
+body.locked > :not(.pin-lock):not(svg):not(script) { visibility: hidden; }
+.pin-lock {
   position: fixed; inset: 0; z-index: 500; display: grid; place-items: center; overflow-y: auto;
   padding: calc(1.5rem + env(safe-area-inset-top, 0px)) 1rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
   background: radial-gradient(60rem 40rem at 50% -10%, color-mix(in srgb, var(--accent) 16%, var(--bg)), var(--bg));

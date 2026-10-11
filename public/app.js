@@ -80,7 +80,7 @@ function pinScreen(mode) {
   return new Promise((resolve) => {
     if (modal.open) modal.close();
     const el = document.createElement('div');
-    el.className = 'lock';
+    el.className = 'pin-lock';
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-modal', 'true');
     el.setAttribute('aria-labelledby', 'lock-title');
@@ -365,8 +365,9 @@ function chips(r) {
 function renderPlan() {
   const { plan, settings } = state;
   const enabled = MEALS.filter((m) => settings.meals.includes(m) || plan.slots.some((s) => s.meal === m));
-  const filled = plan.slots.filter((s) => s.recipeId && state.byId.has(s.recipeId));
-  const locked = plan.slots.filter((s) => s.locked).length;
+  const active = plan.slots.filter((s) => !s.off);
+  const filled = active.filter((s) => s.recipeId && state.byId.has(s.recipeId));
+  const locked = active.filter((s) => s.locked).length;
   const weekCost = filled.reduce((sum, s) => sum + cost(state.byId.get(s.recipeId)) * settings.householdSize, 0);
   const avg = filled.length ? weekCost / filled.length / settings.householdSize : 0;
   const over = settings.maxPricePerServing > 0 && avg > settings.maxPricePerServing;
@@ -382,14 +383,14 @@ function renderPlan() {
       <section class="panel day ${isoDate(date) === todayKey ? 'today' : ''} ${thisWeek && isoDate(date) < todayKey ? 'past' : ''}" data-day="${d}" aria-label="${DAY_NAMES[date.getDay()]}">
         <div class="day-head"><h2>${DAY_NAMES[date.getDay()]}</h2><span>${date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span></div>
         ${slots.map((s) => `${enabled.length > 1 ? `<div class="meal-label">${s.meal}</div>` : ''}${renderSlot(s)}`).join('')}
-        ${dayMacros(slots)}
+        ${dayMacros(slots.filter((s) => !s.off))}
       </section>`);
   }
 
   return `
     <div class="toolbar">
       <div class="stats">
-        <span><strong>${filled.length}</strong>/${plan.slots.length} meals</span>
+        <span><strong>${filled.length}</strong>/${active.length} meals</span>
         <span><strong>${locked}</strong> locked</span>
         ${weekMacros(filled)}
         <span class="${over ? 'over' : ''}" title="Feeds ${settings.householdSize}"><strong>${money(weekCost)}</strong> est. week · ${money(avg)}/serving</span>
@@ -417,6 +418,7 @@ function dayMacros(slots) {
   const target = s.dailyCalories > 0 ? Math.min(100, (t.kcal / s.dailyCalories) * 100) : null;
   const ptarget = s.dailyProtein > 0 ? Math.min(100, (t.protein / s.dailyProtein) * 100) : null;
   const label = meals.length < slots.length ? 'planned meals' : slots.length > 1 ? 'day total' : 'per person';
+  if (!slots.length) return '';
   return `
     <div class="day-macros" title="Per person, from ${meals.length} planned meal${meals.length > 1 ? 's' : ''} (estimated)">
       <div class="dm-top"><span><b>${fmt(t.kcal)}</b> kcal${s.dailyCalories > 0 ? ` <small>/ ${fmt(s.dailyCalories)}</small>` : ''}</span><small>${label}</small></div>
@@ -441,6 +443,16 @@ function weekMacros(filled) {
 }
 
 function renderSlot(s) {
+  if (s.off) {
+    const oneOff = s.skip === true;
+    return `
+      <div class="meal off-slot" data-day="${s.day}" data-meal="${s.meal}">
+        ${icon('moon')}
+        <b>Fend for yourself</b>
+        <span>${oneOff ? `No ${s.meal} planned this week` : `No ${s.meal} on ${DAY_NAMES[(parseKey(state.weekKey).getDay() + s.day) % 7]}s (Settings)`}</span>
+        <button class="btn sm ghost" data-action="skip-slot" data-slot="${s.id}" data-skip="${oneOff ? 'null' : 'false'}">${icon('plus')}Plan ${s.meal} anyway</button>
+      </div>`;
+  }
   const r = s.recipeId && state.byId.get(s.recipeId);
   if (!r) {
     return `
@@ -449,6 +461,7 @@ function renderSlot(s) {
         <div class="row">
           <button class="btn" data-action="reroll" data-slot="${s.id}">${icon('dice')}Random</button>
           <button class="btn" data-action="choose" data-slot="${s.id}">${icon('search')}Choose</button>
+          <button class="btn ghost" data-action="skip-slot" data-slot="${s.id}" data-skip="true" title="Fend for yourself this time">${icon('moon')}Skip</button>
         </div>
       </div>`;
   }
@@ -765,6 +778,8 @@ function renderRecipes() {
     ${list.length > shown.length ? `<div class="more"><button class="btn lg" data-action="more">Show more (${list.length - shown.length} left)</button></div>` : ''}`;
 }
 
+const weekOrder = () => Array.from({ length: 7 }, (_, i) => (state.settings.weekStartsOn + i) % 7);
+
 function renderSettings() {
   const s = state.settings;
   const theme = load('theme', 'dark');
@@ -787,6 +802,19 @@ function renderSettings() {
           <div class="chips">
             ${MEALS.map((m) => `<button class="chip-toggle" data-action="toggle-meal" data-meal="${m}" aria-pressed="${s.meals.includes(m)}">${m}</button>`).join('')}
           </div>
+        </div>
+        <div class="field">
+          <span class="label">Days you need each meal</span>
+          <div class="meal-days" role="grid">
+            <span></span>${weekOrder().map((d) => `<span class="md-head">${DAY_NAMES[d].slice(0, 3)}</span>`).join('')}
+            ${MEALS.filter((m) => s.meals.includes(m)).map((m) => `
+              <span class="md-meal">${m}</span>
+              ${weekOrder().map((d) => {
+                const on = (s.mealDays?.[m] || [0, 1, 2, 3, 4, 5, 6]).includes(d);
+                return `<button class="md-cell" data-action="toggle-meal-day" data-meal="${m}" data-weekday="${d}" aria-pressed="${on}" aria-label="${m} on ${DAY_NAMES[d]}: ${on ? 'planned' : 'fend for yourself'}">${on ? icon('check') : icon('moon')}</button>`;
+              }).join('')}`).join('')}
+          </div>
+          <small>Tap a day to turn that meal off, like dinner on nights you work. Those become "fend for yourself": no recipe, nothing on the grocery list. You can also skip a single meal from the plan.</small>
         </div>
         <div class="field">
           <label for="week-start">Week starts on</label>
@@ -986,6 +1014,7 @@ async function openRecipe(id, slotId) {
           <button class="btn ${r.favorite ? '' : 'primary'}" data-action="fav" data-id="${esc(r.id)}" aria-pressed="${r.favorite}">${icon(r.favorite ? 'heart-fill' : 'heart')}${r.favorite ? 'Favorited' : 'Favorite'}</button>
           ${r.sourceUrl ? `<a class="btn ghost" href="${esc(r.sourceUrl)}" target="_blank" rel="noopener noreferrer">${icon('link')}${esc(r.creator || r.source)}${/tiktok/i.test(r.sourceUrl) ? ' on TikTok' : ''}</a>` : ''}
           <button class="btn ghost" data-action="edit-recipe" data-id="${esc(r.id)}">${icon('pencil')}Edit</button>
+          ${slotId ? `<button class="btn ghost" data-action="skip-slot" data-slot="${esc(slotId)}" data-skip="true" title="Make this a fend-for-yourself meal">${icon('moon')}Skip this meal</button>` : ''}
         </div>
       </div>
 
@@ -1151,7 +1180,7 @@ async function updateSettings(patch) {
     const clash = state.plan.slots.filter((sl) => sl.recipeId && state.byId.has(sl.recipeId) && avoidHits(state.byId.get(sl.recipeId)).length).length;
     if (clash) toast(`${clash} planned meal${clash > 1 ? 's' : ''} this week contain${clash > 1 ? '' : 's'} something on your list. They're marked ⚠ on the plan.`, '', 'clash');
   }
-  if (['meals', 'householdSize', 'stores', 'storeLevels', 'tripThreshold', 'countPantry'].some((k) => k in patch)) await loadWeek();
+  if (['meals', 'mealDays', 'householdSize', 'stores', 'storeLevels', 'tripThreshold', 'countPantry'].some((k) => k in patch)) await loadWeek();
   if ('weekStartsOn' in patch) { state.weekKey = weekStart(parseKey(state.weekKey)); await loadWeek(); }
   render();
 }
@@ -1172,7 +1201,7 @@ const actions = {
   'week-today': async () => { state.weekKey = weekStart(); await loadWeek(); render(); scrollToToday(); },
   randomize: async (el) => {
     await setPlan(await api('POST', `/api/weeks/${state.weekKey}/randomize`));
-    const empty = state.plan.slots.filter((s) => !s.recipeId).length;
+    const empty = state.plan.slots.filter((s) => !s.recipeId && !s.off).length;
     if (empty) toast(`Couldn't fill ${empty} meal${empty > 1 ? 's' : ''} — try loosening your price, health, protein or allergy settings.`, 'error');
   },
   'clear-week': async () => {
@@ -1231,6 +1260,19 @@ const actions = {
   'filter-healthy': () => { state.recipeFilters.healthy = !state.recipeFilters.healthy; state.recipeFilters.limit = PAGE; render(); },
   'filter-budget': () => { state.recipeFilters.budget = !state.recipeFilters.budget; state.recipeFilters.limit = PAGE; render(); },
   'import-url': () => openImport(),
+  'skip-slot': async (el) => {
+    const skip = el.dataset.skip === 'null' ? null : el.dataset.skip === 'true';
+    if (modal.open) modal.close();
+    await setPlan(await api('PATCH', `/api/weeks/${state.weekKey}/slots/${el.dataset.slot}`, { skip }));
+    toast(skip ? 'Marked as fend for yourself' : 'Back on the plan');
+  },
+  'toggle-meal-day': (el) => {
+    const { meal } = el.dataset;
+    const day = Number(el.dataset.weekday);
+    const cur = state.settings.mealDays?.[meal] || [0, 1, 2, 3, 4, 5, 6];
+    const next = cur.includes(day) ? cur.filter((d) => d !== day) : [...cur, day];
+    return updateSettings({ mealDays: { ...state.settings.mealDays, [meal]: next } });
+  },
   'lock-now': async () => {
     await api('POST', '/api/auth/logout');
     await requirePin();
@@ -1351,7 +1393,8 @@ function startDrag() {
 function moveGhost() {
   const d = drag;
   d.ghost.style.transform = `translate(${d.x - d.offsetX}px, ${d.y - d.offsetY}px) rotate(1.5deg) scale(1.03)`;
-  const day = dropTargetAt(d.x, d.y);
+  let day = dropTargetAt(d.x, d.y);
+  if (day != null && document.querySelector(`.day[data-day="${day}"] .off-slot[data-meal="${d.meal}"]`)) day = null;
   if (day === d.overDay) return;
   d.overDay = day;
   document.querySelectorAll('.drop-target').forEach((el) => el.classList.remove('drop-target'));
@@ -1434,7 +1477,9 @@ document.addEventListener('keydown', (e) => {
   const tile = handle.closest('.meal');
   const { meal } = tile.dataset;
   const from = Number(tile.dataset.day);
-  const to = from + step;
+  // Skip over "fend for yourself" days.
+  let to = from + step;
+  while (to >= 0 && to <= 6 && state.plan.slots.find((x) => x.meal === meal && x.day === to)?.off) to += step;
   if (to < 0 || to > 6) return;
   const recipe = tile.dataset.recipe;
   busy(null, async () => {

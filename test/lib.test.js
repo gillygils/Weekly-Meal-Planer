@@ -261,3 +261,26 @@ test('PIN hashing, sessions and the wrong-PIN throttle', async () => {
   for (let i = 0; i < 30; i++) th.fail(`ip${i}`);
   assert.ok(th.wait('fresh') > 0, 'many misses overall lock everyone');
 });
+
+test('meal days: off nights are skipped by the randomizer and groceries', async () => {
+  const { activeSlots, weekdayOf, moveMeal } = await import('../server/lib/planner.js');
+  const recipes = Array.from({ length: 20 }, (_, i) => mk(`r${i}`));
+  // Week starting Monday 2026-10-05; no dinner on Wednesdays (weekday 3).
+  const mealDays = { dinner: [0, 1, 2, 4, 5, 6] };
+  const plan = ensureSlots({ key: '2026-10-05', slots: [] }, ['dinner'], mealDays);
+  assert.equal(weekdayOf('2026-10-05', 2), 3);
+  assert.deepEqual(plan.slots.filter((s) => s.off).map((s) => s.day), [2]);
+  randomizePlan(plan, recipes, { meals: ['dinner'], excludedProteins: [] });
+  assert.equal(plan.slots[2].recipeId, null, 'off night stays empty');
+  assert.equal(activeSlots(plan).length, 6);
+  // Per-week overrides: plan Wednesday anyway, skip Friday.
+  plan.slots[2].skip = false;
+  plan.slots[4].skip = true;
+  ensureSlots(plan, ['dinner'], mealDays);
+  assert.equal(plan.slots[2].off, false);
+  assert.equal(plan.slots[4].off, true);
+  // Drag-and-drop never moves a meal onto (or off) an off night.
+  const before = plan.slots[4].recipeId;
+  moveMeal(plan, 'dinner', 0, 4);
+  assert.equal(plan.slots[4].recipeId, before);
+});

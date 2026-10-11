@@ -5,7 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { Store, sanitizeSettings } from './store.js';
-import { ensureSlots, randomizePlan, moveMeal } from './lib/planner.js';
+import { ensureSlots, randomizePlan, moveMeal, activeSlots } from './lib/planner.js';
 import { buildGroceryList } from './lib/grocery.js';
 import { fetchAllSources, importLink, normalizeUrl, pullCreatorSite, SUGGESTED_CREATORS } from './lib/sources.js';
 import { buildCustomRecipe } from './lib/custom.js';
@@ -104,7 +104,7 @@ function getWeek(key, create = true) {
     plan = { key, slots: [], checked: {}, extras: [], createdAt: new Date().toISOString() };
     store.db.weeks[key] = plan;
   }
-  ensureSlots(plan, store.db.settings.meals);
+  ensureSlots(plan, store.db.settings.meals, store.db.settings.mealDays);
   return plan;
 }
 
@@ -124,7 +124,7 @@ function summary(r) {
 
 function groceryFor(plan) {
   const byId = new Map(store.db.recipes.map((r) => [r.id, r]));
-  const list = buildGroceryList(plan.slots, byId, store.db.settings.householdSize)
+  const list = buildGroceryList(activeSlots(plan), byId, store.db.settings.householdSize)
     .map((i) => ({ ...i, checked: Boolean(plan.checked[i.key]) }));
   const pricing = priceGroceryList(list, store.db.settings, store.db.priceBook);
   const byKey = new Map(pricing.items.map((p) => [p.key, p]));
@@ -351,6 +351,12 @@ route('PATCH', '/api/weeks/:key/slots/:slot', ({ params, body }) => {
     if (!slot.recipeId) slot.locked = false;
   }
   if ('locked' in body) slot.locked = Boolean(body.locked) && Boolean(slot.recipeId);
+  if ('skip' in body) {
+    // true = skip this meal this week, false = plan it even on an off day, null = follow Settings.
+    slot.skip = body.skip === null ? undefined : Boolean(body.skip);
+    if (slot.skip === undefined) delete slot.skip;
+    ensureSlots(plan, store.db.settings.meals, store.db.settings.mealDays);
+  }
   plan.updatedAt = new Date().toISOString();
   store.save();
   return plan;

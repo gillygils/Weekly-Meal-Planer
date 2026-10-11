@@ -11,6 +11,8 @@ const SEED_FILE = path.join(here, 'seed', 'recipes.json');
 export const DEFAULT_SETTINGS = {
   householdSize: 4,
   meals: ['dinner'],
+  // Which weekdays (0 = Sunday) each meal is needed; the rest are "fend for yourself".
+  mealDays: { breakfast: [0, 1, 2, 3, 4, 5, 6], lunch: [0, 1, 2, 3, 4, 5, 6], dinner: [0, 1, 2, 3, 4, 5, 6] },
   maxPricePerServing: 0, // 0 = no limit
   excludedProteins: [],
   avoidAllergens: [],
@@ -39,6 +41,12 @@ export function sanitizeSettings(input, base = DEFAULT_SETTINGS) {
   if (Array.isArray(input.meals)) {
     const meals = input.meals.filter((m) => ['breakfast', 'lunch', 'dinner'].includes(m));
     if (meals.length) s.meals = meals;
+  }
+  if (input.mealDays && typeof input.mealDays === 'object') {
+    s.mealDays = { ...base.mealDays };
+    for (const m of ['breakfast', 'lunch', 'dinner']) {
+      if (Array.isArray(input.mealDays[m])) s.mealDays[m] = [...new Set(input.mealDays[m].map(Number).filter((d) => Number.isInteger(d) && d >= 0 && d <= 6))].sort();
+    }
   }
   if (input.maxPricePerServing != null) s.maxPricePerServing = Math.max(0, Math.round((Number(input.maxPricePerServing) || 0) * 100) / 100);
   if (Array.isArray(input.excludedProteins)) s.excludedProteins = input.excludedProteins.map(String).slice(0, 20);

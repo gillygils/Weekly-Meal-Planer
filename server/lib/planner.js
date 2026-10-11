@@ -7,8 +7,20 @@ export function slotId(day, meal) {
   return `${day}-${meal}`;
 }
 
-/** Make sure a plan has a slot for every day x enabled meal, keeping existing picks. */
-export function ensureSlots(plan, meals) {
+const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
+
+/** Weekday (0 = Sunday) of day index `day` in the week starting on plan.key. */
+export function weekdayOf(planKey, day) {
+  const start = planKey ? new Date(`${planKey}T00:00:00Z`).getUTCDay() : 1;
+  return (start + day) % 7;
+}
+
+/**
+ * Make sure a plan has a slot for every day x enabled meal, keeping existing picks.
+ * Marks slots `off` ("fend for yourself") from the meal-days setting, unless a
+ * slot has its own `skip` override (true = skip this one, false = plan it anyway).
+ */
+export function ensureSlots(plan, meals, mealDays = null) {
   const enabled = MEAL_TYPES.filter((m) => meals.includes(m));
   const existing = new Map((plan.slots || []).map((s) => [s.id, s]));
   const slots = [];
@@ -22,9 +34,16 @@ export function ensureSlots(plan, meals) {
   for (const s of plan.slots || []) {
     if (!enabled.includes(s.meal) && s.locked && s.recipeId) slots.push(s);
   }
+  for (const s of slots) {
+    const days = mealDays?.[s.meal] || ALL_DAYS;
+    s.off = s.skip != null ? Boolean(s.skip) : !days.includes(weekdayOf(plan.key, s.day));
+  }
   plan.slots = slots;
   return plan;
 }
+
+/** Slots that actually need food (not switched off). */
+export const activeSlots = (plan) => plan.slots.filter((s) => !s.off);
 
 /**
  * Move a meal to another day by swapping it with that day's meal (or empty
@@ -33,7 +52,7 @@ export function ensureSlots(plan, meals) {
 export function moveMeal(plan, meal, from, to) {
   const src = plan.slots.find((s) => s.meal === meal && s.day === from);
   const dst = plan.slots.find((s) => s.meal === meal && s.day === to);
-  if (!src || !dst || from === to) return plan;
+  if (!src || !dst || from === to || src.off || dst.off) return plan;
   [src.recipeId, dst.recipeId] = [dst.recipeId, src.recipeId];
   [src.locked, dst.locked] = [dst.locked, src.locked];
   plan.updatedAt = new Date().toISOString();
@@ -122,7 +141,7 @@ export function randomizePlan(plan, recipes, settings, { recentIds = new Set(), 
   const pool = recipes.filter((r) => !avoid(r.ingredients.map((i) => i.name)).length);
   const usedIds = new Set();
   const usedNames = new Set();
-  const reroll = (s) => !s.locked && (!onlySlotId || s.id === onlySlotId);
+  const reroll = (s) => !s.locked && !s.off && (!onlySlotId || s.id === onlySlotId);
   for (const s of plan.slots) {
     if (!reroll(s) && s.recipeId && byId.has(s.recipeId)) {
       usedIds.add(s.recipeId);
