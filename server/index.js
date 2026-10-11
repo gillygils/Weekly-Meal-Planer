@@ -468,11 +468,23 @@ function serveStatic(req, res, pathname) {
   if (!SHARED_LIB[pathname] && !file.startsWith(PUBLIC_DIR)) return send(res, 403, { error: 'Forbidden' });
   if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(PUBLIC_DIR, 'index.html');
   const ext = path.extname(file);
-  res.writeHead(200, {
+  const stat = fs.statSync(file);
+  const etag = `"${stat.size.toString(36)}-${Math.round(stat.mtimeMs).toString(36)}"`;
+  // App code is always revalidated (a cheap 304 when unchanged), so after an
+  // update browsers and Cloudflare never keep running the old version.
+  const code = ['.html', '.js', '.css', '.webmanifest'].includes(ext);
+  const headers = {
     'content-type': MIME[ext] || 'application/octet-stream',
-    'cache-control': ext === '.html' ? 'no-cache' : 'public, max-age=300',
+    'cache-control': code ? 'no-cache' : 'public, max-age=86400',
+    etag,
     'x-content-type-options': 'nosniff',
-  });
+  };
+  if (req.headers['if-none-match'] === etag) {
+    res.writeHead(304, headers);
+    return res.end();
+  }
+  res.writeHead(200, headers);
+  if (req.method === 'HEAD') return res.end();
   fs.createReadStream(file).pipe(res);
 }
 
