@@ -227,6 +227,7 @@ export function buildGroceryList(slots, recipes, householdSize = 4) {
       aisle: i.aisle,
       amount: [...amounts, ...notes].join(' + '),
       recipes: [...i.recipes],
+      totals: i.totals,
     };
   });
   list.sort((a, b) => AISLE_ORDER.indexOf(a.aisle) - AISLE_ORDER.indexOf(b.aisle) || a.name.localeCompare(b.name));

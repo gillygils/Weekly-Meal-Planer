@@ -428,6 +428,78 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select:
 .g-item.done .g-name, .g-item.done .g-amount { text-decoration: line-through; color: var(--muted); }
 .g-item .icon-btn { margin: -.25rem -.2rem -.25rem 0; border: 0; background: none; }
 
+/* Grocery views */
+.segmented { display: flex; gap: .25rem; padding: .25rem; margin-bottom: 1rem; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); width: fit-content; max-width: 100%; overflow-x: auto; }
+.segmented button { display: inline-flex; align-items: center; gap: .45rem; padding: .5rem 1rem; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 650; white-space: nowrap; min-height: 2.5rem; }
+.segmented button[aria-selected="true"] { background: var(--accent); color: var(--on-accent); }
+.g-price { display: grid; justify-items: end; font-variant-numeric: tabular-nums; flex: none; }
+.g-price small { color: var(--muted); font-size: .72rem; }
+.g-item.done .g-price { opacity: .5; }
+
+.pr-head { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 4.2rem); z-index: 5; padding: .3rem .6rem; margin-bottom: .6rem; }
+.pr-row { display: grid; grid-template-columns: minmax(0, 1fr) repeat(var(--stores, 2), minmax(6.5rem, 9rem)) minmax(6rem, 8rem); gap: .5rem; align-items: center; padding: .45rem .3rem; border-bottom: 1px solid var(--border); }
+.pr-wrap.one .pr-row { grid-template-columns: minmax(0, 1fr) minmax(6.5rem, 9rem); }
+.pr-section .pr-row:last-child { border-bottom: 0; }
+.pr-row.done { opacity: .45; }
+.pr-item { display: grid; min-width: 0; }
+.pr-item small { color: var(--muted); font-size: .8rem; }
+.pr-cols { border-bottom: 0; }
+.pc-head { display: grid; text-align: right; font-variant-numeric: tabular-nums; padding-right: .5rem; border-right: 3px solid var(--accent); }
+.pc-head.s-b { border-color: var(--m-carbs); }
+.pc-head.best { border-color: var(--ok); }
+.pc-head span { font-size: 1.15rem; font-weight: 750; }
+.pc-head b { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.pc { display: grid; justify-items: end; gap: .05rem; padding: .4rem .55rem; border-radius: var(--radius-sm); border: 1px solid transparent; background: transparent; color: var(--text); font-variant-numeric: tabular-nums; text-align: right; }
+.pc:hover { background: var(--surface-2); border-color: var(--border); }
+.pc b { font-size: 1rem; }
+.pc small { display: inline-flex; align-items: center; gap: .2rem; font-size: .7rem; color: var(--muted); }
+.pc.est b { color: var(--muted); font-weight: 600; }
+.pc.real small { color: var(--ok); }
+.pc.best { background: var(--ok-bg); }
+.pc.best b { color: var(--ok); }
+.aisle-tag { font-size: .7rem; padding: .05rem .4rem; border-radius: 999px; background: var(--surface-3); color: var(--text); }
+.aisle-tag.empty { background: transparent; color: var(--muted); border: 1px dashed var(--border); }
+.pr-best { display: grid; justify-items: end; gap: .15rem; }
+.pr-best small { color: var(--muted); font-size: .75rem; }
+.store-chip { display: inline-block; padding: .15rem .55rem; border-radius: 999px; font-size: .78rem; font-weight: 700; background: var(--accent-soft); color: var(--accent-strong); }
+.store-chip.s-b { background: color-mix(in srgb, var(--m-carbs) 18%, var(--surface)); color: var(--m-carbs); }
+.pr-section { padding: .4rem .6rem .3rem; margin-bottom: .8rem; }
+.pr-section h3 { display: flex; justify-content: space-between; align-items: baseline; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: .5rem .3rem .3rem; margin: 0; }
+.pr-section h3 small { text-transform: none; letter-spacing: 0; font-weight: 500; }
+.pr-note { display: flex; gap: .5rem; align-items: flex-start; margin: 0 0 1rem; max-width: 60rem; }
+.pr-note svg { margin-top: .15rem; color: var(--accent); }
+@media (max-width: 700px) {
+  .pr-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pr-item { grid-column: 1 / -1; }
+  .pr-cols .pr-item { display: none; }
+  .pr-head { top: 0; }
+  .pc, .pc-head, .pr-best { justify-items: start; text-align: left; }
+  .pc-head { border-right: 0; border-left: 3px solid var(--accent); padding: 0 0 0 .5rem; }
+  .pc-head.s-b { border-color: var(--m-carbs); }
+  .pc-head.best { border-color: var(--ok); }
+  .segmented { width: 100%; }
+  .segmented button { flex: 1; justify-content: center; padding: .5rem .4rem; font-size: .85rem; }
+  .segmented button svg { display: none; }
+}
+
+.plan-opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: .8rem; margin-bottom: .8rem; }
+.plan-opt { position: relative; display: grid; gap: .2rem; padding: 1rem 1.1rem; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+.plan-opt span { color: var(--muted); font-weight: 600; }
+.plan-opt b { font-size: 1.6rem; letter-spacing: -.02em; }
+.plan-opt small { color: var(--ok); font-weight: 650; }
+.plan-opt.active { border-color: var(--ok); box-shadow: 0 0 0 1px var(--ok), var(--shadow); }
+.plan-badge { position: absolute; top: .8rem; right: .8rem; display: inline-flex; align-items: center; gap: .25rem; padding: .15rem .55rem; border-radius: 999px; background: var(--ok-bg); color: var(--ok) !important; font-size: .75rem; }
+.plan-badge svg { width: .9rem; height: .9rem; }
+.plan-verdict { margin: 0 0 1rem; padding: .9rem 1.1rem; }
+.trip { padding: .6rem .8rem; margin-bottom: 1rem; }
+.trip h3 { display: flex; justify-content: space-between; align-items: center; margin: .2rem .2rem .4rem; font-size: 1rem; }
+.trip h3 .store-chip { font-size: .95rem; padding: .3rem .8rem; }
+.trip p { margin: 0 .3rem .4rem; }
+.trip-row { display: flex; align-items: center; gap: .5rem; border-bottom: 1px solid var(--border); }
+.trip-row:last-child { border-bottom: 0; }
+.trip-row .g-item { flex: 1; min-width: 0; }
+.trip-row.done { opacity: .5; }
+
 /* ---------- Recipes ---------- */
 .filters { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
 .filters select.input { width: auto; border-radius: 999px; }

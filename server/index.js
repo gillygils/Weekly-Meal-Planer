@@ -9,6 +9,7 @@ import { ensureSlots, randomizePlan, moveMeal } from './lib/planner.js';
 import { buildGroceryList } from './lib/grocery.js';
 import { fetchAllSources, importLink, normalizeUrl, pullCreatorSite, SUGGESTED_CREATORS } from './lib/sources.js';
 import { buildCustomRecipe } from './lib/custom.js';
+import { priceGroceryList, STORES } from './lib/pricing.js';
 import { PROTEINS, ALLERGEN_GROUPS } from './lib/recipes.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -111,9 +112,15 @@ function summary(r) {
 
 function groceryFor(plan) {
   const byId = new Map(store.db.recipes.map((r) => [r.id, r]));
-  const items = buildGroceryList(plan.slots, byId, store.db.settings.householdSize)
+  const list = buildGroceryList(plan.slots, byId, store.db.settings.householdSize)
     .map((i) => ({ ...i, checked: Boolean(plan.checked[i.key]) }));
-  return { week: plan.key, items, extras: plan.extras };
+  const pricing = priceGroceryList(list, store.db.settings, store.db.priceBook);
+  const byKey = new Map(pricing.items.map((p) => [p.key, p]));
+  const items = list.map(({ totals, ...i }) => {
+    const p = byKey.get(i.key);
+    return p ? { ...i, price: { buy: p.buy, at: p.at, best: p.best, pantry: p.pantry } } : i;
+  });
+  return { week: plan.key, items, extras: plan.extras, pricing: { stores: pricing.stores, totals: pricing.totals, plan: pricing.plan, realCount: pricing.realCount } };
 }
 
 let refreshing = null;
@@ -127,7 +134,7 @@ const route = (method, pattern, handler) => {
   routes.push({ method, re, keys, handler });
 };
 
-route('GET', '/api/meta', () => ({ proteins: [...PROTEINS, 'vegetarian'], allergens: Object.fromEntries(Object.entries(ALLERGEN_GROUPS).map(([k, g]) => [k, g.label])), recipeCount: store.db.recipes.length, auth: Boolean(PASSWORD), suggestedCreators: SUGGESTED_CREATORS }));
+route('GET', '/api/meta', () => ({ stores: STORES, proteins: [...PROTEINS, 'vegetarian'], allergens: Object.fromEntries(Object.entries(ALLERGEN_GROUPS).map(([k, g]) => [k, g.label])), recipeCount: store.db.recipes.length, auth: Boolean(PASSWORD), suggestedCreators: SUGGESTED_CREATORS }));
 
 route('GET', '/api/settings', () => store.db.settings);
 route('PUT', '/api/settings', async ({ body }) => {
@@ -290,6 +297,20 @@ route('POST', '/api/weeks/:key/clear', ({ params }) => {
   for (const s of plan.slots) if (!s.locked) s.recipeId = null;
   store.save();
   return plan;
+});
+
+// Price book: real prices (per package / per lb) and aisles the household has entered.
+route('PUT', '/api/prices', ({ body }) => {
+  const storeKey = String(body.store || '');
+  const key = String(body.key || '').slice(0, 80);
+  if (!STORES[storeKey] || !key) throw new HttpError(400, 'Store and item are required');
+  const book = (store.db.priceBook[storeKey] ||= {});
+  const price = Math.round(Number(body.price) * 100) / 100;
+  const aisle = String(body.aisle ?? book[key]?.aisle ?? '').trim().slice(0, 30);
+  if (!(price > 0) && !aisle) delete book[key];
+  else book[key] = { price: price > 0 ? price : null, aisle, updatedAt: new Date().toISOString() };
+  store.save();
+  return book[key] || null;
 });
 
 route('GET', '/api/weeks/:key/grocery', ({ params }) => groceryFor(getWeek(params.key)));

@@ -21,6 +21,10 @@ export const DEFAULT_SETTINGS = {
   minProtein: 0, // grams per serving
   dailyCalories: 0, // per person, 0 = no target
   dailyProtein: 0,
+  stores: ['meijer', 'aldi'],
+  storeLevels: {}, // price level overrides, % vs. average
+  tripThreshold: 5, // a second store trip has to save at least this much
+  countPantry: false, // include spices, oils and sauces in price totals
   creators: [
     { name: 'Hunt4Shredz', handle: '@hunt4shredz', url: 'https://www.hunt4shredz.com' },
     { name: 'AmateurProChef', handle: '@amateurprochef', url: 'https://amateurprochef.com' },
@@ -53,6 +57,14 @@ export function sanitizeSettings(input, base = DEFAULT_SETTINGS) {
       url: /^https?:\/\//i.test(String(c.url || '')) ? String(c.url).trim().slice(0, 200) : '',
     })).filter((c) => c.name && c.url);
   }
+  if (Array.isArray(input.stores)) s.stores = [...new Set(input.stores.map(String))].filter((k) => /^[a-z-]{2,20}$/.test(k)).slice(0, 2);
+  if (input.storeLevels && typeof input.storeLevels === 'object') {
+    s.storeLevels = Object.fromEntries(Object.entries(input.storeLevels)
+      .filter(([k, v]) => /^[a-z-]{2,20}$/.test(k) && v !== '' && v != null && Number.isFinite(Number(v)))
+      .map(([k, v]) => [k, Math.max(-60, Math.min(100, Math.round(Number(v))))]));
+  }
+  if (input.tripThreshold != null) s.tripThreshold = Math.max(0, Math.min(500, Number(input.tripThreshold) || 0));
+  if (input.countPantry != null) s.countPantry = Boolean(input.countPantry);
   if (input.favoritesBoost != null) s.favoritesBoost = Boolean(input.favoritesBoost);
   if (input.currency != null) s.currency = String(input.currency).slice(0, 4) || '$';
   if (input.weekStartsOn != null) s.weekStartsOn = Number(input.weekStartsOn) === 0 ? 0 : 1;
@@ -77,9 +89,10 @@ export class Store {
       db.settings = sanitizeSettings(db.settings || {}, DEFAULT_SETTINGS);
       db.recipes ||= [];
       db.weeks ||= {};
+      db.priceBook ||= {};
       return db;
     }
-    return { version: 1, settings: { ...DEFAULT_SETTINGS }, recipes: [], weeks: {} };
+    return { version: 1, settings: { ...DEFAULT_SETTINGS }, recipes: [], weeks: {}, priceBook: {} };
   }
 
   /** Add any bundled recipes that aren't in the database yet (never overwrites user edits). */

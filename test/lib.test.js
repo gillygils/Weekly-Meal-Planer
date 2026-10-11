@@ -205,3 +205,31 @@ test('custom recipes from the editor', async () => {
   assert.equal(edited.favorite, true);
   assert.throws(() => buildCustomRecipe({ name: '', ingredientsText: 'x' }), /name/);
 });
+
+test('store prices and the cheapest shopping plan', async () => {
+  const { priceGroceryList, purchaseFor } = await import('../server/lib/pricing.js');
+  const item = (key, totals) => ({ key, name: key, aisle: 'Other', recipes: ['x'], totals, checked: false });
+  // Packages: 600 g pasta = 2 one-pound boxes; loose meat rounds up to the next quarter pound.
+  assert.equal(purchaseFor(item('pasta', { g: 600 })).units, 2);
+  assert.equal(purchaseFor(item('chicken breast', { g: 500 })).qtyText, '1.25 lb');
+  assert.equal(purchaseFor(item('coriander', { pack: 1 })).units, 1);
+  assert.equal(purchaseFor(item('water', { ml: 500 })), null);
+  const items = [item('pasta', { g: 450 }), item('chicken breast', { g: 900 }), item('onion', { '': 3 }), item('cumin', { tsp: 1 })];
+  const settings = { stores: ['meijer', 'aldi'], tripThreshold: 0.5 };
+  const est = priceGroceryList(items, settings, {});
+  assert.ok(est.totals.aldi < est.totals.meijer, 'Aldi estimates are cheaper');
+  assert.equal(est.plan.splitWorthIt, false);
+  assert.equal(est.items.find((p) => p.key === 'cumin').pantry, true);
+  // Real prices: chicken much cheaper at Meijer -> split the shop.
+  const real = priceGroceryList(items, settings, { meijer: { 'chicken breast': { price: 1.99, aisle: '12' } } });
+  const chicken = real.items.find((p) => p.key === 'chicken breast');
+  assert.equal(chicken.at.meijer.real, true);
+  assert.equal(chicken.at.meijer.cost, 3.98); // 2 lb x $1.99
+  assert.equal(chicken.best, 'meijer');
+  assert.equal(real.plan.splitWorthIt, true);
+  assert.deepEqual(real.plan.trips.map((t) => t.store), ['meijer', 'aldi']);
+  assert.ok(real.plan.trips[0].items.includes('chicken breast'));
+  // Pantry staples stay out of totals unless asked for.
+  const withPantry = priceGroceryList(items, { ...settings, countPantry: true }, {});
+  assert.ok(withPantry.totals.aldi > est.totals.aldi);
+});

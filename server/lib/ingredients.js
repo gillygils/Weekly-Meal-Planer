@@ -100,8 +100,8 @@ const DB = [
   [['berries', 'strawberries', 'strawberry', 'blueberries', 'raspberries', 'blackberries', 'mixed berries', 'frozen berries'], 45, 0.8, 11, 0.4, 2.5, { cup: 148, buy: [454, 'g', 4.2, '1 lb pack'] }],
   [['mango', 'pineapple', 'peach', 'pear', 'grapes', 'kiwi', 'cherries', 'melon', 'watermelon', 'papaya'], 55, 0.7, 14, 0.3, 1.8, { each: 200, cup: 165, buy: [1, 'each', 1.8, 'each'] }],
   [['raisins', 'sultanas', 'dates', 'dried apricots', 'dried cranberries', 'prunes'], 300, 3, 75, 0.5, 5, { cup: 160, buy: [340, 'g', 3.5, '12 oz bag'], pantry: true }],
-  [['parsley', 'coriander', 'cilantro', 'basil', 'mint', 'dill', 'chives', 'fresh herbs', 'tarragon'], 36, 3, 6, 0.8, 3.3, { cup: 30, each: 1, buy: [1, 'each', 1.2, 'bunch'] }],
-  [['thyme', 'rosemary', 'sage', 'oregano leaves', 'bay leaf', 'bay leaves', 'curry leaves', 'kaffir lime leaves', 'lemongrass'], 100, 4, 20, 2, 10, { cup: 40, each: 1, buy: [1, 'each', 2, 'pack'], pantry: true }],
+  [['parsley', 'coriander', 'cilantro', 'basil', 'mint', 'dill', 'chives', 'fresh herbs', 'tarragon'], 36, 3, 6, 0.8, 3.3, { cup: 30, each: 30, buy: [1, 'each', 1.2, 'bunch'] }],
+  [['thyme', 'rosemary', 'sage', 'oregano leaves', 'bay leaf', 'bay leaves', 'curry leaves', 'kaffir lime leaves', 'lemongrass'], 100, 4, 20, 2, 10, { cup: 40, each: 15, buy: [1, 'each', 2, 'pack'], pantry: true }],
 
   // ---- Grains, pasta, bread ----
   [['rice', 'white rice', 'basmati rice', 'jasmine rice', 'long grain rice', 'arborio rice', 'risotto rice', 'sushi rice'], 360, 6.6, 79, 0.6, 1.3, { cup: 185, buy: [907, 'g', 2.8, '2 lb bag'] }],
@@ -231,7 +231,8 @@ export function toBuyUnits(qty, unit, entry) {
   if (buyUnit === 'each') {
     // Garlic is bought by the head (~10 cloves) but recipes count cloves.
     if (entry.words.includes('garlic') && (unit === 'clove' || unit === '')) return qty / 10;
-    if (unit === '' || unit === 'piece' || unit === 'head' || unit === 'bunch' || unit === 'fillet') return qty;
+    if (['', 'piece', 'head', 'bunch', 'fillet', 'pack', 'stalk'].includes(unit)) return qty;
+    if (unit === 'sprig' || unit === 'handful') return qty / 8; // a bunch has plenty
     const g = toGrams(qty, unit, entry);
     return g != null && entry.each ? g / entry.each : null;
   }

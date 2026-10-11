@@ -29,6 +29,7 @@ const state = {
   grocery: null,
   recipeFilters: { q: '', protein: '', meal: '', favorites: false, budget: false, sort: 'name', limit: PAGE },
   hideChecked: load('hideChecked', false),
+  groceryView: load('groceryView', 'list'),
 };
 
 // ---------- utilities ----------
@@ -348,6 +349,152 @@ function renderSlot(s) {
 }
 
 function renderGroceries() {
+  const views = [['list', 'List', 'cart'], ['compare', 'Compare prices', 'tag'], ['plan', 'Shopping plan', 'route']];
+  const body = { list: renderGroceryList, compare: renderPriceCompare, plan: renderShoppingPlan }[state.groceryView] || renderGroceryList;
+  return `
+    <div class="segmented" role="tablist" aria-label="Grocery view">
+      ${views.map(([k, label, ic]) => `<button role="tab" aria-selected="${state.groceryView === k}" data-action="grocery-view" data-view="${k}">${icon(ic)}<span>${label}</span></button>`).join('')}
+    </div>
+    ${body()}`;
+}
+
+// ---- Prices ----
+const storeName = (k) => state.meta.stores[k]?.name || k;
+function bestPrice(i) {
+  const at = i.price?.at;
+  if (!at) return null;
+  const keys = Object.keys(at);
+  if (!keys.length) return null;
+  const k = i.price.best || keys.reduce((a, b) => (at[a].cost <= at[b].cost ? a : b));
+  return { store: k, ...at[k] };
+}
+const qtyText = (buy) => (buy.unitLabel === 'each' ? `${buy.units}` : buy.unitLabel === 'per lb' ? `${buy.units} lb` : buy.qtyText);
+function priceCell(i, k) {
+  const p = i.price.at[k];
+  const s = state.meta.stores[k];
+  return `<button class="pc ${p.real ? 'real' : 'est'} ${i.price.best === k ? 'best' : ''}" data-action="edit-price" data-key="${esc(i.key)}" data-store="${k}" title="${p.real ? 'Your price' : 'Estimate'} · tap to enter what it costs at ${esc(s.name)}">
+    <b>${money(p.cost)}</b><small>${p.real ? `${icon('check')}yours` : 'est.'}</small>
+    ${s.aisles ? `<span class="aisle-tag ${p.aisle ? '' : 'empty'}">${p.aisle ? `Aisle ${esc(p.aisle)}` : '+ aisle'}</span>` : p.aisle ? `<span class="aisle-tag">${esc(p.aisle)}</span>` : ''}
+  </button>`;
+}
+
+function priceSummary() {
+  const pr = state.grocery.pricing;
+  if (!pr.stores.length) return `<div class="panel empty"><h2>Pick your stores</h2><p>Choose the two stores you shop at to compare prices.</p><a class="btn primary" href="#settings">${icon('sliders')}Choose stores</a></div>`;
+  return '';
+}
+
+function renderPriceCompare() {
+  const g = state.grocery;
+  const pr = g.pricing;
+  const none = priceSummary();
+  if (none) return none;
+  const items = g.items.filter((i) => i.price && !(state.hideChecked && i.checked));
+  const [a, b] = pr.stores.map((s) => s.key);
+  const pantry = items.filter((i) => i.price.pantry);
+  const main = items.filter((i) => !i.price.pantry);
+  const groups = new Map();
+  for (const i of main) {
+    if (!groups.has(i.aisle)) groups.set(i.aisle, []);
+    groups.get(i.aisle).push(i);
+  }
+  const row = (i) => `
+    <div class="pr-row ${i.checked ? 'done' : ''}">
+      <div class="pr-item"><b>${esc(i.name)}</b><small>${esc(qtyText(i.price.buy))}${i.amount ? ` · needs ${esc(i.amount)}` : ''}</small></div>
+      ${pr.stores.map((s) => priceCell(i, s.key)).join('')}
+      ${b ? `<div class="pr-best">${i.price.best ? `<span class="store-chip s-${i.price.best === a ? 'a' : 'b'}">${esc(storeName(i.price.best))}</span><small>saves ${money(Math.abs(i.price.at[a].cost - i.price.at[b].cost))}</small>` : '<small>same</small>'}</div>` : ''}
+    </div>`;
+  const section = (title, list, note = '') => list.length ? `
+    <section class="panel pr-section">
+      <h3><span>${esc(title)}</span>${note ? `<small>${note}</small>` : ''}</h3>
+      ${list.map(row).join('')}
+    </section>` : '';
+  return `<div class="pr-wrap ${b ? '' : 'one'}">
+    <div class="pr-head panel">
+      <div class="pr-row pr-cols">
+        <div class="pr-item"><b>${items.length} items</b><small>${pr.realCount ? `${pr.realCount} prices are yours` : 'All prices are estimates so far'}</small></div>
+        ${pr.stores.map((s, n) => `<div class="pc-head s-${n ? 'b' : 'a'}"><b>${esc(s.name)}</b><span>${money(pr.totals[s.key])}</span></div>`).join('')}
+        ${b ? `<div class="pc-head best"><b>Cheapest</b><span>${money(pr.plan.split)}</span></div>` : ''}
+      </div>
+    </div>
+    <p class="subtle pr-note">${icon('tag')} Tap any price to enter what it really costs (and its aisle). Your prices are saved and replace estimates from then on. Estimates use typical US prices for the package size you need, adjusted by each store's usual price level.${state.settings.countPantry ? '' : ' Pantry staples are left out of the totals.'}</p>
+    ${[...groups].map(([aisle, list]) => section(aisle, list)).join('')}
+    ${section('Pantry staples', pantry, state.settings.countPantry ? '' : 'not in totals')}
+  </div>`;
+}
+
+function renderShoppingPlan() {
+  const g = state.grocery;
+  const pr = g.pricing;
+  const none = priceSummary();
+  if (none) return none;
+  if (pr.stores.length < 2) return `<div class="panel empty"><h2>Add a second store</h2><p>Pick two stores in Settings to see whether splitting your shop saves money.</p><a class="btn primary" href="#settings">${icon('sliders')}Choose stores</a></div>`;
+  const plan = pr.plan;
+  const byKey = new Map(g.items.map((i) => [i.key, i]));
+  const [a, b] = pr.stores.map((s) => s.key);
+  const option = (label, total, active, extra = '') => `
+    <div class="plan-opt ${active ? 'active' : ''}">
+      <span>${label}</span><b>${money(total)}</b>${extra}
+      ${active ? `<span class="plan-badge">${icon('check')}Best plan</span>` : ''}
+    </div>`;
+  const aisleNum = (p) => { const m = /\d+/.exec(p.aisle || ''); return m ? Number(m[0]) : 999; };
+  const trip = (t, n) => {
+    const s = state.meta.stores[t.store];
+    const items = t.items.map((k) => byKey.get(k)).filter(Boolean)
+      .map((i) => ({ i, p: i.price.at[t.store] }))
+      .sort((x, y) => aisleNum(x.p) - aisleNum(y.p) || x.i.aisle.localeCompare(y.i.aisle) || x.i.name.localeCompare(y.i.name));
+    return `
+      <section class="panel trip">
+        <h3><span class="store-chip s-${t.store === a ? 'a' : 'b'}">${n + 1}. ${esc(s.name)}</span><b>${money(t.total)}</b></h3>
+        ${s.aisles ? `<p class="subtle">Sorted by aisle where you've saved one; tap a price to add the aisle.</p>` : ''}
+        ${items.map(({ i, p }) => `
+          <div class="trip-row ${i.checked ? 'done' : ''}">
+            <label class="g-item"><input type="checkbox" data-action="check" data-key="${esc(i.key)}" ${i.checked ? 'checked' : ''}><span class="g-box">${icon('check')}</span>
+              <span class="g-text"><span class="g-name">${esc(i.name)}</span><span class="g-for">${esc(qtyText(i.price.buy))} · ${p.aisle ? `Aisle ${esc(p.aisle)}` : esc(i.aisle)}</span></span></label>
+            <button class="pc ${p.real ? 'real' : 'est'}" data-action="edit-price" data-key="${esc(i.key)}" data-store="${t.store}"><b>${money(p.cost)}</b><small>${p.real ? 'yours' : 'est.'}</small></button>
+          </div>`).join('')}
+      </section>`;
+  };
+  const verdict = plan.splitWorthIt
+    ? `Split your shop: get ${plan.trips[0].items.length} items at ${esc(storeName(plan.trips[0].store))} and ${plan.trips[1].items.length} at ${esc(storeName(plan.trips[1].store))} to save <b>${money(plan.savings)}</b>.`
+    : plan.savings > 0
+      ? `Shop everything at <b>${esc(storeName(plan.cheapest))}</b>. Splitting would only save ${money(plan.savings)}, under your ${money(plan.threshold)} limit for a second trip.`
+      : `Shop everything at <b>${esc(storeName(plan.cheapest))}</b>. It's the cheapest for every item${pr.realCount ? '' : ' at the estimated prices'}.`;
+  return `
+    <div class="plan-opts">
+      ${option(`All at ${esc(storeName(a))}`, pr.totals[a], !plan.splitWorthIt && plan.cheapest === a)}
+      ${option(`All at ${esc(storeName(b))}`, pr.totals[b], !plan.splitWorthIt && plan.cheapest === b)}
+      ${option('Split between both', plan.split, plan.splitWorthIt, `<small>saves ${money(plan.savings)}</small>`)}
+    </div>
+    <p class="plan-verdict panel">${verdict}</p>
+    ${pr.realCount ? '' : `<p class="subtle pr-note">${icon('tag')} These are estimates, so one store tends to win everything. Enter real prices as you shop (tap any price) and the plan will start finding the real bargains at each store.</p>`}
+    ${plan.trips.map(trip).join('')}`;
+}
+
+function openPriceEditor(key, storeKey) {
+  const i = state.grocery.items.find((x) => x.key === key);
+  const p = i.price.at[storeKey];
+  const s = state.meta.stores[storeKey];
+  const unit = i.price.buy.unitLabel;
+  openModal(`
+    <form class="modal-content" data-form="save-price" data-key="${esc(key)}" data-store="${storeKey}">
+      <h2 id="modal-title">${esc(i.name)} at ${esc(s.name)}</h2>
+      <p class="subtle" style="margin:0">You need ${esc(qtyText(i.price.buy))}${i.amount ? ` (recipes call for ${esc(i.amount)})` : ''}. ${p.real ? 'This is the price you saved.' : `Estimated at ${money(p.unitPrice)} ${unit === 'per lb' ? 'per lb' : `for ${esc(unit)}`}.`}</p>
+      <div class="field-row">
+        <div class="field"><label for="pe-price">Price ${unit === 'per lb' ? 'per lb' : unit === 'each' ? 'each' : `for ${esc(unit)}`}</label>
+          <div class="money"><span>${esc(state.settings.currency)}</span><input id="pe-price" class="input" name="price" type="number" inputmode="decimal" min="0" step="0.01" value="${p.real ? p.unitPrice : ''}" placeholder="${p.unitPrice.toFixed(2)}"></div></div>
+        <div class="field"><label for="pe-aisle">Aisle</label><input id="pe-aisle" class="input" name="aisle" maxlength="30" value="${esc(p.aisle)}" placeholder="${s.aisles ? 'e.g. 12' : 'optional'}"></div>
+      </div>
+      <p class="subtle" style="margin:0">Saved for ${esc(s.name)} and used every week from now on.</p>
+      <div class="modal-actions">
+        <button class="btn primary">${icon('check')}Save</button>
+        ${p.real || p.aisle ? `<button type="button" class="btn ghost" data-action="clear-price" data-key="${esc(key)}" data-store="${storeKey}">Use estimate</button>` : ''}
+      </div>
+    </form>`);
+  setTimeout(() => $('#pe-price', modalBody)?.focus(), 50);
+}
+
+function renderGroceryList() {
   const g = state.grocery;
   const total = g.items.length + g.extras.length;
   const done = g.items.filter((i) => i.checked).length + g.extras.filter((e) => e.checked).length;
@@ -370,6 +517,7 @@ function renderGroceries() {
         ${i.amount ? `<span class="g-amount">${esc(i.amount)}</span>` : ''}
         <span class="g-for" title="${esc(i.recipes.join(', '))}">${esc(i.recipes.join(' · '))}</span>
       </span>
+      ${bestPrice(i) && !i.price.pantry ? `<span class="g-price"><b>${money(bestPrice(i).cost)}</b><small>${esc(storeName(bestPrice(i).store))}</small></span>` : ''}
     </label>`;
 
   const extraRow = (e) => `
@@ -537,6 +685,33 @@ function renderSettings() {
           <label for="currency">Currency symbol</label>
           <input id="currency" class="input" style="max-width:6rem" maxlength="4" data-setting="currency" value="${esc(s.currency)}">
         </div>
+      </section>
+
+      <section class="panel">
+        <h2>Stores &amp; prices</h2>
+        <div class="field-row">
+          ${[0, 1].map((n) => `
+            <div class="field">
+              <label for="store-${n}">${n ? 'Second store' : 'Main store'}</label>
+              <select id="store-${n}" class="input" data-store-idx="${n}">
+                ${n ? '<option value="">None</option>' : ''}
+                ${Object.entries(state.meta.stores).map(([k, st]) => `<option value="${k}" ${s.stores[n] === k ? 'selected' : ''}>${esc(st.name)}</option>`).join('')}
+              </select>
+            </div>`).join('')}
+        </div>
+        <div class="field-row">
+          ${s.stores.map((k) => `
+            <div class="field">
+              <label for="lvl-${k}">${esc(storeName(k))} price level</label>
+              <div class="money"><input id="lvl-${k}" class="input" type="number" min="-60" max="100" step="1" data-store-level="${k}" value="${s.storeLevels[k] ?? state.meta.stores[k].level}"><span>% vs. average</span></div>
+            </div>`).join('')}
+        </div>
+        <div class="field">
+          <label for="trip">Worth a second trip if it saves at least</label>
+          <div class="money"><span>${esc(s.currency)}</span><input id="trip" class="input" type="number" min="0" step="1" data-setting="tripThreshold" value="${s.tripThreshold}"></div>
+        </div>
+        <label class="switch"><span><b>Count pantry staples</b><br><small class="subtle">Include spices, oils and sauces in price totals and the shopping plan.</small></span><input type="checkbox" data-setting="countPantry" ${s.countPantry ? 'checked' : ''}></label>
+        <small class="subtle">Meijer, Aldi, Walmart and Target don't publish prices for other apps to use, so the app starts with estimates (typical US prices adjusted by each store's usual price level, which you can tune above). Tap any price on the Groceries tab to save the real one and the aisle; your prices are remembered and used every week.</small>
       </section>
 
       <section class="panel">
@@ -839,7 +1014,7 @@ async function updateSettings(patch) {
     const clash = state.plan.slots.filter((sl) => sl.recipeId && state.byId.has(sl.recipeId) && avoidHits(state.byId.get(sl.recipeId)).length).length;
     if (clash) toast(`${clash} planned meal${clash > 1 ? 's' : ''} this week contain${clash > 1 ? '' : 's'} something on your list. They're marked ⚠ on the plan.`, '', 'clash');
   }
-  if ('meals' in patch || 'householdSize' in patch) await loadWeek();
+  if (['meals', 'householdSize', 'stores', 'storeLevels', 'tripThreshold', 'countPantry'].some((k) => k in patch)) await loadWeek();
   if ('weekStartsOn' in patch) { state.weekKey = weekStart(parseKey(state.weekKey)); await loadWeek(); }
   render();
 }
@@ -882,6 +1057,15 @@ const actions = {
   fav: (el) => toggleFavorite(el.dataset.id),
   'open-recipe': (el) => openRecipe(el.dataset.id, el.dataset.slot),
   'close-modal': () => modal.close(),
+  'grocery-view': (el) => { state.groceryView = el.dataset.view; saveLocal('groceryView', state.groceryView); render(); },
+  'edit-price': (el, e) => { e.preventDefault(); openPriceEditor(el.dataset.key, el.dataset.store); },
+  'clear-price': async (el) => {
+    await api('PUT', '/api/prices', { store: el.dataset.store, key: el.dataset.key, price: 0, aisle: '' });
+    modal.close();
+    state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
+    render();
+    toast('Back to the estimated price');
+  },
   'toggle-hide': () => { state.hideChecked = !state.hideChecked; saveLocal('hideChecked', state.hideChecked); render(); },
   'uncheck-all': async () => { state.grocery = await api('PATCH', `/api/weeks/${state.weekKey}/grocery`, { uncheckAll: true }); render(); },
   'remove-extra': async (el, e) => {
@@ -1136,6 +1320,12 @@ document.addEventListener('change', (e) => {
   } else if (el.dataset.action === 'theme') {
     saveLocal('theme', el.value);
     document.documentElement.dataset.theme = el.value;
+  } else if (el.dataset.storeIdx != null) {
+    const stores = [...state.settings.stores];
+    stores[Number(el.dataset.storeIdx)] = el.value;
+    busy(null, () => updateSettings({ stores: stores.filter(Boolean) }));
+  } else if (el.dataset.storeLevel) {
+    busy(null, () => updateSettings({ storeLevels: { ...state.settings.storeLevels, [el.dataset.storeLevel]: el.value } }));
   } else if (el.dataset.setting) {
     const key = el.dataset.setting;
     const value = el.type === 'checkbox' ? el.checked : el.type === 'number' || key === 'weekStartsOn' ? Number(el.value) || 0 : el.value;
@@ -1223,6 +1413,13 @@ document.addEventListener('submit', (e) => {
     'add-creator': async () => {
       await updateSettings({ creators: [...state.settings.creators, { name: data.name.trim(), url: data.url.trim(), handle: '' }] });
       toast(`Following ${data.name}. Tap Pull to get their recipes.`);
+    },
+    'save-price': async () => {
+      await api('PUT', '/api/prices', { store: form.dataset.store, key: form.dataset.key, price: data.price === '' ? 0 : Number(data.price), aisle: data.aisle });
+      modal.close();
+      state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
+      render();
+      toast(`Saved for ${storeName(form.dataset.store)}`, '', 'price');
     },
     'add-to-plan': async () => {
       const id = $('[data-recipe]', modalBody).dataset.recipe;
