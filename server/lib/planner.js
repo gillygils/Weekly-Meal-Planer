@@ -134,14 +134,15 @@ export function pickRecipe({ meal, recipes, settings, usedIds, usedNames, recent
 }
 
 /** Fill all unlocked slots (or just `onlySlotId`) with random recipes. */
-export function randomizePlan(plan, recipes, settings, { recentIds = new Set(), onlySlotId = null, rng = Math.random } = {}) {
+/** Fill unlocked meals with random recipes: the whole week, one day (`onlyDay`) or one meal (`onlySlotId`). */
+export function randomizePlan(plan, recipes, settings, { recentIds = new Set(), onlySlotId = null, onlyDay = null, rng = Math.random } = {}) {
   const byId = new Map(recipes.map((r) => [r.id, r]));
   // Allergies & dislikes are a hard rule: those recipes are never candidates.
   const avoid = createAvoidMatcher(settings);
   const pool = recipes.filter((r) => !avoid(r.ingredients.map((i) => i.name)).length);
   const usedIds = new Set();
   const usedNames = new Set();
-  const reroll = (s) => !s.locked && !s.off && (!onlySlotId || s.id === onlySlotId);
+  const reroll = (s) => !s.locked && !s.off && (onlySlotId ? s.id === onlySlotId : onlyDay != null ? s.day === onlyDay : true);
   for (const s of plan.slots) {
     if (!reroll(s) && s.recipeId && byId.has(s.recipeId)) {
       usedIds.add(s.recipeId);
@@ -151,7 +152,7 @@ export function randomizePlan(plan, recipes, settings, { recentIds = new Set(), 
   for (const s of plan.slots) {
     if (!reroll(s)) continue;
     // Re-rolling a single slot should give something different from what's there now.
-    if (onlySlotId && s.recipeId) usedIds.add(s.recipeId);
+    if ((onlySlotId || onlyDay != null) && s.recipeId) usedIds.add(s.recipeId);
     const pick = pickRecipe({ meal: s.meal, recipes: pool, settings, usedIds, usedNames, recentIds, rng });
     s.recipeId = pick ? pick.id : null;
     if (pick) {

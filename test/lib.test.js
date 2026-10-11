@@ -299,3 +299,16 @@ test('pantry matching', async () => {
   assert.equal(m('extra virgin olive oil'), 'olive oil');
   assert.equal(m('onion'), null);
 });
+
+test('re-rolling one day leaves every other day alone', () => {
+  const recipes = Array.from({ length: 40 }, (_, i) => mk(`d${i}`));
+  const plan = ensureSlots({ key: '2026-10-05', slots: [] }, ['lunch', 'dinner']);
+  randomizePlan(plan, recipes, { meals: ['lunch', 'dinner'], excludedProteins: [] });
+  plan.slots.find((s) => s.id === '3-lunch').locked = true;
+  const before = Object.fromEntries(plan.slots.map((s) => [s.id, s.recipeId]));
+  randomizePlan(plan, recipes, { meals: ['lunch', 'dinner'], excludedProteins: [] }, { onlyDay: 3 });
+  for (const s of plan.slots) {
+    if (s.id === '3-dinner') assert.notEqual(s.recipeId, before[s.id], 'unlocked meal on that day changes');
+    else assert.equal(s.recipeId, before[s.id], `${s.id} untouched`);
+  }
+});

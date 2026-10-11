@@ -346,6 +346,14 @@ route('POST', '/api/weeks/:key/slots/:slot/reroll', ({ params }) => {
   store.save();
   return plan;
 });
+route('POST', '/api/weeks/:key/days/:day/reroll', ({ params }) => {
+  const plan = getWeek(params.key);
+  const day = Number(params.day);
+  if (!Number.isInteger(day) || day < 0 || day > 6) throw new HttpError(400, 'Day must be 0-6');
+  randomizePlan(plan, store.db.recipes, store.db.settings, { recentIds: recentIds(plan.key), onlyDay: day });
+  store.save();
+  return plan;
+});
 route('PATCH', '/api/weeks/:key/slots/:slot', ({ params, body }) => {
   const plan = getWeek(params.key);
   const slot = plan.slots.find((s) => s.id === params.slot);

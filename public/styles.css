@@ -282,9 +282,14 @@ main { padding: 1rem var(--gutter) 2.5rem; max-width: 150rem; margin: 0 auto; ou
 @media (min-width: 1700px) { .week-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
 
 .day { display: flex; flex-direction: column; gap: .7rem; padding: .85rem; }
-.day-head { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; padding: 0 .2rem; }
+.day-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: 0 .2rem; min-height: 2rem; }
 .day-head h2 { font-size: 1.05rem; }
 .day-head span { color: var(--muted); font-size: .85rem; }
+.dh-right { display: inline-flex; align-items: center; gap: .4rem; }
+.day-dice { width: 2rem; height: 2rem; border: 0; background: var(--surface-2); color: var(--muted); }
+.day-dice:hover { color: var(--accent); }
+.day-dice svg { width: 1.05rem; height: 1.05rem; }
+.day.today .day-dice { background: color-mix(in srgb, var(--on-accent) 18%, transparent); color: var(--on-accent); }
 /* Today: solid orange header band and a glow, so it's obvious at a glance (even across a room on a TV). */
 .day.today {
   padding-top: 0; scroll-margin-top: 1rem;

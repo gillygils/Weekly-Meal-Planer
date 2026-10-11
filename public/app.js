@@ -381,7 +381,12 @@ function renderPlan() {
     const slots = enabled.map((m) => plan.slots.find((s) => s.day === d && s.meal === m)).filter(Boolean);
     days.push(`
       <section class="panel day ${isoDate(date) === todayKey ? 'today' : ''} ${thisWeek && isoDate(date) < todayKey ? 'past' : ''}" data-day="${d}" aria-label="${DAY_NAMES[date.getDay()]}">
-        <div class="day-head"><h2>${DAY_NAMES[date.getDay()]}</h2><span>${date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span></div>
+        <div class="day-head">
+          <h2>${DAY_NAMES[date.getDay()]}</h2>
+          <span class="dh-right">${date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+            ${slots.some((s) => !s.locked && !s.off) ? `<button class="icon-btn sm day-dice" data-action="reroll-day" data-day="${d}" title="New recipes for ${DAY_NAMES[date.getDay()]} (locked meals stay)" aria-label="Randomize ${DAY_NAMES[date.getDay()]}'s unlocked meals">${icon('dice')}</button>` : ''}
+          </span>
+        </div>
         ${slots.map((s) => `${enabled.length > 1 ? `<div class="meal-label">${s.meal}</div>` : ''}${renderSlot(s)}`).join('')}
         ${dayMacros(slots.filter((s) => !s.off))}
       </section>`);
@@ -477,7 +482,7 @@ function renderSlot(s) {
       <button class="icon-btn sm grip" data-drag-handle title="Drag to another day (or use the arrow keys)" aria-label="Move ${esc(r.name)} to another day. Use the arrow keys.">${icon('grip')}</button>
       <div class="meal-actions">
         <button class="icon-btn sm lock" data-action="lock" data-slot="${s.id}" aria-pressed="${s.locked}" title="${s.locked ? 'Unlock (randomizer can change it)' : 'Lock in (randomizer will keep it)'}" aria-label="${s.locked ? 'Unlock' : 'Lock'} ${esc(r.name)}">${icon(s.locked ? 'lock' : 'unlock')}</button>
-        <button class="icon-btn sm" data-action="reroll" data-slot="${s.id}" ${s.locked ? 'disabled' : ''} title="Random new recipe" aria-label="Random new recipe">${icon('dice')}</button>
+        <button class="icon-btn sm" data-action="reroll" data-slot="${s.id}" ${s.locked ? 'disabled' : ''} title="New recipe for just this meal" aria-label="New recipe for just this meal">${icon('dice')}</button>
         <button class="icon-btn sm" data-action="choose" data-slot="${s.id}" title="Choose a recipe" aria-label="Choose a recipe">${icon('swap')}</button>
         <button class="icon-btn sm fav push" data-action="fav" data-id="${esc(r.id)}" aria-pressed="${r.favorite}" title="${r.favorite ? 'Remove favorite' : 'Favorite'}" aria-label="Favorite">${icon(r.favorite ? 'heart-fill' : 'heart')}</button>
       </div>
@@ -1298,6 +1303,11 @@ const actions = {
     await setPlan(await api('POST', `/api/weeks/${state.weekKey}/clear`));
   },
   reroll: async (el) => setPlan(await api('POST', `/api/weeks/${state.weekKey}/slots/${el.dataset.slot}/reroll`)),
+  'reroll-day': async (el) => {
+    await setPlan(await api('POST', `/api/weeks/${state.weekKey}/days/${el.dataset.day}/reroll`));
+    const name = DAY_NAMES[addDays(parseKey(state.weekKey), Number(el.dataset.day)).getDay()];
+    toast(`New picks for ${name}`, '', 'reroll');
+  },
   lock: async (el) => {
     const slot = state.plan.slots.find((s) => s.id === el.dataset.slot);
     await setPlan(await api('PATCH', `/api/weeks/${state.weekKey}/slots/${slot.id}`, { locked: !slot.locked }));
