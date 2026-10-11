@@ -7,6 +7,10 @@ A self-hostable weekly meal planner for your household. Randomize a week of meal
 - **Week by week planning.** Every week has its own plan. Move between weeks with the arrows, or tap the date to jump back to this week.
 - **Randomize** fills every unlocked meal. It avoids repeats within a week, and avoids last and next week's meals when it can.
 - **Lock** 🔒 a meal you like and the randomizer will keep it. You can also re-roll 🎲 a single meal, or choose one by hand (hand-picked meals are locked automatically).
+- **Drag meals between days.** Drag a meal onto another day and the meals in between shift over by one. Locked meals stay on their day and the rest flow around them; dropping onto a locked meal swaps the two.
+  - Mouse: drag the tile.
+  - Phone or tablet: press and hold the tile, or drag the ⠿ handle on its photo.
+  - Keyboard or TV remote: focus the handle and use the arrow keys.
 - **Grocery list tab.** The week's ingredients are merged, scaled to your household size, and sorted by aisle. You can check items off, add your own (paper towels, snacks…), hide checked items, and copy or share the list.
 - **840+ recipes are included**, pulled from [TheMealDB](https://www.themealdb.com) and [DummyJSON](https://dummyjson.com/docs/recipes).
   - **Pull more recipes** fetches anything new from those sources.

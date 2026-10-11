@@ -5,7 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { Store, sanitizeSettings } from './store.js';
-import { ensureSlots, randomizePlan } from './lib/planner.js';
+import { ensureSlots, randomizePlan, moveMeal } from './lib/planner.js';
 import { buildGroceryList } from './lib/grocery.js';
 import { fetchAllSources, importFromUrl } from './lib/sources.js';
 import { PROTEINS, ALLERGEN_GROUPS } from './lib/recipes.js';
@@ -215,6 +215,16 @@ route('PATCH', '/api/weeks/:key/slots/:slot', ({ params, body }) => {
   }
   if ('locked' in body) slot.locked = Boolean(body.locked) && Boolean(slot.recipeId);
   plan.updatedAt = new Date().toISOString();
+  store.save();
+  return plan;
+});
+route('POST', '/api/weeks/:key/move', ({ params, body }) => {
+  const plan = getWeek(params.key);
+  const from = Number(body.from);
+  const to = Number(body.to);
+  const valid = (d) => Number.isInteger(d) && d >= 0 && d < 7;
+  if (!valid(from) || !valid(to) || !plan.slots.some((s) => s.meal === body.meal)) throw new HttpError(400, 'Invalid move');
+  moveMeal(plan, body.meal, from, to);
   store.save();
   return plan;
 });

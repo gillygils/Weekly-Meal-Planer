@@ -162,10 +162,32 @@ async function loadWeek() {
   state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
 }
 
-async function setPlan(plan) {
+async function setPlan(plan, { animate = false } = {}) {
+  const before = animate ? tilePositions() : null;
   state.plan = plan;
   state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
   render();
+  if (before) slideFrom(before);
+}
+
+// Remember where each meal tile is, then after re-rendering slide tiles from
+// their old spot to the new one so a move is easy to follow.
+function tilePositions() {
+  const map = new Map();
+  document.querySelectorAll('.meal[data-recipe]').forEach((el) => map.set(`${el.dataset.meal}|${el.dataset.recipe}`, el.getBoundingClientRect()));
+  return map;
+}
+function slideFrom(before) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.meal[data-recipe]').forEach((el) => {
+    const old = before.get(`${el.dataset.meal}|${el.dataset.recipe}`);
+    if (!old) return;
+    const now = el.getBoundingClientRect();
+    const dx = old.left - now.left;
+    const dy = old.top - now.top;
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+    el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  });
 }
 
 // ---------- rendering ----------
@@ -214,7 +236,7 @@ function renderPlan() {
     const date = addDays(start, d);
     const slots = enabled.map((m) => plan.slots.find((s) => s.day === d && s.meal === m)).filter(Boolean);
     days.push(`
-      <section class="panel day ${isoDate(date) === todayKey ? 'today' : ''}" aria-label="${DAY_NAMES[date.getDay()]}">
+      <section class="panel day ${isoDate(date) === todayKey ? 'today' : ''}" data-day="${d}" aria-label="${DAY_NAMES[date.getDay()]}">
         <div class="day-head"><h2>${DAY_NAMES[date.getDay()]}</h2><span>${date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span></div>
         ${slots.map((s) => `${enabled.length > 1 ? `<div class="meal-label">${s.meal}</div>` : ''}${renderSlot(s)}`).join('')}
       </section>`);
@@ -239,7 +261,7 @@ function renderSlot(s) {
   const r = s.recipeId && state.byId.get(s.recipeId);
   if (!r) {
     return `
-      <div class="meal empty-slot">
+      <div class="meal empty-slot" data-day="${s.day}" data-meal="${s.meal}">
         <span>No ${s.meal} planned</span>
         <div class="row">
           <button class="btn" data-action="reroll" data-slot="${s.id}">${icon('dice')}Random</button>
@@ -248,7 +270,7 @@ function renderSlot(s) {
       </div>`;
   }
   return `
-    <article class="meal ${s.locked ? 'locked' : ''}">
+    <article class="meal ${s.locked ? 'locked' : ''}" data-day="${s.day}" data-meal="${s.meal}" data-recipe="${esc(r.id)}">
       <button class="meal-open" data-action="open-recipe" data-id="${esc(r.id)}" data-slot="${s.id}" aria-label="Open ${esc(r.name)}">
         <div class="meal-img">${imgTag(r, 'medium')}${s.locked ? `<span class="lock-flag">${icon('lock')}<span>Locked</span></span>` : ''}</div>
         <div class="meal-body">
@@ -256,6 +278,7 @@ function renderSlot(s) {
           <div class="meal-meta">${chips(r)}</div>
         </div>
       </button>
+      <button class="icon-btn sm grip" data-drag-handle title="Drag to another day (or use the arrow keys)" aria-label="Move ${esc(r.name)} to another day. Use the arrow keys.">${icon('grip')}</button>
       <div class="meal-actions">
         <button class="icon-btn sm lock" data-action="lock" data-slot="${s.id}" aria-pressed="${s.locked}" title="${s.locked ? 'Unlock (randomizer can change it)' : 'Lock in (randomizer will keep it)'}" aria-label="${s.locked ? 'Unlock' : 'Lock'} ${esc(r.name)}">${icon(s.locked ? 'lock' : 'unlock')}</button>
         <button class="icon-btn sm" data-action="reroll" data-slot="${s.id}" ${s.locked ? 'disabled' : ''} title="Random new recipe" aria-label="Random new recipe">${icon('dice')}</button>
@@ -735,6 +758,139 @@ async function changeWeek(days) {
   await loadWeek();
   render();
 }
+
+// ---------- drag meals between days ----------
+// Mouse: drag a tile anywhere. Touch: press and hold a tile, or drag the grip
+// handle straight away. Keyboard / TV remote: focus the grip and use arrows.
+
+let drag = null;
+let suppressClick = false;
+
+async function moveMealTo(meal, from, to) {
+  if (from === to || to < 0 || to > 6) return;
+  await setPlan(await api('POST', `/api/weeks/${state.weekKey}/move`, { meal, from, to }), { animate: true });
+}
+
+function dropTargetAt(x, y) {
+  const el = document.elementFromPoint(x, y);
+  const day = el && el.closest('.day[data-day]');
+  return day ? Number(day.dataset.day) : null;
+}
+
+function startDrag() {
+  const d = drag;
+  d.active = true;
+  clearTimeout(d.timer);
+  const rect = d.tile.getBoundingClientRect();
+  d.offsetX = d.x - rect.left;
+  d.offsetY = d.y - rect.top;
+  d.ghost = d.tile.cloneNode(true);
+  d.ghost.classList.add('drag-ghost');
+  d.ghost.style.width = `${rect.width}px`;
+  document.body.append(d.ghost);
+  d.tile.classList.add('dragging');
+  document.body.classList.add('is-dragging');
+  navigator.vibrate?.(12);
+  moveGhost();
+  d.raf = requestAnimationFrame(autoScroll);
+}
+
+function moveGhost() {
+  const d = drag;
+  d.ghost.style.transform = `translate(${d.x - d.offsetX}px, ${d.y - d.offsetY}px) rotate(1.5deg) scale(1.03)`;
+  const day = dropTargetAt(d.x, d.y);
+  if (day === d.overDay) return;
+  d.overDay = day;
+  document.querySelectorAll('.drop-target').forEach((el) => el.classList.remove('drop-target'));
+  if (day != null && day !== d.from) {
+    document.querySelector(`.day[data-day="${day}"] .meal[data-meal="${d.meal}"]`)?.classList.add('drop-target');
+    document.querySelector(`.day[data-day="${day}"]`)?.classList.add('drop-target');
+  }
+}
+
+// Scroll the page when dragging near the top or bottom edge (phones stack the days).
+function autoScroll() {
+  if (!drag?.active) return;
+  const edge = 90;
+  const bottom = innerHeight - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tabbar-h')) || 0) * 16;
+  let dy = 0;
+  if (drag.y < edge) dy = -Math.ceil((edge - drag.y) / 6);
+  else if (drag.y > bottom - edge) dy = Math.ceil((drag.y - (bottom - edge)) / 6);
+  if (dy) { window.scrollBy(0, dy); moveGhost(); }
+  drag.raf = requestAnimationFrame(autoScroll);
+}
+
+function endDrag(commit) {
+  const d = drag;
+  drag = null;
+  if (!d) return;
+  clearTimeout(d.timer);
+  if (!d.active) return;
+  cancelAnimationFrame(d.raf);
+  d.ghost.remove();
+  d.tile.classList.remove('dragging');
+  document.body.classList.remove('is-dragging');
+  document.querySelectorAll('.drop-target').forEach((el) => el.classList.remove('drop-target'));
+  suppressClick = true;
+  setTimeout(() => { suppressClick = false; }, 0);
+  if (commit && d.overDay != null && d.overDay !== d.from) busy(null, () => moveMealTo(d.meal, d.from, d.overDay));
+}
+
+document.addEventListener('pointerdown', (e) => {
+  if (state.tab !== 'plan' || drag || (e.pointerType === 'mouse' && e.button !== 0)) return;
+  const tile = e.target.closest('.meal[data-recipe]');
+  if (!tile) return;
+  const handle = e.target.closest('[data-drag-handle]');
+  if (!handle && e.target.closest('.meal-actions')) return; // let the other buttons work normally
+  drag = { tile, from: Number(tile.dataset.day), meal: tile.dataset.meal, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, type: e.pointerType, active: false, overDay: null };
+  if (handle) {
+    e.preventDefault();
+    startDrag();
+  } else if (e.pointerType !== 'mouse') {
+    drag.timer = setTimeout(() => drag && !drag.active && startDrag(), 380); // press and hold
+  }
+});
+
+document.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  drag.x = e.clientX;
+  drag.y = e.clientY;
+  if (!drag.active) {
+    const moved = Math.hypot(drag.x - drag.sx, drag.y - drag.sy);
+    if (drag.type === 'mouse' && moved > 6) startDrag();
+    else if (drag.type !== 'mouse' && moved > 10) endDrag(false); // finger moved first: it's a scroll
+    return;
+  }
+  moveGhost();
+});
+document.addEventListener('pointerup', () => endDrag(true));
+document.addEventListener('pointercancel', () => endDrag(false));
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drag?.active) endDrag(false); });
+// While dragging on a touch screen, stop the page from scrolling under the finger.
+document.addEventListener('touchmove', (e) => { if (drag?.active) e.preventDefault(); }, { passive: false });
+document.addEventListener('contextmenu', (e) => { if (drag) e.preventDefault(); });
+// A drag shouldn't also count as a click that opens the recipe.
+document.addEventListener('click', (e) => { if (suppressClick) { e.stopPropagation(); e.preventDefault(); } }, true);
+
+document.addEventListener('keydown', (e) => {
+  const handle = e.target.closest?.('[data-drag-handle]');
+  if (!handle) return;
+  const step = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[e.key];
+  if (!step) return;
+  e.preventDefault();
+  const tile = handle.closest('.meal');
+  const { meal } = tile.dataset;
+  const from = Number(tile.dataset.day);
+  const to = from + step;
+  if (to < 0 || to > 6) return;
+  // Moving onto a locked day swaps the two; otherwise the meal moves and others shift.
+  const recipe = tile.dataset.recipe;
+  busy(null, async () => {
+    await moveMealTo(meal, from, to);
+    const moved = state.plan.slots.find((s) => s.meal === meal && s.recipeId === recipe);
+    document.querySelector(`.meal[data-day="${moved?.day}"][data-meal="${meal}"] [data-drag-handle]`)?.focus();
+  });
+});
 
 document.addEventListener('click', (e) => {
   const el = e.target.closest('[data-action]');

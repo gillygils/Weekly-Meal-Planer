@@ -306,6 +306,25 @@ main { padding: 1rem var(--gutter) 2.5rem; max-width: 150rem; margin: 0 auto; ou
 .meal-actions { display: flex; gap: .4rem; padding: .5rem .75rem .7rem; }
 .meal-actions .push { margin-left: auto; }
 
+.grip {
+  position: absolute; top: .45rem; right: .45rem; z-index: 2;
+  cursor: grab; touch-action: none; border: 0;
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.grip:hover { background: var(--surface-2); color: var(--accent); }
+.meal[data-recipe] { -webkit-touch-callout: none; }
+.meal[data-recipe] img { -webkit-user-drag: none; user-select: none; }
+.meal.dragging { opacity: .35; }
+.drag-ghost {
+  position: fixed; top: 0; left: 0; z-index: 200; margin: 0; pointer-events: none;
+  box-shadow: var(--shadow-lg), 0 0 0 2px var(--accent); border-radius: var(--radius-sm);
+  will-change: transform;
+}
+body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select: none; -webkit-user-select: none; }
+.day.drop-target { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow); }
+.meal.drop-target { outline: 2px dashed var(--accent); outline-offset: 3px; }
+
 .meal.empty-slot { border: 2px dashed var(--border); background: transparent; padding: 1rem; gap: .6rem; align-items: center; text-align: center; color: var(--muted); }
 .meal.empty-slot .row { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; }
 
@@ -315,6 +334,7 @@ main { padding: 1rem var(--gutter) 2.5rem; max-width: 150rem; margin: 0 auto; ou
   .meal-body { align-content: center; padding: .6rem .75rem; }
   .lock-flag span { display: none; }
   .r-card .meal-body { padding-right: 3rem; }
+  .meal[data-recipe] .meal-body { padding-right: 2.9rem; }
 }
 
 /* ---------- Groceries ---------- */
