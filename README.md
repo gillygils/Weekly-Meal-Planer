@@ -19,6 +19,8 @@ A self-hostable weekly meal planner for your household. Randomize a week of meal
 - **Pantry ("already have").** List what's in your pantry, spice rack, fridge and freezer. Grocery items you already have are moved to "Already have" automatically and left out of price totals.
   - "Rice" covers basmati rice and "chicken" covers chicken thighs, but "chicken" doesn't cover chicken stock.
   - Tap the jar on any list item to add it to the pantry. Tap **Need to buy** when you've run out.
+  - **Scan a shelf:** take a photo of your spice rack, a pantry shelf or your oils and Claude reads the labels into a list (needs an Anthropic API key, see [Photo scanning](#photo-scanning)). You check and fix the list before anything is added.
+  - **Scan barcodes:** point the camera at barcodes and each product is looked up on [Open Food Facts](https://world.openfoodfacts.org) (free, no key). Live camera scanning works in Chrome on Android; on iPhone, type the number under the barcode or use photo scanning.
 - **Store prices and the cheapest shop.** Pick the two stores you use (Meijer, Aldi, Walmart, Target, Kroger, Costco and more).
   - **Compare prices:** each item's price at both stores, and which one is cheaper.
   - **Shopping plan:** compares "all at store A", "all at store B" and splitting the trip. A split is only recommended when it saves at least the amount you set. Each store gets its own list, sorted by aisle.
@@ -62,11 +64,12 @@ To require a password, set `APP_PASSWORD` in `docker-compose.yml`. Any username 
 
 ### Plain Node.js (18+)
 
-No `npm install` needed, because there are no dependencies.
-
 ```bash
-npm start            # http://localhost:3000
+npm install --omit=dev   # only needed for photo scanning (the Anthropic SDK)
+npm start                # http://localhost:3000
 ```
+
+Everything except photo scanning runs without `npm install`.
 
 | Env var | Default | Meaning |
 | --- | --- | --- |
@@ -75,8 +78,26 @@ npm start            # http://localhost:3000
 | `DATA_DIR` | `./data` | Where `db.json` is stored |
 | `APP_PASSWORD` | _(none)_ | Turns on HTTP basic auth |
 | `ALLOW_PRIVATE_IMPORTS` | `false` | Allow "Import from URL" to reach LAN addresses |
+| `ANTHROPIC_API_KEY` | _(none)_ | Turns on photo scanning for the pantry |
 
 If your server reaches the internet through an HTTP proxy, start Node with `NODE_USE_ENV_PROXY=1` (Node 22.21+) so recipe fetching uses `HTTPS_PROXY`.
+
+### Photo scanning
+
+Photo scanning sends the photo to Claude (`claude-opus-5-5`) to read the labels. It needs an API key from [console.anthropic.com](https://console.anthropic.com) and costs about 1–2 cents per photo. Photos are shrunk in the browser first (1568 pixels on the long side) and are not stored.
+
+For the systemd setup, keep the key in a file only root can read:
+
+```bash
+cd /opt/meal-planner && npm install --omit=dev
+echo 'ANTHROPIC_API_KEY=sk-ant-...' > /etc/meal-planner.env && chmod 600 /etc/meal-planner.env
+systemctl edit meal-planner      # add these two lines, then save:
+#   [Service]
+#   EnvironmentFile=/etc/meal-planner.env
+systemctl restart meal-planner
+```
+
+With Docker, add `ANTHROPIC_API_KEY` under `environment:` in `docker-compose.yml`. The request uses Anthropic's server-side fallback, so if a photo is ever declined by a safety check it's retried on another model automatically. The app allows up to 30 photo scans an hour.
 
 ## Notes
 

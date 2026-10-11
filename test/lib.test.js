@@ -348,3 +348,19 @@ test('re-rolling keeps offering new dishes before repeating', async () => {
   for (let i = 0; i < 4; i++) randomizePlan(plan, recipes, { meals: ['dinner'], excludedProteins: [] }, { onlySlotId: '5-dinner' });
   assert.ok(plan.slots[5].recipeId);
 });
+
+test('pantry scanning: barcode products and photo results', async () => {
+  const { productToName, placeForProduct, cleanItems, lookupBarcode, scanPhotos, aiScanEnabled } = await import('../server/lib/scan.js');
+  assert.equal(productToName({ product_name: 'McCormick Ground Cumin, 1.5 oz', brands: 'McCormick' }), 'cumin');
+  assert.equal(productToName({ product_name: 'Great Value Garlic Powder 3.4 oz', brands: 'Great Value,Walmart' }), 'garlic powder');
+  assert.equal(placeForProduct({ product_name: 'Garlic Powder' }), 'spices');
+  assert.equal(placeForProduct({ product_name: 'Vegetable Oil' }), 'pantry');
+  assert.deepEqual(cleanItems([{ name: 'Cumin', where: 'spices' }, { name: 'cumin ', where: 'spices' }, { name: 'Olive Oil', where: 'attic' }, { name: '' }]),
+    [{ name: 'cumin', where: 'spices' }, { name: 'olive oil', where: 'pantry' }]);
+  const fake = (body, status = 200) => async () => ({ status, ok: status < 400, json: async () => body });
+  assert.deepEqual(await lookupBarcode('041196910759', fake({ status: 1, product: { product_name: 'Bertolli Extra Light Olive Oil', brands: 'Bertolli' } })),
+    { code: '041196910759', name: 'extra light olive oil', where: 'pantry', brand: 'Bertolli' });
+  assert.equal(await lookupBarcode('000', fake({ status: 0 })), null);
+  // Without an API key, photo scanning says how to turn it on instead of failing oddly.
+  if (!aiScanEnabled()) await assert.rejects(scanPhotos([{ type: 'image/jpeg', data: 'x' }]), (e) => e.status === 501);
+});

@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { Store, sanitizeSettings } from './store.js';
 import { ensureSlots, randomizePlan, moveMeal, activeSlots, isEasy, wantsEasy } from './lib/planner.js';
 import { pantryMatch, PLACES, STAPLES } from './lib/pantry.js';
+import { aiScanEnabled, scanPhotos, lookupBarcode, ScanError } from './lib/scan.js';
 import { buildGroceryList } from './lib/grocery.js';
 import { fetchAllSources, importLink, normalizeUrl, pullCreatorSite, SUGGESTED_CREATORS } from './lib/sources.js';
 import { buildCustomRecipe } from './lib/custom.js';
@@ -58,12 +59,12 @@ function send(res, status, body) {
   res.end(data);
 }
 
-async function readBody(req) {
+async function readBody(req, limit = 1_000_000) {
   const chunks = [];
   let size = 0;
   for await (const chunk of req) {
     size += chunk.length;
-    if (size > 1_000_000) throw new HttpError(413, 'Request too large');
+    if (size > limit) throw new HttpError(413, 'Request too large');
     chunks.push(chunk);
   }
   if (!chunks.length) return {};
@@ -422,11 +423,15 @@ route('PUT', '/api/prices', ({ body }) => {
 const pantryState = () => ({ items: store.db.pantry, places: PLACES, staples: STAPLES });
 route('GET', '/api/pantry', pantryState);
 route('POST', '/api/pantry', ({ body }) => {
-  const where = PLACES.includes(body.where) ? body.where : 'pantry';
-  const names = String(body.name || '').split(',').map((n) => n.trim().slice(0, 60)).filter(Boolean);
-  if (!names.length) throw new HttpError(400, 'Type what you have.');
+  const place = (w) => (PLACES.includes(w) ? w : 'pantry');
+  // Either { name: "rice, cumin", where } typed in, or { items: [{ name, where }] } from a scan.
+  const entries = Array.isArray(body.items)
+    ? body.items.slice(0, 200).map((i) => ({ name: String(i?.name || '').trim().slice(0, 60), where: place(i?.where) }))
+    : String(body.name || '').split(',').map((n) => ({ name: n.trim().slice(0, 60), where: place(body.where) }));
+  const list = entries.filter((e) => e.name);
+  if (!list.length) throw new HttpError(400, 'Type what you have.');
   const have = new Set(store.db.pantry.map((p) => p.name.toLowerCase()));
-  for (const name of names) {
+  for (const { name, where } of list) {
     if (have.has(name.toLowerCase()) || store.db.pantry.length >= 500) continue;
     store.db.pantry.push({ id: crypto.randomUUID(), name, where, addedAt: new Date().toISOString() });
     have.add(name.toLowerCase());
@@ -434,6 +439,46 @@ route('POST', '/api/pantry', ({ body }) => {
   store.save();
   return pantryState();
 });
+
+// Camera: read a photo of a shelf with Claude, or look up a barcode. Nothing is
+// added until you confirm the list in the app.
+const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+let scanTimes = [];
+route('GET', '/api/pantry/scan', () => ({ photo: aiScanEnabled(), barcode: true }));
+route('POST', '/api/pantry/scan', async ({ body }) => {
+  const images = (Array.isArray(body.images) ? body.images : []).slice(0, 4).map((img) => ({
+    type: String(img?.type || ''),
+    data: String(img?.data || '').replace(/^data:[^,]*,/, ''),
+  }));
+  if (!images.length || images.some((i) => !IMAGE_TYPES.includes(i.type) || !i.data)) throw new HttpError(400, 'Send a JPEG, PNG or WebP photo.');
+  // Each scan costs a little on the API key, so keep runaway clicking in check.
+  scanTimes = scanTimes.filter((t) => t > Date.now() - 3600_000);
+  if (scanTimes.length >= 30) throw new HttpError(429, 'That is a lot of photo scans for one hour. Try again later.');
+  scanTimes.push(Date.now());
+  try {
+    const items = await scanPhotos(images);
+    return { items: markHave(items) };
+  } catch (e) {
+    if (e instanceof ScanError) throw new HttpError(e.status, e.message);
+    throw e;
+  }
+});
+route('GET', '/api/pantry/barcode/:code', async ({ params }) => {
+  if (!/^\d{6,14}$/.test(params.code)) throw new HttpError(400, "That doesn't look like a barcode.");
+  let found;
+  try {
+    found = await lookupBarcode(params.code);
+  } catch (e) {
+    if (e instanceof ScanError) throw new HttpError(e.status, e.message);
+    throw new HttpError(502, 'The barcode lookup is not reachable right now.');
+  }
+  if (!found) throw new HttpError(404, "That barcode isn't in the Open Food Facts database. Type the item in instead.");
+  return markHave([found])[0];
+});
+/** Flag scanned items the pantry already covers, so the app can leave them unticked. */
+function markHave(items) {
+  return items.map((it) => ({ ...it, have: Boolean(pantryMatch(it.name, store.db.pantry)) }));
+}
 route('DELETE', '/api/pantry/:id', ({ params }) => {
   store.db.pantry = store.db.pantry.filter((p) => p.id !== params.id);
   store.save();
@@ -529,7 +574,9 @@ const server = http.createServer(async (req, res) => {
         if (!auth?.hash) throw new HttpError(401, 'Set a PIN to start using the app.');
         if (!sessionValid(auth, readCookie(req))) throw new HttpError(401, 'Enter your PIN.');
       }
-      const body = ['POST', 'PUT', 'PATCH'].includes(req.method) ? await readBody(req) : {};
+      // Photo scans carry images, everything else is small.
+      const limit = pathname === '/api/pantry/scan' ? 12_000_000 : 1_000_000;
+      const body = ['POST', 'PUT', 'PATCH'].includes(req.method) ? await readBody(req, limit) : {};
       return send(res, 200, await r.handler({ params, body, req, res }));
     }
     throw new HttpError(404, 'Not found');

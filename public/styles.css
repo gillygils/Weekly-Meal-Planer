@@ -700,3 +700,25 @@ dialog[open] { animation: pop .18s ease-out; }
   body { background: #fff; color: #000; padding: 0; }
   .panel { box-shadow: none; }
 }
+
+/* Camera scanning (pantry) */
+.scan-btns { display: flex; flex-wrap: wrap; gap: .5rem; }
+.modal-content.scan { display: grid; gap: .8rem; }
+.modal-content.scan .segmented { margin: .6rem 0 0; }
+.scan-shoot { justify-self: start; cursor: pointer; }
+.scan-shoot.busy { opacity: .6; pointer-events: none; }
+.scan-video { position: relative; border-radius: var(--radius, 12px); overflow: hidden; background: #000; aspect-ratio: 4 / 3; max-height: 50vh; }
+.scan-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.scan-aim { position: absolute; inset: 30% 12%; border: 2px solid var(--accent); border-radius: 10px; box-shadow: 0 0 0 100vmax rgb(0 0 0 / .25); pointer-events: none; }
+.scan-status:empty { display: none; }
+.scan-results { display: grid; gap: .45rem; }
+.scan-results h3 { margin: .3rem 0 0; }
+.scan-results > p { margin: 0 0 .2rem; }
+.scan-row { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(6.5rem, 9rem) auto; gap: .5rem; align-items: center; }
+.scan-row .chip { white-space: nowrap; }
+.scan-row input[type=checkbox] { accent-color: var(--accent); width: 1.4rem; height: 1.4rem; }
+.scan-results > .btn { justify-self: start; margin-top: .3rem; }
+@media (max-width: 520px) {
+  .scan-row { grid-template-columns: auto minmax(0, 1fr); }
+  .scan-row select, .scan-row .chip { grid-column: 2; }
+}

@@ -14,5 +14,8 @@
     "fetch-recipes": "node scripts/fetch-recipes.js",
     "test": "node --test test/*.test.js"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.133.0"
+  }
 }

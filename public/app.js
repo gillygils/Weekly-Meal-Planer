@@ -744,6 +744,10 @@ function renderPantry() {
         </select>
         <button class="btn primary">${icon('plus')}Add</button>
       </form>
+      <div class="scan-btns">
+        <button class="btn" data-action="scan-open" data-mode="photo">${icon('camera')}Scan a shelf</button>
+        <button class="btn ghost" data-action="scan-open" data-mode="barcode">${icon('barcode')}Scan barcodes</button>
+      </div>
       ${staples.length ? `<div class="chips suggest"><span class="subtle">Common staples:</span>${staples.map(([n, w]) => `<button class="chip-toggle" data-action="add-staple" data-name="${esc(n)}" data-where="${w}">${icon('plus')}${esc(n)}</button>`).join('')}</div>` : ''}
     </section>
     <div class="pantry-grid">
@@ -758,6 +762,163 @@ function renderPantry() {
         </section>`).join('')}
     </div>`;
 }
+
+// ---------- camera scanning (pantry) ----------
+
+// A photo of a shelf is read on the server by Claude; barcodes are read in the
+// browser and looked up on Open Food Facts. Either way you review the list first.
+const scan = { mode: 'photo', caps: null, results: [], codes: new Set(), stream: null, timer: null, status: '' };
+
+async function openScan(mode) {
+  scan.mode = mode;
+  scan.results = [];
+  scan.codes = new Set();
+  scan.status = '';
+  scan.caps ||= await api('GET', '/api/pantry/scan');
+  drawScan();
+  if (mode === 'barcode' && 'BarcodeDetector' in window) startBarcodeCamera();
+}
+
+function drawScan() {
+  const photo = scan.mode === 'photo';
+  const live = 'BarcodeDetector' in window;
+  openModal(`
+    <div class="modal-content scan">
+      <div class="modal-head">
+        <h2 id="modal-title">${photo ? 'Scan a shelf' : 'Scan barcodes'}</h2>
+        <div class="segmented" role="tablist">
+          <button data-action="scan-mode" data-mode="photo" role="tab" aria-selected="${photo}">${icon('camera')}Photo</button>
+          <button data-action="scan-mode" data-mode="barcode" role="tab" aria-selected="${!photo}">${icon('barcode')}Barcode</button>
+        </div>
+      </div>
+      ${photo ? (scan.caps.photo ? `
+        <p class="subtle">Take a photo of your spice rack, a pantry shelf or your oils with the labels facing the camera. A few photos of different shelves works too. You'll check the list before anything is added.</p>
+        <label class="btn primary scan-shoot">${icon('camera')}Take or choose photos
+          <input type="file" accept="image/*" capture="environment" multiple data-scan-photo hidden>
+        </label>` : `
+        <p class="subtle">Photo scanning reads labels with Claude, which needs an Anthropic API key on your server. Add <code>ANTHROPIC_API_KEY</code> to the server's environment and restart it (the README has the steps). Barcode scanning works without a key.</p>`) : `
+        <p class="subtle">Point the camera at a barcode. Each one is looked up on Open Food Facts and added to the list below.${live ? '' : ' This browser can\'t read barcodes from the camera (Safari can\'t yet), so type the number under the barcode instead.'}</p>
+        ${live ? '<div class="scan-video"><video playsinline muted autoplay></video><span class="scan-aim"></span></div>' : ''}
+        <form class="inline-form" data-form="scan-code">
+          <input class="input" name="code" inputmode="numeric" pattern="[0-9]{6,14}" placeholder="Barcode number, e.g. 052100002064" aria-label="Barcode number" required>
+          <button class="btn">${icon('search')}Look up</button>
+        </form>`}
+      <p class="scan-status subtle" aria-live="polite">${esc(scan.status)}</p>
+      <form data-form="save-scan" class="scan-results">${renderScanResults()}</form>
+    </div>`);
+}
+
+function renderScanResults() {
+  if (!scan.results.length) return '';
+  const n = scan.results.filter((r) => r.checked).length;
+  return `
+    <h3>Found ${scan.results.length} item${scan.results.length === 1 ? '' : 's'}</h3>
+    <p class="subtle">Untick anything that's wrong and fix any names. Items you already have are unticked.</p>
+    ${scan.results.map((r, i) => `
+      <div class="scan-row">
+        <input type="checkbox" class="g-box" data-scan-i="${i}" data-field="checked" ${r.checked ? 'checked' : ''} aria-label="Add ${esc(r.name)}">
+        <input class="input" data-scan-i="${i}" data-field="name" value="${esc(r.name)}" maxlength="60" aria-label="Name">
+        <select class="input" data-scan-i="${i}" data-field="where" aria-label="Where it goes">
+          ${Object.entries(PLACE_LABEL).map(([k, v]) => `<option value="${k}" ${k === r.where ? 'selected' : ''}>${v}</option>`).join('')}
+        </select>
+        ${r.have ? '<span class="chip">Already have</span>' : ''}
+      </div>`).join('')}
+    <button class="btn primary" ${n ? '' : 'disabled'}>${icon('plus')}Add ${n} to pantry</button>`;
+}
+
+function refreshScan() {
+  const box = $('.scan-results', modalBody);
+  if (box) box.innerHTML = renderScanResults();
+  const st = $('.scan-status', modalBody);
+  if (st) st.textContent = scan.status;
+}
+
+function addScanResults(items) {
+  const known = new Set(scan.results.map((r) => r.name));
+  for (const it of items) {
+    if (known.has(it.name)) continue;
+    known.add(it.name);
+    scan.results.push({ ...it, checked: !it.have });
+  }
+  refreshScan();
+}
+
+/** Shrink a photo to what the model reads anyway (1568 px long side), as base64 JPEG. */
+async function shrinkPhoto(file) {
+  const bmp = await createImageBitmap(file);
+  const k = Math.min(1, 1568 / Math.max(bmp.width, bmp.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(bmp.width * k);
+  canvas.height = Math.round(bmp.height * k);
+  canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+  bmp.close?.();
+  const url = canvas.toDataURL('image/jpeg', 0.85);
+  return { type: 'image/jpeg', data: url.slice(url.indexOf(',') + 1) };
+}
+
+async function scanPhotoFiles(files) {
+  const list = [...files].slice(0, 4);
+  if (!list.length) return;
+  scan.status = `Reading ${list.length === 1 ? 'the photo' : `${list.length} photos`}… this takes a few seconds.`;
+  refreshScan();
+  $('.scan-shoot', modalBody)?.classList.add('busy');
+  try {
+    const images = await Promise.all(list.map(shrinkPhoto));
+    const { items } = await api('POST', '/api/pantry/scan', { images });
+    scan.status = items.length ? '' : "Couldn't spot any food labels. Try closer, with the labels facing the camera.";
+    addScanResults(items);
+  } catch (e) {
+    scan.status = e.message;
+    refreshScan();
+  } finally {
+    $('.scan-shoot', modalBody)?.classList.remove('busy');
+  }
+}
+
+async function lookupCode(code) {
+  if (scan.codes.has(code)) return;
+  scan.codes.add(code);
+  navigator.vibrate?.(60);
+  scan.status = `Looking up ${code}…`;
+  refreshScan();
+  try {
+    const found = await api('GET', `/api/pantry/barcode/${encodeURIComponent(code)}`);
+    scan.status = `Found ${found.name}${found.brand ? ` (${found.brand})` : ''}.`;
+    addScanResults([found]);
+  } catch (e) {
+    scan.status = e.message;
+    refreshScan();
+  }
+}
+
+async function startBarcodeCamera() {
+  try {
+    scan.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+  } catch {
+    scan.status = 'The camera is blocked. Allow camera access for this site, or type the barcode number.';
+    refreshScan();
+    return;
+  }
+  const video = $('.scan-video video', modalBody);
+  if (!video || !modal.open) return stopCamera();
+  video.srcObject = scan.stream;
+  const detector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
+  scan.timer = setInterval(async () => {
+    if (video.readyState < 2) return;
+    try {
+      for (const b of await detector.detect(video)) lookupCode(b.rawValue);
+    } catch { /* frame not ready */ }
+  }, 350);
+}
+
+function stopCamera() {
+  clearInterval(scan.timer);
+  scan.timer = null;
+  scan.stream?.getTracks().forEach((t) => t.stop());
+  scan.stream = null;
+}
+
+modal.addEventListener('close', stopCamera);
 
 function filteredRecipes() {
   const f = state.recipeFilters;
@@ -1343,6 +1504,8 @@ const actions = {
   fav: (el) => toggleFavorite(el.dataset.id),
   'open-recipe': (el) => openRecipe(el.dataset.id, el.dataset.slot),
   'close-modal': () => modal.close(),
+  'scan-open': (el) => openScan(el.dataset.mode),
+  'scan-mode': (el) => { stopCamera(); return openScan(el.dataset.mode); },
   'grocery-view': (el) => { state.groceryView = el.dataset.view; saveLocal('groceryView', state.groceryView); render(); },
   'edit-price': (el, e) => { e.preventDefault(); openPriceEditor(el.dataset.key, el.dataset.store); },
   'clear-price': async (el) => {
@@ -1699,6 +1862,14 @@ document.addEventListener('input', (e) => {
     }, 180);
   } else if (el.matches('[data-picker-q]')) {
     refreshPicker();
+  } else if (el.matches('[data-scan-photo]')) {
+    scanPhotoFiles(el.files);
+    el.value = '';
+  } else if (el.matches('[data-scan-i]')) {
+    const r = scan.results[Number(el.dataset.scanI)];
+    if (!r) return;
+    r[el.dataset.field] = el.type === 'checkbox' ? el.checked : el.value.trim();
+    if (el.type === 'checkbox') refreshScan();
   }
 });
 
@@ -1721,6 +1892,19 @@ document.addEventListener('submit', (e) => {
       if (!terms.length) return;
       await updateSettings({ avoidIngredients: [...state.settings.avoidIngredients, ...terms] });
       $('#avoid-in')?.focus();
+    },
+    'scan-code': async () => {
+      await lookupCode(data.code.trim());
+      form.reset();
+    },
+    'save-scan': async () => {
+      const items = scan.results.filter((r) => r.checked && r.name);
+      if (!items.length) return;
+      state.pantry = await api('POST', '/api/pantry', { items: items.map(({ name, where }) => ({ name, where })) });
+      state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
+      modal.close();
+      render();
+      toast(`Added ${items.length} item${items.length === 1 ? '' : 's'} to your pantry`, '', 'pantry');
     },
     'add-pantry': async () => {
       state.pantry = await api('POST', '/api/pantry', { name: data.name, where: data.where });
