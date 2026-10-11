@@ -82,7 +82,9 @@ function thumb(r, size = 'medium') {
 
 function imgTag(r, size) {
   const src = thumb(r, size);
-  return src ? `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : '';
+  // The emoji sits behind the photo and shows through if it is missing or fails to load.
+  const ph = `<span class="ph-emoji" aria-hidden="true">${PROTEIN_EMOJI[r.mainProtein] || '🍽️'}</span>`;
+  return src ? `${ph}<img src="${esc(src)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ph;
 }
 
 // ---------- weeks ----------
@@ -462,7 +464,7 @@ async function openRecipe(id, slotId) {
   }).join('');
   const scaleNote = r.servings !== s.householdSize ? `Recipe serves ${r.servings}; your grocery list scales it to ${s.householdSize}.` : `Serves ${r.servings}.`;
   openModal(`
-    ${r.image ? `<div class="hero"><img src="${esc(r.image)}" alt="" onerror="this.remove()"></div>` : ''}
+    ${r.image ? `<div class="hero"><img src="${esc(r.image)}" alt="" onerror="this.parentNode.remove()"></div>` : ''}
     <div class="modal-content" data-recipe="${esc(r.id)}">
       <div class="modal-head">
         <h2 id="modal-title">${esc(r.name)}</h2>
