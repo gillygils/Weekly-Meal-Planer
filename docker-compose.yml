@@ -1,0 +1,13 @@
+services:
+  meal-planner:
+    build: .
+    container_name: meal-planner
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/data
+    environment:
+      - TZ=America/New_York
+      # Uncomment to require a password (username can be anything):
+      # - APP_PASSWORD=change-me
