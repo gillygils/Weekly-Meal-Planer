@@ -229,6 +229,7 @@ function renderPlan() {
   const avg = filled.length ? weekCost / filled.length / settings.householdSize : 0;
   const over = settings.maxPricePerServing > 0 && avg > settings.maxPricePerServing;
   const todayKey = isoDate(new Date());
+  const thisWeek = state.weekKey === weekStart();
   const start = parseKey(state.weekKey);
 
   const days = [];
@@ -236,7 +237,7 @@ function renderPlan() {
     const date = addDays(start, d);
     const slots = enabled.map((m) => plan.slots.find((s) => s.day === d && s.meal === m)).filter(Boolean);
     days.push(`
-      <section class="panel day ${isoDate(date) === todayKey ? 'today' : ''}" data-day="${d}" aria-label="${DAY_NAMES[date.getDay()]}">
+      <section class="panel day ${isoDate(date) === todayKey ? 'today' : ''} ${thisWeek && isoDate(date) < todayKey ? 'past' : ''}" data-day="${d}" aria-label="${DAY_NAMES[date.getDay()]}">
         <div class="day-head"><h2>${DAY_NAMES[date.getDay()]}</h2><span>${date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span></div>
         ${slots.map((s) => `${enabled.length > 1 ? `<div class="meal-label">${s.meal}</div>` : ''}${renderSlot(s)}`).join('')}
       </section>`);
@@ -655,7 +656,7 @@ async function toggleFavorite(id) {
 const actions = {
   'week-prev': () => changeWeek(-7),
   'week-next': () => changeWeek(7),
-  'week-today': () => { state.weekKey = weekStart(); return loadWeek().then(render); },
+  'week-today': async () => { state.weekKey = weekStart(); await loadWeek(); render(); scrollToToday(); },
   randomize: async (el) => {
     await setPlan(await api('POST', `/api/weeks/${state.weekKey}/randomize`));
     const empty = state.plan.slots.filter((s) => !s.recipeId).length;
@@ -1006,8 +1007,16 @@ function route() {
   if (modal.open) modal.close();
   render();
   window.scrollTo({ top: 0 });
+  scrollToToday();
 }
 window.addEventListener('hashchange', route);
+
+// When the days are stacked in one column (phones), jump straight to today.
+function scrollToToday() {
+  const el = state.tab === 'plan' && document.querySelector('.day.today');
+  if (!el || el.offsetWidth < main.clientWidth * 0.7 || el.dataset.day === '0') return;
+  el.scrollIntoView({ block: 'start' });
+}
 
 // Keep devices in sync: refresh when the app comes back into view.
 document.addEventListener('visibilitychange', () => {
