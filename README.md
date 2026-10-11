@@ -15,7 +15,10 @@ A self-hostable weekly meal planner for your household. Randomize a week of meal
   - Each day on the plan shows its total per person, with a protein/carbs/fat bar and optional daily calorie and protein targets.
   - **Healthier meals** mode only randomizes recipes with a good health score and favors the healthiest. You can also cap calories or require a minimum amount of protein per serving.
   - Macros come from the recipe itself when it publishes them; otherwise they're estimated from the ingredients.
-- **Grocery list tab.** The week's ingredients are merged, scaled to your household size, and sorted by aisle. You can check items off, add your own (paper towels, snacks…), hide checked items, and copy or share the list.
+- **Grocery list tab.** The week's ingredients are merged, scaled to your household size, and sorted by aisle. Tick items as they go in the cart (they move to an "In the cart" section), add your own items (paper towels, snacks…), and copy or share the list.
+- **Pantry ("already have").** List what's in your pantry, spice rack, fridge and freezer. Grocery items you already have are moved to "Already have" automatically and left out of price totals.
+  - "Rice" covers basmati rice and "chicken" covers chicken thighs, but "chicken" doesn't cover chicken stock.
+  - Tap the jar on any list item to add it to the pantry. Tap **Need to buy** when you've run out.
 - **Store prices and the cheapest shop.** Pick the two stores you use (Meijer, Aldi, Walmart, Target, Kroger, Costco and more).
   - **Compare prices:** each item's price at both stores, and which one is cheaper.
   - **Shopping plan:** compares "all at store A", "all at store B" and splitting the trip. A split is only recommended when it saves at least the amount you set. Each store gets its own list, sorted by aisle.
@@ -37,6 +40,8 @@ A self-hostable weekly meal planner for your household. Randomize a week of meal
   - Allergen groups catch hidden sources too, like butter for dairy or soy sauce for gluten.
   - Common alternative names are matched as well (cilantro/coriander, eggplant/aubergine, shrimp/prawn…).
 - **Meals per day.** Plan breakfast, lunch and/or dinner (dinner only by default).
+- **Meal days.** In Settings, switch off any meal on any weekday (e.g. no dinner on Wednesdays). Those become "fend for yourself": nothing is planned and nothing goes on the grocery list. You can also skip a single meal, or plan one anyway, for just this week from the plan.
+- **PIN lock.** You set a PIN (4–8 digits) the first time you open the app; after that each device asks for it once every 24 hours. Wrong guesses are slowed down (5 tries, then waits that grow), so a PIN can't be guessed. Change the PIN, lock a device or sign out every device in Settings.
 - **Responsive, modern UI.** It scales smoothly from phone to 4K TV, has a black, dark grey and orange theme (a light theme is available in Settings), can be installed to a phone's home screen (PWA), and can be driven with a keyboard or TV remote.
 - **Shared by the whole household.** Data lives on the server, so every device sees the same plan.
 
@@ -81,6 +86,15 @@ If your server reaches the internet through an HTTP proxy, start Node with `NODE
 - **Protein and allergen detection** reads each recipe's ingredients. Fish sauce, oyster sauce and Worcestershire don't count as fish/shellfish, but anchovies do. If you're avoiding a protein because of an **allergy**, still check the ingredients yourself.
 - The bundled recipes live in `server/seed/recipes.json`. You can regenerate them with `npm run fetch-recipes`. New seed recipes are added to an existing database on startup, and your favorites and edits are never overwritten.
 - Removing a recipe hides it, so a later refresh won't bring it back.
+
+## Forgot the PIN?
+
+On the server, create a file named `reset-pin` in the data folder and restart the app. The PIN is cleared, and the next visit asks you to set a new one:
+
+```bash
+touch /var/lib/meal-planner/reset-pin && systemctl restart meal-planner   # plain Node / systemd
+touch ./data/reset-pin && docker compose restart                          # Docker
+```
 
 ## Development
 
