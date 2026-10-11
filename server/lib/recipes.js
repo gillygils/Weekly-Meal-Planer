@@ -81,11 +81,13 @@ export function mainProtein(proteins, category = '') {
   return 'vegetarian';
 }
 
+const BREAKFAST_NAME = /\b(pancakes?|waffles?|overnight oats|oatmeal|porridge|granola|omelett?es?|french toast|breakfast|egg bites|frittata|parfait|banana bread|muffins?|smoothie bowl|shakshuka|hash browns?|bagel)\b/i;
 const DESSERT_NAME = /\b(cake|cakes|cupcakes?|cookies?|brownies?|muffins?|cheesecake|fudge|crumble|mousse|pavlova|trifle|sorbet|ice cream|flapjacks?|macarons?|tiramisu|smoothie|milkshake|lemonade)\b/i;
 
 export function mealTypesFor(category = '', hints = [], name = '') {
   const all = [category, ...hints].map((c) => String(c || '').toLowerCase());
   if (all.some((c) => c.includes('dessert') || c.includes('beverage') || c.includes('drink'))) return [];
+  if (BREAKFAST_NAME.test(name)) return ['breakfast'];
   if (DESSERT_NAME.test(name)) return [];
   if (all.some((c) => c.includes('breakfast') || c.includes('brunch'))) return ['breakfast'];
   if (all.some((c) => ['side', 'side dish', 'starter', 'appetizer', 'snack'].includes(c))) return ['lunch'];
@@ -140,6 +142,7 @@ export function estimateCostPerServing(ingredients, servings = 4) {
 
 export function cleanText(s) {
   return String(s ?? '')
+    .replace(/[\u200b\ufeff]/g, '')
     .replace(/<[^>]*>/g, ' ')
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
@@ -148,6 +151,9 @@ export function cleanText(s) {
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&#(\d+);/g, (_, d) => String.fromCharCode(Number(d)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/&(rsquo|lsquo);/g, "'").replace(/&(rdquo|ldquo);/g, '"').replace(/&ndash;/g, '–').replace(/&mdash;/g, '—')
+    .replace(/&frac12;/g, '½').replace(/&frac14;/g, '¼').replace(/&frac34;/g, '¾').replace(/&deg;/g, '°')
     .replace(/\s+/g, ' ')
     .trim();
 }

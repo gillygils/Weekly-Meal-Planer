@@ -17592,8 +17592,7 @@
   ],
   "mainProtein": "egg",
   "mealTypes": [
-   "lunch",
-   "dinner"
+   "breakfast"
   ],
   "estimatedCost": 1.87,
   "costOverride": null,
@@ -18109,7 +18108,9 @@
    "egg"
   ],
   "mainProtein": "egg",
-  "mealTypes": [],
+  "mealTypes": [
+   "breakfast"
+  ],
   "estimatedCost": 3.33,
   "costOverride": null,
   "favorite": false,
@@ -28121,8 +28122,7 @@
   ],
   "mainProtein": "pork",
   "mealTypes": [
-   "lunch",
-   "dinner"
+   "breakfast"
   ],
   "estimatedCost": 3.1,
   "costOverride": null,
@@ -30098,7 +30098,7 @@
    "Once the vegetables have browned and become slightly mushy, add the meat and bay leaves and garlic. Pour over with wine and simmer for 10-15 minutes to allow the alcohol to evaporate. Now is the right time to add 2/3 the amount of liquid",
    "Cover the pot and cook over low heat for an hour, stirring occasionally. After the first hour, pour over the rest of the water or stock and cook for another 30-45 minutes",
    "Allow the stew to cool slightly and serve it with a sprinkle of chopped parsley and few slices of fresh hot pepper if you like to spice it up a bit",
-   "Slice ​​some fresh bread, season the salad and simply enjoying these wonderful flavors"
+   "Slice some fresh bread, season the salad and simply enjoying these wonderful flavors"
   ],
   "proteins": [
    "beef"
@@ -31914,7 +31914,7 @@
   ],
   "mainProtein": "egg",
   "mealTypes": [
-   "lunch"
+   "breakfast"
   ],
   "estimatedCost": 1.2,
   "costOverride": null,
@@ -38027,8 +38027,7 @@
   ],
   "mainProtein": "pork",
   "mealTypes": [
-   "lunch",
-   "dinner"
+   "breakfast"
   ],
   "estimatedCost": 2.55,
   "costOverride": null,
@@ -43315,8 +43314,7 @@
   ],
   "mainProtein": "egg",
   "mealTypes": [
-   "lunch",
-   "dinner"
+   "breakfast"
   ],
   "estimatedCost": 2.34,
   "costOverride": null,
@@ -43597,8 +43595,7 @@
   ],
   "mainProtein": "egg",
   "mealTypes": [
-   "lunch",
-   "dinner"
+   "breakfast"
   ],
   "estimatedCost": 1.73,
   "costOverride": null,
@@ -68229,8 +68226,7 @@
   ],
   "mainProtein": "pork",
   "mealTypes": [
-   "lunch",
-   "dinner"
+   "breakfast"
   ],
   "estimatedCost": 4.65,
   "costOverride": null,
@@ -71037,7 +71033,6 @@
    "Preheat the oven at 350F.",
    "In a non-stick medium pot, add the milk, butter, sugar, and vanilla; bring to a boil, and reduce heat to low.",
    "In a large bowl, add the eggs and the cornstarch and mix well. Slowly add 1 cup of the milk mixture, mixing constantly to temper the eggs. Keep adding more milk until the mixture is soft and has no lumps.",
-   "​",
    "Add the mixture to the pot SLOWLY and mix constantly using a wooden spoon.",
    "Keep cooking and mixing for a few more minutes until the mixture gets thick, you will know when it is ready when passing a spoon at the bottom of the pot creates a line that separates the mixture.",
    "Remove from heat and pour into the pyrex (no need to grease it ( I use an 11 by 8-inch pyrex).",
@@ -71206,10 +71201,8 @@
   ],
   "instructions": [
    "Preheat oven to 350 degrees F (175 degrees C).",
-   "​",
    "Grease and flour a 12 x 8' pyrex (you can use a smaller pyrex if you prefer the bread to be thicker).",
    "Peel and shred the yucca and set aside. In a medium bowl, combine flour, baking powder and salt and set aside.",
-   "​",
    "In a large bowl cream the butter with the sugar. Beat in the eggs, one at a time, then stir in the vanilla.",
    "Add half of the dry ingredients and mix well, add cream cheese, mix well and, add the other half of the dry ingredients and mix well.",
    "With a wooden spoon incorporate the shredded yucca, until well incorporated.",
@@ -71456,7 +71449,6 @@
   ],
   "instructions": [
    "Chopped pepper, onion and tomato and set aside. Turn on Instant Pot in sauteed setting for 8 minutes. Add a little bit of olive oil and add, onion, garlic, tomato, bell pepper, cumin, oregano salt and pepper and sauteed for 4 minutes.",
-   "​",
    "Add the chicken and cook for 2 minutes on each side often, mixing often. Add the chicken stock , cover and set the pressure cooker on high for 20 minutes. When done release the pressure and if need it, add a little bit more salt. I like to serve it with some of the juice over rice and beans."
   ],
   "proteins": [
@@ -71619,7 +71611,6 @@
   ],
   "instructions": [
    "Using a food processor or a blender, combine all the ingredients, don't overdo it, the mixture should be crumby.",
-   "​",
    "Heat a lightly oiled pan over medium-high heat. Pour 1/4 cup of the batter onto the pan. Cook until lightly brown on each side, just like making pancakes ;)",
    "Traditionally you serve it with a spoon of sour cream on top. I just prefer to eat it plain."
   ],

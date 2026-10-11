@@ -7,7 +7,8 @@ import { fileURLToPath } from 'node:url';
 import { Store, sanitizeSettings } from './store.js';
 import { ensureSlots, randomizePlan, moveMeal } from './lib/planner.js';
 import { buildGroceryList } from './lib/grocery.js';
-import { fetchAllSources, importFromUrl } from './lib/sources.js';
+import { fetchAllSources, importLink, normalizeUrl, pullCreatorSite, SUGGESTED_CREATORS } from './lib/sources.js';
+import { buildCustomRecipe } from './lib/custom.js';
 import { PROTEINS, ALLERGEN_GROUPS } from './lib/recipes.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -126,7 +127,7 @@ const route = (method, pattern, handler) => {
   routes.push({ method, re, keys, handler });
 };
 
-route('GET', '/api/meta', () => ({ proteins: [...PROTEINS, 'vegetarian'], allergens: Object.fromEntries(Object.entries(ALLERGEN_GROUPS).map(([k, g]) => [k, g.label])), recipeCount: store.db.recipes.length, auth: Boolean(PASSWORD) }));
+route('GET', '/api/meta', () => ({ proteins: [...PROTEINS, 'vegetarian'], allergens: Object.fromEntries(Object.entries(ALLERGEN_GROUPS).map(([k, g]) => [k, g.label])), recipeCount: store.db.recipes.length, auth: Boolean(PASSWORD), suggestedCreators: SUGGESTED_CREATORS }));
 
 route('GET', '/api/settings', () => store.db.settings);
 route('PUT', '/api/settings', async ({ body }) => {
@@ -169,17 +170,73 @@ route('DELETE', '/api/recipes/:id', ({ params }) => {
   return { ok: true };
 });
 route('POST', '/api/recipes/import', async ({ body }) => {
-  let recipe;
+  let res;
   try {
-    recipe = await importFromUrl(body.url);
+    res = await importLink(body.url);
   } catch (e) {
     throw new HttpError(422, e.message);
   }
-  const dupe = store.db.recipes.find((r) => r.sourceUrl === recipe.sourceUrl && !r.hidden);
+  if (res.draft) {
+    // A TikTok without the recipe in its caption: the app opens the editor to finish it.
+    const dupe = store.db.recipes.find((r) => normalizeUrl(r.sourceUrl) === normalizeUrl(res.draft.sourceUrl) && !r.hidden);
+    return dupe ? { recipe: dupe, duplicate: true } : { draft: res.draft };
+  }
+  const { recipe } = res;
+  const dupe = store.db.recipes.find((r) => normalizeUrl(r.sourceUrl) === normalizeUrl(recipe.sourceUrl) && !r.hidden);
   if (dupe) return { recipe: dupe, duplicate: true };
   store.db.recipes.push(recipe);
   store.save();
   return { recipe, duplicate: false };
+});
+
+route('POST', '/api/recipes', ({ body }) => {
+  let recipe;
+  try {
+    recipe = buildCustomRecipe(body);
+  } catch (e) {
+    throw new HttpError(400, e.message);
+  }
+  store.db.recipes.push(recipe);
+  store.save();
+  return recipe;
+});
+route('PUT', '/api/recipes/:id', ({ params, body }) => {
+  const i = store.db.recipes.findIndex((r) => r.id === params.id);
+  if (i === -1) throw new HttpError(404, 'Recipe not found');
+  try {
+    store.db.recipes[i] = buildCustomRecipe(body, store.db.recipes[i]);
+  } catch (e) {
+    throw new HttpError(400, e.message);
+  }
+  store.save();
+  return store.db.recipes[i];
+});
+
+let pulling = null;
+route('POST', '/api/creators/pull', async ({ body }) => {
+  if (pulling) throw new HttpError(409, 'Already pulling creator recipes. Give it a minute.');
+  const creators = store.db.settings.creators.filter((c) => c.url && (!body.name || c.name === body.name));
+  if (!creators.length) throw new HttpError(400, 'Follow a creator with a recipe website first (Settings → Creators).');
+  pulling = (async () => {
+    const results = [];
+    for (const c of creators) {
+      const known = new Set(store.db.recipes.map((r) => normalizeUrl(r.sourceUrl)));
+      try {
+        const { recipes, checked, remaining } = await pullCreatorSite(c, { knownUrls: known, log: (m) => console.warn(m) });
+        const added = store.addRecipes(recipes);
+        results.push({ name: c.name, added, checked, remaining });
+      } catch (e) {
+        results.push({ name: c.name, added: 0, error: e.message });
+      }
+    }
+    return results;
+  })();
+  try {
+    const results = await pulling;
+    return { results, total: store.db.recipes.length };
+  } finally {
+    pulling = null;
+  }
 });
 route('POST', '/api/recipes/refresh', async () => {
   refreshing ||= fetchAllSources((m) => console.warn(m)).finally(() => { refreshing = null; });

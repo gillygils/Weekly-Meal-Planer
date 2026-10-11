@@ -410,6 +410,7 @@ function filteredRecipes() {
     if (f.meal === 'other' ? r.mealTypes.length : f.meal && !r.mealTypes.includes(f.meal)) return false;
     if (f.budget && !fitsSettings(r)) return false;
     if (f.healthy && !isHealthy(r)) return false;
+    if (f.source && recipeSource(r) !== f.source) return false;
     if (q && !`${r.name} ${r.cuisine} ${r.category} ${r.tags.join(' ')} ${r.source}`.toLowerCase().includes(q)) return false;
     return true;
   });
@@ -427,6 +428,13 @@ function filteredRecipes() {
   return list;
 }
 
+const recipeSource = (r) => r.creator || r.source;
+function sourceOptions() {
+  const counts = new Map();
+  for (const r of state.recipes) counts.set(recipeSource(r), (counts.get(recipeSource(r)) || 0) + 1);
+  return [...counts.keys()].sort((a, b) => Number(b.startsWith('@')) - Number(a.startsWith('@')) || a.localeCompare(b));
+}
+
 function renderRecipes() {
   const f = state.recipeFilters;
   const list = filteredRecipes();
@@ -435,10 +443,15 @@ function renderRecipes() {
   return `
     <div class="toolbar">
       <div class="search">${icon('search')}<input class="input" type="search" data-filter="q" value="${esc(f.q)}" placeholder="Search ${state.recipes.length} recipes, cuisines, tags…" aria-label="Search recipes"></div>
-      <button class="btn" data-action="import-url">${icon('link')}Import from URL</button>
-      <button class="btn" data-action="refresh-recipes">${icon('globe')}Pull more recipes</button>
+      <button class="btn primary" data-action="new-recipe">${icon('plus')}New recipe</button>
+      <button class="btn" data-action="import-url">${icon('link')}Import link / TikTok</button>
+      <button class="btn" data-action="pull-creators">${icon('globe')}Pull from creators</button>
     </div>
     <div class="filters">
+      <select class="input" data-filter="source" aria-label="Source">
+        <option value="">All sources</option>
+        ${sourceOptions().map((o) => `<option value="${esc(o)}" ${f.source === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}
+      </select>
       <select class="input" data-filter="protein" aria-label="Protein">
         <option value="">All proteins</option>
         ${proteins.map((p) => `<option value="${p}" ${f.protein === p ? 'selected' : ''}>${PROTEIN_EMOJI[p]} ${PROTEIN_LABEL[p]}</option>`).join('')}
@@ -599,11 +612,35 @@ function renderSettings() {
       </section>
 
       <section class="panel">
+        <h2>Creators</h2>
+        <p class="subtle" style="margin:0">Follow a creator's recipe website and pull their newest recipes into your library. TikTok itself doesn't share recipes with other apps, so for creators without a website, paste a TikTok video link under <b>Import link / TikTok</b>.</p>
+        <ul class="creator-list">
+          ${s.creators.map((c) => `
+            <li>
+              <span class="cr-name"><b>${esc(c.name)}</b> <small>${esc(c.handle || '')}</small><a href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">${esc(c.url.replace(/^https?:\/\/(www\.)?/, ''))}</a></span>
+              <button class="btn sm" data-action="pull-creators" data-name="${esc(c.name)}">${icon('download')}Pull</button>
+              <button class="icon-btn sm" data-action="unfollow" data-name="${esc(c.name)}" aria-label="Unfollow ${esc(c.name)}">${icon('x')}</button>
+            </li>`).join('') || '<li class="subtle">Not following anyone yet.</li>'}
+        </ul>
+        ${state.meta.suggestedCreators.filter((c) => !s.creators.some((f) => f.name === c.name)).map((c) => `
+          <div class="creator-suggest">
+            <span><b>${esc(c.name)}</b> <small>${esc(c.handle)}</small><br><small class="subtle">${esc(c.note)}</small></span>
+            ${c.url ? `<button class="btn sm" data-action="follow" data-name="${esc(c.name)}">${icon('plus')}Follow</button>` : ''}
+          </div>`).join('')}
+        <form class="inline-form" data-form="add-creator">
+          <input class="input" name="name" placeholder="Creator name" maxlength="40" aria-label="Creator name" required>
+          <input class="input" name="url" type="url" placeholder="Their recipe website" aria-label="Creator website" required>
+          <button class="btn">${icon('plus')}Follow</button>
+        </form>
+      </section>
+
+      <section class="panel">
         <h2>Recipes</h2>
         <p class="subtle" style="margin:0">${state.recipes.length} recipes in your library (${state.recipes.filter((r) => r.favorite).length} favorites).</p>
         <div class="modal-actions">
-          <button class="btn" data-action="refresh-recipes">${icon('globe')}Pull more recipes</button>
-          <button class="btn" data-action="import-url">${icon('link')}Import from URL</button>
+          <button class="btn" data-action="new-recipe">${icon('plus')}New recipe</button>
+          <button class="btn" data-action="import-url">${icon('link')}Import link / TikTok</button>
+          <button class="btn" data-action="refresh-recipes">${icon('globe')}Pull from recipe databases</button>
         </div>
       </section>
     </div>`;
@@ -635,7 +672,8 @@ async function openRecipe(id, slotId) {
         <div class="meal-meta">${chips(r)}${r.cuisine ? `<span class="chip">${esc(r.cuisine)}</span>` : ''}${r.category ? `<span class="chip">${esc(r.category)}</span>` : ''}</div>
         <div class="modal-actions">
           <button class="btn ${r.favorite ? '' : 'primary'}" data-action="fav" data-id="${esc(r.id)}" aria-pressed="${r.favorite}">${icon(r.favorite ? 'heart-fill' : 'heart')}${r.favorite ? 'Favorited' : 'Favorite'}</button>
-          ${r.sourceUrl ? `<a class="btn ghost" href="${esc(r.sourceUrl)}" target="_blank" rel="noopener noreferrer">${icon('link')}${esc(r.source)}</a>` : ''}
+          ${r.sourceUrl ? `<a class="btn ghost" href="${esc(r.sourceUrl)}" target="_blank" rel="noopener noreferrer">${icon('link')}${esc(r.creator || r.source)}${/tiktok/i.test(r.sourceUrl) ? ' on TikTok' : ''}</a>` : ''}
+          <button class="btn ghost" data-action="edit-recipe" data-id="${esc(r.id)}">${icon('pencil')}Edit</button>
         </div>
       </div>
 
@@ -727,13 +765,63 @@ function openPicker(slotId) {
   setTimeout(() => $('[data-picker-q]', modalBody)?.focus(), 50);
 }
 
+// Recipe editor: new recipes, finishing a TikTok draft, or editing any recipe.
+function openEditor(d = {}, id = null) {
+  const meals = d.mealTypes || ['lunch', 'dinner'];
+  const n = d.nutrition || {};
+  const num = (v) => (v == null || v === '' ? '' : esc(v));
+  openModal(`
+    <form class="modal-content editor" data-form="save-recipe" data-id="${esc(id || '')}">
+      <h2 id="modal-title">${id ? 'Edit recipe' : d.sourceUrl ? 'Finish this recipe' : 'New recipe'}</h2>
+      ${d.caption ? `<div class="caption-box"><span class="subtle">Caption from ${esc(d.creator || 'TikTok')}</span><p>${esc(d.caption)}</p>${d.sourceUrl ? `<a href="${esc(d.sourceUrl)}" target="_blank" rel="noopener noreferrer">${icon('link')}Watch the video</a>` : ''}</div>` : ''}
+      <div class="field"><label for="ed-name">Name</label><input id="ed-name" class="input" name="name" required maxlength="120" value="${esc(d.name || '')}"></div>
+      <div class="field-row">
+        <div class="field"><label for="ed-creator">Creator</label><input id="ed-creator" class="input" name="creator" maxlength="60" placeholder="@handle" value="${esc(d.creator || '')}"></div>
+        <div class="field"><label for="ed-serv">Serves</label><input id="ed-serv" class="input" name="servings" type="number" min="1" max="30" value="${esc(d.servings || 4)}"></div>
+        <div class="field"><label for="ed-min">Minutes</label><input id="ed-min" class="input" name="totalMinutes" type="number" min="0" max="1440" value="${num(d.totalMinutes)}"></div>
+      </div>
+      <div class="field">
+        <span class="label">Good for</span>
+        <div class="chips">${MEALS.map((m) => `<label class="chip-toggle check" data-meal="${m}"><input type="checkbox" name="meal" value="${m}" ${meals.includes(m) ? 'checked' : ''}>${m}</label>`).join('')}</div>
+      </div>
+      <div class="field"><label for="ed-ing">Ingredients <small class="subtle">one per line, e.g. "500g chicken breast"</small></label><textarea id="ed-ing" class="input" name="ingredientsText" rows="8" required>${esc(d.ingredientsText || '')}</textarea></div>
+      <div class="field"><label for="ed-steps">Steps <small class="subtle">one per line</small></label><textarea id="ed-steps" class="input" name="instructionsText" rows="6">${esc(d.instructionsText || '')}</textarea></div>
+      <div class="field">
+        <span class="label">Macros per serving <small class="subtle">optional; leave empty to estimate from the ingredients</small></span>
+        <div class="field-row macros-in">
+          <label>kcal<input class="input" name="kcal" type="number" min="0" value="${num(n.kcal ?? n.calories)}"></label>
+          <label>Protein g<input class="input" name="protein" type="number" min="0" value="${num(n.protein ?? n.proteinContent)}"></label>
+          <label>Carbs g<input class="input" name="carbs" type="number" min="0" value="${num(n.carbs ?? n.carbohydrateContent)}"></label>
+          <label>Fat g<input class="input" name="fat" type="number" min="0" value="${num(n.fat ?? n.fatContent)}"></label>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label for="ed-src">Link</label><input id="ed-src" class="input" name="sourceUrl" type="url" value="${esc(d.sourceUrl || '')}"></div>
+        <div class="field"><label for="ed-img">Photo URL</label><input id="ed-img" class="input" name="image" type="url" value="${esc(d.image || '')}"></div>
+      </div>
+      <div class="modal-actions"><button class="btn primary lg">${icon('check')}Save recipe</button><button type="button" class="btn ghost" data-action="close-modal">Cancel</button></div>
+    </form>`);
+  setTimeout(() => $('#ed-name', modalBody)?.focus(), 50);
+}
+
+async function editRecipe(id) {
+  const r = await api('GET', `/api/recipes/${encodeURIComponent(id)}`);
+  const n = r.nutrition?.source === 'manual' || r.nutrition?.source === 'recipe' ? r.nutrition : {};
+  openEditor({
+    ...r,
+    ingredientsText: r.ingredients.map((i) => `${i.measure} ${i.name}`.trim()).join('\n'),
+    instructionsText: r.instructions.join('\n'),
+    nutrition: n,
+  }, id);
+}
+
 function openImport() {
   openModal(`
     <div class="modal-content">
-      <h2 id="modal-title">Import a recipe from the web</h2>
-      <p class="subtle" style="margin:0">Paste a link to a recipe page. Works with most recipe sites (AllRecipes, BBC Good Food, Serious Eats, NYT Cooking, Food Network, blogs…). It's fine to import different versions of a meal you already have — each one is its own recipe.</p>
+      <h2 id="modal-title">Import a recipe link</h2>
+      <p class="subtle" style="margin:0">Paste a recipe page or a TikTok video link. Recipe pages from most sites and creator blogs import complete. For a TikTok, the app grabs the caption, creator and cover image; if the ingredients aren't in the caption, you'll finish it in the editor while you watch. Different versions of a meal you already have are kept as separate recipes.</p>
       <form class="inline-form" data-form="import">
-        <input class="input" type="url" name="url" required placeholder="https://www.example.com/best-lasagna" aria-label="Recipe URL">
+        <input class="input" type="url" name="url" required placeholder="https://www.tiktok.com/@creator/video/… or a recipe page" aria-label="Recipe or TikTok link">
         <button class="btn primary">${icon('download')}Import</button>
       </form>
     </div>`);
@@ -822,6 +910,24 @@ const actions = {
   'filter-healthy': () => { state.recipeFilters.healthy = !state.recipeFilters.healthy; state.recipeFilters.limit = PAGE; render(); },
   'filter-budget': () => { state.recipeFilters.budget = !state.recipeFilters.budget; state.recipeFilters.limit = PAGE; render(); },
   'import-url': () => openImport(),
+  'new-recipe': () => openEditor(),
+  'edit-recipe': (el) => editRecipe(el.dataset.id),
+  'pull-creators': async (el) => {
+    toast(`Checking ${el.dataset.name || 'your creators'} for new recipes… this can take a minute.`);
+    const res = await api('POST', '/api/creators/pull', el.dataset.name ? { name: el.dataset.name } : {});
+    setRecipes(await api('GET', '/api/recipes'));
+    render();
+    const added = res.results.reduce((a, r) => a + r.added, 0);
+    const failed = res.results.filter((r) => r.error);
+    if (added) toast(`Added ${added} recipe${added > 1 ? 's' : ''}: ${res.results.filter((r) => r.added).map((r) => `${r.added} from ${r.name}`).join(', ')}`);
+    else if (!failed.length) toast('No new recipes from your creators right now.');
+    failed.forEach((r) => toast(`${r.name}: ${r.error}`, 'error'));
+  },
+  follow: (el) => {
+    const c = state.meta.suggestedCreators.find((x) => x.name === el.dataset.name);
+    return updateSettings({ creators: [...state.settings.creators, { name: c.name, handle: c.handle, url: c.url }] });
+  },
+  unfollow: (el) => updateSettings({ creators: state.settings.creators.filter((c) => c.name !== el.dataset.name) }),
   'refresh-recipes': async () => {
     toast('Pulling recipes from the internet… this can take a minute.');
     const res = await api('POST', '/api/recipes/refresh');
@@ -1090,10 +1196,33 @@ document.addEventListener('submit', (e) => {
     },
     import: async () => {
       const res = await api('POST', '/api/recipes/import', { url: data.url });
+      if (res.draft) {
+        openEditor(res.draft);
+        return;
+      }
       upsertRecipe(res.recipe);
       toast(res.duplicate ? 'You already have that recipe' : `Imported "${res.recipe.name}"`);
       render();
       openRecipe(res.recipe.id);
+    },
+    'save-recipe': async () => {
+      const fd = new FormData(form);
+      const id = form.dataset.id;
+      const payload = {
+        ...data,
+        mealTypes: fd.getAll('meal'),
+        nutrition: { kcal: data.kcal, protein: data.protein, carbs: data.carbs, fat: data.fat },
+      };
+      const saved = await api(id ? 'PUT' : 'POST', id ? `/api/recipes/${encodeURIComponent(id)}` : '/api/recipes', payload);
+      upsertRecipe(saved);
+      setAvoidRules();
+      render();
+      toast(id ? 'Recipe saved' : `Added "${saved.name}" to your recipes`);
+      openRecipe(saved.id);
+    },
+    'add-creator': async () => {
+      await updateSettings({ creators: [...state.settings.creators, { name: data.name.trim(), url: data.url.trim(), handle: '' }] });
+      toast(`Following ${data.name}. Tap Pull to get their recipes.`);
     },
     'add-to-plan': async () => {
       const id = $('[data-recipe]', modalBody).dataset.recipe;

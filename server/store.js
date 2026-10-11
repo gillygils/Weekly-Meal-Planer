@@ -21,6 +21,10 @@ export const DEFAULT_SETTINGS = {
   minProtein: 0, // grams per serving
   dailyCalories: 0, // per person, 0 = no target
   dailyProtein: 0,
+  creators: [
+    { name: 'Hunt4Shredz', handle: '@hunt4shredz', url: 'https://www.hunt4shredz.com' },
+    { name: 'AmateurProChef', handle: '@amateurprochef', url: 'https://amateurprochef.com' },
+  ],
   currency: '$',
   weekStartsOn: 1, // 0 = Sunday, 1 = Monday
 };
@@ -41,6 +45,13 @@ export function sanitizeSettings(input, base = DEFAULT_SETTINGS) {
   if (input.healthFocus != null) s.healthFocus = Boolean(input.healthFocus);
   for (const k of ['maxCalories', 'minProtein', 'dailyCalories', 'dailyProtein']) {
     if (input[k] != null) s[k] = Math.min(10000, Math.max(0, Math.round(Number(input[k]) || 0)));
+  }
+  if (Array.isArray(input.creators)) {
+    s.creators = input.creators.slice(0, 30).map((c) => ({
+      name: String(c.name || '').trim().slice(0, 40),
+      handle: String(c.handle || '').trim().slice(0, 40),
+      url: /^https?:\/\//i.test(String(c.url || '')) ? String(c.url).trim().slice(0, 200) : '',
+    })).filter((c) => c.name && c.url);
   }
   if (input.favoritesBoost != null) s.favoritesBoost = Boolean(input.favoritesBoost);
   if (input.currency != null) s.currency = String(input.currency).slice(0, 4) || '$';

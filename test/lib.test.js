@@ -162,3 +162,46 @@ test('randomizer honors health goals', async () => {
   const plan = randomizePlan(ensureSlots({ slots: [] }, ['dinner']), recipes, { meals: ['dinner'], excludedProteins: [], healthFocus: true, maxCalories: 800, minProtein: 30 });
   assert.ok(plan.slots.every((s) => s.recipeId.startsWith('lean')));
 });
+
+test('creator pages, captions and robots.txt', async () => {
+  const { recipeFromPlainHtml, parseCaption, nutritionFromText, robotsRules, robotsAllows } = await import('../server/lib/sources.js');
+  const html = `<html><head><meta property="og:title" content="Chicken Zucchini Pasta — Hunt4Shredz"></head><body>
+    <h1>CHICKEN ZUCCHINI PASTA</h1><h4>Serving:</h4>
+    <ul><li><p>1.5 lbs (680 grams) chicken breast</p></li><li><p>2 cups (200 grams) zucchini</p></li><li><p>8 oz pasta</p></li><li><p>1 tbsp olive oil</p></li></ul>
+    <p>Season the chicken with salt and pepper and set it aside.</p>
+    <ol><li><p>Cook the pasta until al dente.</p></li><li><p>Sear the chicken and add the zucchini.</p></li><li><p>Divide into 4 equal portions</p></li></ol>
+    <p>Calories: 430, cal, Protein: 47g, Carbohydrates: 35g, Fat: 10g</p></body></html>`;
+  const r = recipeFromPlainHtml(html, 'https://www.hunt4shredz.com/chicken-zucchini-pasta');
+  assert.equal(r.name, 'Chicken Zucchini Pasta');
+  assert.equal(r.servings, 4);
+  assert.equal(r.ingredients[0].measure, '1.5 lbs');
+  assert.equal(r.ingredients[0].name, 'chicken breast');
+  assert.equal(r.instructions.length, 4);
+  assert.deepEqual(r.reportedNutrition, { calories: 430, proteinContent: 47, carbohydrateContent: 35, fatContent: 10 });
+  // A privacy policy with a bullet list isn't a recipe.
+  assert.equal(recipeFromPlainHtml('<ul><li>We collect your name</li><li>We store 2 cookies</li><li>1 year retention</li></ul><ol><li>Contact us at any time to opt out.</li></ol>', 'https://x.com/privacy'), null);
+  const cap = parseCaption('Protein burrito bowl 🔥 520 calories, 48g protein! Ingredients: 500g chicken breast, 1 cup rice, 1 can black beans #mealprep');
+  assert.equal(cap.name, 'Protein burrito bowl');
+  assert.equal(cap.ingredients.length, 3);
+  assert.equal(cap.nutrition.calories, 520);
+  assert.equal(nutritionFromText('Calories: 367.5, cal, Protein: 17.5g').calories, 367.5);
+  const rules = robotsRules('User-agent: GPTBot\nDisallow: /\n\nUser-agent: *\nDisallow: /search\nDisallow: /api/\nAllow: /api/ui/');
+  assert.equal(robotsAllows(rules, '/chicken-pasta'), true);
+  assert.equal(robotsAllows(rules, '/search?q=1'), false);
+  assert.equal(robotsAllows(rules, '/api/ui/x'), true);
+  assert.equal(robotsAllows(robotsRules('User-agent: WeeklyMealPlanner\nDisallow: /\n\nUser-agent: *\nDisallow:'), '/a'), false);
+});
+
+test('custom recipes from the editor', async () => {
+  const { buildCustomRecipe } = await import('../server/lib/custom.js');
+  const r = buildCustomRecipe({ name: 'Taco bowls', ingredientsText: '500g ground turkey\n1 cup rice\n\n1 can black beans', instructionsText: 'Cook.\nServe.', servings: '2', mealTypes: ['dinner'], nutrition: { kcal: '600', protein: '50' } });
+  assert.equal(r.ingredients.length, 3);
+  assert.equal(r.servings, 2);
+  assert.deepEqual(r.mealTypes, ['dinner']);
+  assert.equal(r.nutrition.kcal, 600);
+  assert.equal(r.nutrition.source, 'manual');
+  const edited = buildCustomRecipe({ name: 'Taco bowls v2', ingredientsText: '1 cup rice' }, { ...r, favorite: true });
+  assert.equal(edited.id, r.id);
+  assert.equal(edited.favorite, true);
+  assert.throws(() => buildCustomRecipe({ name: '', ingredientsText: 'x' }), /name/);
+});

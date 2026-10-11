@@ -78,7 +78,13 @@ export function parseMeasure(measure) {
 
 // Split a free-text ingredient line ("2 cups chopped onion") into {measure, name}.
 export function parseIngredientLine(line) {
-  const text = String(line || '').replace(/\s+/g, ' ').trim();
+  const text = String(line || '').replace(/[\u200b\ufeff]/g, '').replace(/^[-•*▢☐✓·]\s*/, '').replace(/\s+/g, ' ').trim();
+  // Quantity at the end: "Chicken breast, 800g" / "Greek yogurt - 0.75 cup".
+  const tail = /^(.+?)\s*[,:–-]\s*((?:[\d½¼¾⅓⅔⅛][\d\s./½¼¾⅓⅔⅛]*)\s*(?:[a-z]+\.?)?(?:\s+[a-z]+)?)$/i.exec(text);
+  if (tail && parseMeasure(tail[2]).qty != null && (parseMeasure(tail[2]).unit || /^\S+$/.test(tail[2].trim()))) {
+    return { measure: tail[2].trim(), name: tail[1].trim() };
+  }
+  if (/^\d+\s*%/.test(text)) return { measure: '', name: text }; // "0% Greek yogurt" is not a quantity
   const m = /^((?:[\d½¼¾⅓⅔⅛⅜⅝⅞⅕][\d\s./,½¼¾⅓⅔⅛⅜⅝⅞⅕-]*)(?:\s*x\s*\d+\s*\w+)?)\s*(.*)$/i.exec(text);
   if (!m) return { measure: '', name: text };
   let rest = m[2];
@@ -92,7 +98,7 @@ export function parseIngredientLine(line) {
     measure = `${measure} ${words.slice(0, used).join(' ')}`;
     rest = words.slice(used).join(' ');
   }
-  rest = rest.replace(/^of\s+/i, '');
+  rest = rest.replace(/^\([^)]*\)\s*/, '').replace(/^of\s+/i, ''); // "1.5 lbs (680 grams) steak"
   return { measure, name: rest || text };
 }
 
