@@ -47,15 +47,138 @@ function esc(s) {
 
 const icon = (name, cls = '') => `<svg class="${cls}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
 
-async function api(method, url, body) {
+async function api(method, url, body, retried = false) {
   const res = await fetch(url, {
     method,
     headers: body ? { 'content-type': 'application/json' } : {},
     body: body ? JSON.stringify(body) : undefined,
+    credentials: 'same-origin',
   });
   const data = await res.json().catch(() => ({}));
+  // Session ran out (24h) while the app was open: ask for the PIN, then carry on.
+  if (res.status === 401 && !url.startsWith('/api/auth/') && !retried) {
+    await requirePin();
+    return api(method, url, body, true);
+  }
   if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
   return data;
+}
+
+// ---------- PIN lock ----------
+
+let pinPromise = null;
+/** Show the PIN screen until the device is signed in (or a PIN is created). */
+function requirePin() {
+  pinPromise ||= (async () => {
+    const st = await fetch('/api/auth/status', { credentials: 'same-origin' }).then((r) => r.json());
+    if (!st.authed) await pinScreen(st.pinSet ? 'login' : 'setup');
+  })().finally(() => { pinPromise = null; });
+  return pinPromise;
+}
+
+function pinScreen(mode) {
+  return new Promise((resolve) => {
+    if (modal.open) modal.close();
+    const el = document.createElement('div');
+    el.className = 'lock';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    el.setAttribute('aria-labelledby', 'lock-title');
+    document.body.append(el);
+    document.body.classList.add('locked');
+    let step = mode; // 'setup' -> 'confirm', or 'login'
+    let pin = '';
+    let first = '';
+    let error = '';
+    let busyNow = false;
+    let lastKey = '1';
+    let typing = false; // true after digits from a keyboard, false after arrows/taps
+    const titles = {
+      setup: ['Create a PIN', 'Pick 4 to 8 digits. Everyone in the house will use it, and each device asks for it once a day.'],
+      confirm: ['Enter it again', 'Just to make sure.'],
+      login: ['Enter your PIN', 'Each device asks once every 24 hours.'],
+    };
+    const draw = () => {
+      const [title, sub] = titles[step];
+      const dots = Math.max(step === 'login' ? 4 : 4, pin.length + (pin.length < 8 ? 1 : 0));
+      el.innerHTML = `
+        <div class="lock-card">
+          <svg class="lock-logo" aria-hidden="true"><use href="#i-logo"/></svg>
+          <h1 id="lock-title">${title}</h1>
+          <p class="subtle">${sub}</p>
+          <div class="pin-dots" aria-label="${pin.length} digits entered">${Array.from({ length: Math.min(8, dots) }, (_, i) => `<i class="${i < pin.length ? 'on' : ''}"></i>`).join('')}</div>
+          <p class="pin-error" role="alert">${esc(error)}</p>
+          <div class="keypad">
+            ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `<button type="button" data-k="${n}">${n}</button>`).join('')}
+            <button type="button" data-k="back" aria-label="Delete">${icon('chevron-left')}</button>
+            <button type="button" data-k="0">0</button>
+            <button type="button" data-k="ok" class="ok" aria-label="Done" ${pin.length < 4 || busyNow ? 'disabled' : ''}>${icon('check')}</button>
+          </div>
+          ${step === 'login' ? '<p class="subtle lock-help">Forgot it? Whoever runs the server can reset it (see the README).</p>' : ''}
+        </div>`;
+      // Keep focus where it was, so a TV remote or keyboard can keep going.
+      if (!matchMedia('(pointer: coarse)').matches) (el.querySelector(`[data-k="${lastKey}"]:not([disabled])`) || el.querySelector('[data-k="1"]')).focus({ preventScroll: true });
+    };
+    const finish = () => {
+      el.remove();
+      document.body.classList.remove('locked');
+      document.removeEventListener('keydown', onKey, true);
+      resolve();
+    };
+    const submit = async () => {
+      if (pin.length < 4 || busyNow) return;
+      error = '';
+      if (step === 'setup') { first = pin; pin = ''; step = 'confirm'; return draw(); }
+      if (step === 'confirm' && pin !== first) { error = "Those didn't match. Start again."; pin = ''; first = ''; step = 'setup'; return draw(); }
+      busyNow = true;
+      draw();
+      const res = await fetch(step === 'login' ? '/api/auth/login' : '/api/auth/setup', {
+        method: 'POST', headers: { 'content-type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ pin }),
+      });
+      const data = await res.json().catch(() => ({}));
+      busyNow = false;
+      if (res.ok) {
+        if (step === 'confirm') toast('PIN set. Each device will ask for it once a day.');
+        return finish();
+      }
+      error = data.error || 'Something went wrong';
+      pin = '';
+      el.querySelector('.lock-card')?.classList.add('shake');
+      draw();
+    };
+    const press = (k) => {
+      if (busyNow) return;
+      if (k === 'back') pin = pin.slice(0, -1);
+      else if (k === 'ok') return submit();
+      else if (/^\d$/.test(k) && pin.length < 8) pin += k;
+      error = '';
+      draw();
+    };
+    const onKey = (e) => {
+      // Arrow keys / Enter on a focused key are handled by the browser (TV remotes).
+      if (e.target.closest?.('[data-k]') && (e.key === ' ' || (e.key === 'Enter' && !typing))) return;
+      const keys = [...el.querySelectorAll('[data-k]')];
+      const at = keys.indexOf(document.activeElement);
+      const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -3, ArrowDown: 3 }[e.key];
+      if (step && at !== -1) {
+        const next = keys[Math.min(keys.length - 1, Math.max(0, at + step))];
+        lastKey = next.dataset.k;
+        typing = false;
+        next.focus();
+        e.preventDefault();
+        return;
+      }
+      if (/^\d$/.test(e.key)) { typing = true; press(e.key); }
+      else if (e.key === 'Backspace') press('back');
+      else if (e.key === 'Enter') press('ok');
+      else return;
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    el.addEventListener('click', (e) => { const b = e.target.closest('[data-k]'); if (b) { lastKey = b.dataset.k; typing = false; press(b.dataset.k); } });
+    document.addEventListener('keydown', onKey, true);
+    draw();
+  });
 }
 
 function toast(message, type = '', key = '') {
@@ -774,6 +897,20 @@ function renderSettings() {
       </section>
 
       <section class="panel">
+        <h2>PIN &amp; security</h2>
+        <p class="subtle" style="margin:0">Every device has to enter the PIN once every 24 hours.</p>
+        <form class="field-row" data-form="change-pin" autocomplete="off">
+          <div class="field"><label for="pin-cur">Current PIN</label><input id="pin-cur" class="input" name="current" type="password" inputmode="numeric" pattern="\\d{4,8}" maxlength="8" required></div>
+          <div class="field"><label for="pin-new">New PIN</label><input id="pin-new" class="input" name="pin" type="password" inputmode="numeric" pattern="\\d{4,8}" maxlength="8" required></div>
+          <div class="field" style="align-self:end"><button class="btn">Change PIN</button></div>
+        </form>
+        <div class="modal-actions">
+          <button class="btn" data-action="lock-now">${icon('lock')}Lock this device</button>
+          <button class="btn danger" data-action="signout-all">Sign out all devices</button>
+        </div>
+      </section>
+
+      <section class="panel">
         <h2>Randomizer & display</h2>
         <label class="switch"><span><b>Prefer favorites</b><br><small class="subtle">Favorited recipes are 3× more likely to be picked.</small></span><input type="checkbox" data-setting="favoritesBoost" ${s.favoritesBoost ? 'checked' : ''}></label>
         <div class="field">
@@ -1094,6 +1231,17 @@ const actions = {
   'filter-healthy': () => { state.recipeFilters.healthy = !state.recipeFilters.healthy; state.recipeFilters.limit = PAGE; render(); },
   'filter-budget': () => { state.recipeFilters.budget = !state.recipeFilters.budget; state.recipeFilters.limit = PAGE; render(); },
   'import-url': () => openImport(),
+  'lock-now': async () => {
+    await api('POST', '/api/auth/logout');
+    await requirePin();
+    route();
+  },
+  'signout-all': async () => {
+    if (!confirm('Sign out every device? Everyone will need the PIN again.')) return;
+    await api('POST', '/api/auth/signout-all');
+    await requirePin();
+    route();
+  },
   'new-recipe': () => openEditor(),
   'edit-recipe': (el) => editRecipe(el.dataset.id),
   'pull-creators': async (el) => {
@@ -1395,6 +1543,11 @@ document.addEventListener('submit', (e) => {
       render();
       openRecipe(res.recipe.id);
     },
+    'change-pin': async () => {
+      await api('POST', '/api/auth/change', { current: data.current, pin: data.pin });
+      form.reset();
+      toast('PIN changed. Other devices will need the new one.');
+    },
     'save-recipe': async () => {
       const fd = new FormData(form);
       const id = form.dataset.id;
@@ -1468,6 +1621,7 @@ document.addEventListener('visibilitychange', () => {
 async function boot() {
   main.innerHTML = '<div class="week-grid">' + '<div class="skeleton"></div>'.repeat(7) + '</div>';
   try {
+    await requirePin();
     const [settings, meta, recipes] = await Promise.all([api('GET', '/api/settings'), api('GET', '/api/meta'), api('GET', '/api/recipes')]);
     state.settings = settings;
     state.meta = meta;

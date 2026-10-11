@@ -10,6 +10,7 @@ import { buildGroceryList } from './lib/grocery.js';
 import { fetchAllSources, importLink, normalizeUrl, pullCreatorSite, SUGGESTED_CREATORS } from './lib/sources.js';
 import { buildCustomRecipe } from './lib/custom.js';
 import { priceGroceryList, STORES } from './lib/pricing.js';
+import { PIN_RE, hashPin, verifyPin, createSession, sessionValid, endSession, pruneSessions, readCookie, sessionCookie, clearCookie, clientIp, Throttle } from './lib/pin.js';
 import { PROTEINS, ALLERGEN_GROUPS } from './lib/recipes.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -20,6 +21,17 @@ const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(here, '..', 'dat
 const PASSWORD = process.env.APP_PASSWORD || '';
 
 const store = new Store(DATA_DIR);
+
+// Forgot the PIN? `touch $DATA_DIR/reset-pin` and restart: the PIN is cleared
+// and the next visitor is asked to set a new one.
+const RESET_FILE = path.join(DATA_DIR, 'reset-pin');
+if (fs.existsSync(RESET_FILE)) {
+  delete store.db.auth;
+  store.saveNow();
+  fs.rmSync(RESET_FILE);
+  console.log('PIN cleared. Open the app to set a new one.');
+}
+const throttle = new Throttle();
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -133,6 +145,67 @@ const route = (method, pattern, handler) => {
   const re = new RegExp(`^${pattern.replace(/:(\w+)/g, (_, k) => { keys.push(k); return '([^/]+)'; })}$`);
   routes.push({ method, re, keys, handler });
 };
+
+// ---------- PIN lock ----------
+
+route('GET', '/api/auth/status', ({ req }) => {
+  const auth = store.db.auth;
+  return { pinSet: Boolean(auth?.hash), authed: Boolean(auth?.hash) && sessionValid(auth, readCookie(req)) };
+});
+route('POST', '/api/auth/setup', ({ req, res, body }) => {
+  if (store.db.auth?.hash) throw new HttpError(409, 'A PIN is already set.');
+  const pin = String(body.pin || '');
+  if (!PIN_RE.test(pin)) throw new HttpError(400, 'Use 4 to 8 digits.');
+  store.db.auth = { ...hashPin(pin), sessions: {} };
+  res.setHeader('set-cookie', sessionCookie(req, createSession(store.db.auth)));
+  store.save();
+  return { ok: true };
+});
+route('POST', '/api/auth/login', ({ req, res, body }) => {
+  const auth = store.db.auth;
+  if (!auth?.hash) throw new HttpError(409, 'No PIN set yet.');
+  const ip = clientIp(req);
+  const wait = throttle.wait(ip);
+  if (wait) throw new HttpError(429, `Too many wrong PINs. Try again in ${wait < 90 ? `${wait} seconds` : `${Math.ceil(wait / 60)} minutes`}.`);
+  if (!verifyPin(body.pin, auth)) {
+    throttle.fail(ip);
+    throw new HttpError(401, "That PIN isn't right.");
+  }
+  throttle.succeed(ip);
+  pruneSessions(auth);
+  res.setHeader('set-cookie', sessionCookie(req, createSession(auth)));
+  store.save();
+  return { ok: true };
+});
+route('POST', '/api/auth/logout', ({ req, res }) => {
+  endSession(store.db.auth, readCookie(req));
+  res.setHeader('set-cookie', clearCookie(req));
+  store.save();
+  return { ok: true };
+});
+route('POST', '/api/auth/change', ({ req, res, body }) => {
+  const auth = store.db.auth;
+  if (!sessionValid(auth, readCookie(req))) throw new HttpError(401, 'Enter your PIN first.');
+  const ip = clientIp(req);
+  if (throttle.wait(ip)) throw new HttpError(429, 'Too many wrong PINs. Try again later.');
+  if (!verifyPin(body.current, auth)) {
+    throttle.fail(ip);
+    throw new HttpError(401, "Your current PIN isn't right.");
+  }
+  if (!PIN_RE.test(String(body.pin || ''))) throw new HttpError(400, 'Use 4 to 8 digits.');
+  // A new PIN signs out every other device.
+  store.db.auth = { ...hashPin(body.pin), sessions: {} };
+  res.setHeader('set-cookie', sessionCookie(req, createSession(store.db.auth)));
+  store.save();
+  return { ok: true };
+});
+route('POST', '/api/auth/signout-all', ({ req, res }) => {
+  if (!sessionValid(store.db.auth, readCookie(req))) throw new HttpError(401, 'Enter your PIN first.');
+  store.db.auth.sessions = {};
+  res.setHeader('set-cookie', clearCookie(req));
+  store.save();
+  return { ok: true };
+});
 
 route('GET', '/api/meta', () => ({ stores: STORES, proteins: [...PROTEINS, 'vegetarian'], allergens: Object.fromEntries(Object.entries(ALLERGEN_GROUPS).map(([k, g]) => [k, g.label])), recipeCount: store.db.recipes.length, auth: Boolean(PASSWORD), suggestedCreators: SUGGESTED_CREATORS }));
 
@@ -378,8 +451,14 @@ const server = http.createServer(async (req, res) => {
       const m = r.re.exec(pathname);
       if (!m) continue;
       const params = Object.fromEntries(r.keys.map((k, i) => [k, decodeURIComponent(m[i + 1])]));
+      if (!pathname.startsWith('/api/auth/')) {
+        // Everything except the PIN screen itself needs a signed-in device.
+        const auth = store.db.auth;
+        if (!auth?.hash) throw new HttpError(401, 'Set a PIN to start using the app.');
+        if (!sessionValid(auth, readCookie(req))) throw new HttpError(401, 'Enter your PIN.');
+      }
       const body = ['POST', 'PUT', 'PATCH'].includes(req.method) ? await readBody(req) : {};
-      return send(res, 200, await r.handler({ params, body, req }));
+      return send(res, 200, await r.handler({ params, body, req, res }));
     }
     throw new HttpError(404, 'Not found');
   } catch (e) {

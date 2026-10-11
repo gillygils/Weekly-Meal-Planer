@@ -550,6 +550,36 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select:
 .macros-in { grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr)); }
 .macros-in label { display: grid; gap: .3rem; font-size: .85rem; color: var(--muted); }
 
+/* PIN lock */
+body.locked > :not(.lock):not(svg):not(script) { visibility: hidden; }
+.lock {
+  position: fixed; inset: 0; z-index: 500; display: grid; place-items: center; overflow-y: auto;
+  padding: calc(1.5rem + env(safe-area-inset-top, 0px)) 1rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  background: radial-gradient(60rem 40rem at 50% -10%, color-mix(in srgb, var(--accent) 16%, var(--bg)), var(--bg));
+}
+.lock-card { width: min(22rem, 100%); display: grid; justify-items: center; gap: .6rem; text-align: center; }
+.lock-card.shake { animation: shake .35s; }
+@keyframes shake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+.lock-logo { width: 3.4rem; height: 3.4rem; color: var(--accent); margin-bottom: .4rem; }
+.lock-card h1 { font-size: 1.6rem; letter-spacing: -.01em; }
+.lock-card .subtle { margin: 0; max-width: 18rem; }
+.pin-dots { display: flex; gap: .8rem; margin: .9rem 0 .2rem; min-height: 1.1rem; }
+.pin-dots i { width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid var(--muted); transition: background .12s, border-color .12s, transform .12s; }
+.pin-dots i.on { background: var(--accent); border-color: var(--accent); transform: scale(1.1); }
+.pin-error { color: var(--danger); font-weight: 600; min-height: 1.4em; margin: 0; }
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; width: 100%; margin-top: .3rem; }
+.keypad button {
+  aspect-ratio: 1.35; border-radius: 1.2rem; border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); font-size: 1.6rem; font-weight: 650; display: grid; place-items: center;
+  font-variant-numeric: tabular-nums; transition: background .12s, transform .08s;
+}
+.keypad button:hover { background: var(--surface-2); }
+.keypad button:active { transform: scale(.95); background: var(--surface-3); }
+.keypad button svg { width: 1.6rem; height: 1.6rem; }
+.keypad .ok { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.keypad .ok:disabled { opacity: .35; cursor: not-allowed; }
+.lock-help { font-size: .8rem; margin-top: .6rem !important; }
+
 /* ---------- Modal ---------- */
 dialog {
   width: min(52rem, calc(100vw - 2rem)); max-height: min(92dvh, 70rem);

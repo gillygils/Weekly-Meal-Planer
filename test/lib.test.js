@@ -233,3 +233,31 @@ test('store prices and the cheapest shopping plan', async () => {
   const withPantry = priceGroceryList(items, { ...settings, countPantry: true }, {});
   assert.ok(withPantry.totals.aldi > est.totals.aldi);
 });
+
+test('PIN hashing, sessions and the wrong-PIN throttle', async () => {
+  const { hashPin, verifyPin, createSession, sessionValid, endSession, Throttle, SESSION_HOURS } = await import('../server/lib/pin.js');
+  const auth = { ...hashPin('4821'), sessions: {} };
+  assert.equal(auth.hash.includes('4821'), false);
+  assert.equal(verifyPin('4821', auth), true);
+  assert.equal(verifyPin('4822', auth), false);
+  assert.equal(verifyPin('12', auth), false);
+  const t0 = Date.now();
+  const token = createSession(auth, t0);
+  assert.equal(sessionValid(auth, token, t0 + 1000), true);
+  assert.equal(sessionValid(auth, token, t0 + SESSION_HOURS * 3600 * 1000 + 1), false, 'expires after 24h');
+  assert.equal(sessionValid(auth, 'nope', t0), false);
+  endSession(auth, token);
+  assert.equal(sessionValid(auth, token, t0), false);
+  let now = 0;
+  const th = new Throttle({ now: () => now });
+  for (let i = 0; i < 4; i++) th.fail('a');
+  assert.equal(th.wait('a'), 0, '4 misses are free');
+  th.fail('a');
+  assert.equal(th.wait('a'), 30);
+  assert.equal(th.wait('b'), 0, 'other devices unaffected');
+  now += 31000;
+  th.fail('a');
+  assert.equal(th.wait('a'), 60, 'backs off');
+  for (let i = 0; i < 30; i++) th.fail(`ip${i}`);
+  assert.ok(th.wait('fresh') > 0, 'many misses overall lock everyone');
+});
