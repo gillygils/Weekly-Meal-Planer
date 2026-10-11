@@ -27,29 +27,15 @@ export function ensureSlots(plan, meals) {
 }
 
 /**
- * Move one meal to another day and shift the meals in between over by one
- * (like reordering a list). Locked meals stay on their day and the others
- * flow around them; dropping onto a locked meal swaps the two instead.
- * The moved meal keeps its own locked state.
+ * Move a meal to another day by swapping it with that day's meal (or empty
+ * slot). Every other day stays as it is, and each meal keeps its own lock.
  */
 export function moveMeal(plan, meal, from, to) {
-  const row = plan.slots.filter((s) => s.meal === meal).sort((a, b) => a.day - b.day);
-  const src = row.find((s) => s.day === from);
-  const dst = row.find((s) => s.day === to);
+  const src = plan.slots.find((s) => s.meal === meal && s.day === from);
+  const dst = plan.slots.find((s) => s.meal === meal && s.day === to);
   if (!src || !dst || from === to) return plan;
-  const take = (s) => ({ recipeId: s.recipeId, locked: s.locked });
-  const put = (s, v) => { s.recipeId = v.recipeId; s.locked = v.locked; };
-  if (dst.locked) {
-    const a = take(src);
-    put(src, take(dst));
-    put(dst, a);
-  } else {
-    const free = row.filter((s) => s === src || !s.locked);
-    const contents = free.map(take);
-    const [item] = contents.splice(free.indexOf(src), 1);
-    contents.splice(free.indexOf(dst), 0, item);
-    free.forEach((s, i) => put(s, contents[i]));
-  }
+  [src.recipeId, dst.recipeId] = [dst.recipeId, src.recipeId];
+  [src.locked, dst.locked] = [dst.locked, src.locked];
   plan.updatedAt = new Date().toISOString();
   return plan;
 }

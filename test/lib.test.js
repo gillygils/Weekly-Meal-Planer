@@ -117,17 +117,17 @@ test('randomizer never picks avoided ingredients', () => {
   assert.ok(plan.slots.every((s) => s.recipeId.startsWith('plain')));
 });
 
-test('moving a meal shifts the days in between and respects locks', async () => {
+test('moving a meal swaps it with the target day', async () => {
   const { moveMeal } = await import('../server/lib/planner.js');
   const make = (locks = []) => {
     const plan = ensureSlots({ slots: [] }, ['dinner']);
     plan.slots.forEach((s, i) => { s.recipeId = 'ABCDEFG'[i]; s.locked = locks.includes(i); });
     return plan;
   };
-  const row = (p) => p.slots.map((s) => s.recipeId + (s.locked ? '*' : '')).join('');
-  assert.equal(row(moveMeal(make(), 'dinner', 0, 3)), 'BCDAEFG'); // Mon -> Thu
-  assert.equal(row(moveMeal(make(), 'dinner', 5, 1)), 'AFBCDEG'); // Sat -> Tue
-  assert.equal(row(moveMeal(make([1]), 'dinner', 0, 3)), 'CB*DAEFG'); // locked Tue stays put
-  assert.equal(row(moveMeal(make([3]), 'dinner', 0, 3)), 'D*BCAEFG'); // onto a locked day: swap
-  assert.equal(row(moveMeal(make([0]), 'dinner', 0, 2)), 'BCA*DEFG'); // the lock travels with the moved meal
+  const row = (p) => p.slots.map((s) => (s.recipeId || '-') + (s.locked ? '*' : '')).join('');
+  assert.equal(row(moveMeal(make(), 'dinner', 0, 3)), 'DBCAEFG'); // Mon <-> Thu
+  assert.equal(row(moveMeal(make([1, 3]), 'dinner', 0, 3)), 'D*B*CAEFG'); // locks travel with their meals
+  const empty = make();
+  empty.slots[2].recipeId = null;
+  assert.equal(row(moveMeal(empty, 'dinner', 0, 2)), '-BADEFG'); // onto an empty day
 });

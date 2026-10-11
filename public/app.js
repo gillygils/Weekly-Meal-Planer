@@ -883,7 +883,6 @@ document.addEventListener('keydown', (e) => {
   const from = Number(tile.dataset.day);
   const to = from + step;
   if (to < 0 || to > 6) return;
-  // Moving onto a locked day swaps the two; otherwise the meal moves and others shift.
   const recipe = tile.dataset.recipe;
   busy(null, async () => {
     await moveMealTo(meal, from, to);
