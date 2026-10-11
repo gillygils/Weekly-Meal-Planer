@@ -90,10 +90,23 @@ function avoidHits(r) {
   if (!avoidCache.has(r.id)) avoidCache.set(r.id, avoidMatch(r.ingredientNames || []));
   return avoidCache.get(r.id);
 }
+const HEALTHY = 65;
+const isHealthy = (r) => (r.healthScore ?? 0) >= HEALTHY;
+function meetsHealthGoals(r) {
+  const s = state.settings;
+  const n = r.nutrition;
+  if (s.healthFocus && !isHealthy(r)) return false;
+  if (s.maxCalories > 0 && (!n || n.kcal > s.maxCalories)) return false;
+  if (s.minProtein > 0 && (!n || (n.protein ?? 0) < s.minProtein)) return false;
+  return true;
+}
+const fmt = (n) => Math.round(n).toLocaleString();
+
 function fitsSettings(r, meal) {
   const excluded = state.settings.excludedProteins;
   if (meal && !r.mealTypes.includes(meal)) return false;
   if (overBudget(r)) return false;
+  if (!meetsHealthGoals(r)) return false;
   if (r.proteins.some((p) => excluded.includes(p))) return false;
   if (excluded.includes('vegetarian') && r.mainProtein === 'vegetarian') return false;
   return !avoidHits(r).length;
@@ -215,6 +228,11 @@ function chips(r) {
   const out = [`<span class="chip">${PROTEIN_EMOJI[p] || ''} ${esc(PROTEIN_LABEL[p] || p)}</span>`];
   out.push(`<span class="chip price ${overBudget(r) ? 'over' : ''}" title="Estimated cost per serving">${money(cost(r))}/serving</span>`);
   if (r.totalMinutes) out.push(`<span class="chip">${icon('clock')}${r.totalMinutes} min</span>`);
+  const n = r.nutrition;
+  if (n?.kcal) {
+    const tip = `Per serving${isHealthy(r) ? ` · healthy (score ${r.healthScore}/100)` : ''}`;
+    out.splice(1, 0, `<span class="chip macro ${isHealthy(r) ? 'healthy' : ''}" title="${tip}">${isHealthy(r) ? icon('leaf') : ''}${fmt(n.kcal)} kcal · ${fmt(n.protein ?? 0)}g protein</span>`);
+  }
   const hits = avoidHits(r);
   if (hits.length) out.unshift(`<span class="chip warn" title="On your allergies & dislikes list">⚠ ${esc(hits.join(', '))}</span>`);
   return out.join('');
@@ -240,6 +258,7 @@ function renderPlan() {
       <section class="panel day ${isoDate(date) === todayKey ? 'today' : ''} ${thisWeek && isoDate(date) < todayKey ? 'past' : ''}" data-day="${d}" aria-label="${DAY_NAMES[date.getDay()]}">
         <div class="day-head"><h2>${DAY_NAMES[date.getDay()]}</h2><span>${date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span></div>
         ${slots.map((s) => `${enabled.length > 1 ? `<div class="meal-label">${s.meal}</div>` : ''}${renderSlot(s)}`).join('')}
+        ${dayMacros(slots)}
       </section>`);
   }
 
@@ -248,6 +267,7 @@ function renderPlan() {
       <div class="stats">
         <span><strong>${filled.length}</strong>/${plan.slots.length} meals</span>
         <span><strong>${locked}</strong> locked</span>
+        ${weekMacros(filled)}
         <span class="${over ? 'over' : ''}" title="Feeds ${settings.householdSize}"><strong>${money(weekCost)}</strong> est. week · ${money(avg)}/serving</span>
       </div>
       <span class="spacer"></span>
@@ -256,6 +276,44 @@ function renderPlan() {
     </div>
     ${filled.length === 0 ? `<div class="panel empty" style="margin-bottom:1rem"><h2>Nothing planned yet</h2><p>Hit <b>Randomize</b> to fill the week. Lock the meals you like and randomize again to swap out the rest.</p></div>` : ''}
     <div class="week-grid">${days.join('')}</div>`;
+}
+
+// Per-person totals for one day's planned meals, with a calorie split bar.
+function dayMacros(slots) {
+  const meals = slots.map((s) => s.recipeId && state.byId.get(s.recipeId)).filter((r) => r?.nutrition?.kcal);
+  if (!meals.length) return '';
+  const t = { kcal: 0, protein: 0, carbs: 0, fat: 0 };
+  for (const r of meals) for (const k of Object.keys(t)) t[k] += r.nutrition[k] || 0;
+  const s = state.settings;
+  const pk = t.protein * 4;
+  const ck = t.carbs * 4;
+  const fk = t.fat * 9;
+  const sum = pk + ck + fk || 1;
+  const pct = (v) => `${((v / sum) * 100).toFixed(1)}%`;
+  const target = s.dailyCalories > 0 ? Math.min(100, (t.kcal / s.dailyCalories) * 100) : null;
+  const ptarget = s.dailyProtein > 0 ? Math.min(100, (t.protein / s.dailyProtein) * 100) : null;
+  const label = meals.length < slots.length ? 'planned meals' : slots.length > 1 ? 'day total' : 'per person';
+  return `
+    <div class="day-macros" title="Per person, from ${meals.length} planned meal${meals.length > 1 ? 's' : ''} (estimated)">
+      <div class="dm-top"><span><b>${fmt(t.kcal)}</b> kcal${s.dailyCalories > 0 ? ` <small>/ ${fmt(s.dailyCalories)}</small>` : ''}</span><small>${label}</small></div>
+      ${target != null ? `<div class="meter" aria-hidden="true"><i style="width:${target}%"></i></div>` : ''}
+      <div class="macro-bar" aria-hidden="true"><i class="p" style="width:${pct(pk)}"></i><i class="c" style="width:${pct(ck)}"></i><i class="f" style="width:${pct(fk)}"></i></div>
+      <div class="dm-row">
+        <span><i class="dot p"></i>${fmt(t.protein)}g protein${s.dailyProtein > 0 ? ` <small>/ ${fmt(s.dailyProtein)}</small>` : ''}</span>
+        <span><i class="dot c"></i>${fmt(t.carbs)}g carbs</span>
+        <span><i class="dot f"></i>${fmt(t.fat)}g fat</span>
+      </div>
+      ${ptarget != null ? `<div class="meter protein" aria-hidden="true"><i style="width:${ptarget}%"></i></div>` : ''}
+    </div>`;
+}
+
+function weekMacros(filled) {
+  const meals = filled.map((s) => state.byId.get(s.recipeId)).filter((r) => r?.nutrition?.kcal);
+  if (!meals.length) return '';
+  const avg = (k) => meals.reduce((a, r) => a + (r.nutrition[k] || 0), 0) / meals.length;
+  const healthy = meals.filter(isHealthy).length;
+  return `<span title="Average per serving"><strong>${fmt(avg('kcal'))}</strong> kcal · <strong>${fmt(avg('protein'))}g</strong> protein avg</span>
+        <span><strong>${healthy}</strong> healthy</span>`;
 }
 
 function renderSlot(s) {
@@ -351,6 +409,7 @@ function filteredRecipes() {
     if (f.protein && !(r.mainProtein === f.protein || r.proteins.includes(f.protein))) return false;
     if (f.meal === 'other' ? r.mealTypes.length : f.meal && !r.mealTypes.includes(f.meal)) return false;
     if (f.budget && !fitsSettings(r)) return false;
+    if (f.healthy && !isHealthy(r)) return false;
     if (q && !`${r.name} ${r.cuisine} ${r.category} ${r.tags.join(' ')} ${r.source}`.toLowerCase().includes(q)) return false;
     return true;
   });
@@ -360,6 +419,9 @@ function filteredRecipes() {
     pricey: (a, b) => cost(b) - cost(a),
     newest: (a, b) => (b.addedAt || '').localeCompare(a.addedAt || ''),
     quick: (a, b) => (a.totalMinutes || 999) - (b.totalMinutes || 999),
+    healthy: (a, b) => (b.healthScore ?? 0) - (a.healthScore ?? 0),
+    protein: (a, b) => (b.nutrition?.protein ?? 0) - (a.nutrition?.protein ?? 0),
+    light: (a, b) => (a.nutrition?.kcal ?? 9999) - (b.nutrition?.kcal ?? 9999),
   };
   list = list.sort(sorters[f.sort] || sorters.name);
   return list;
@@ -391,10 +453,14 @@ function renderRecipes() {
         <option value="cheap" ${f.sort === 'cheap' ? 'selected' : ''}>Cheapest first</option>
         <option value="pricey" ${f.sort === 'pricey' ? 'selected' : ''}>Priciest first</option>
         <option value="quick" ${f.sort === 'quick' ? 'selected' : ''}>Quickest first</option>
+        <option value="healthy" ${f.sort === 'healthy' ? 'selected' : ''}>Healthiest first</option>
+        <option value="protein" ${f.sort === 'protein' ? 'selected' : ''}>Most protein</option>
+        <option value="light" ${f.sort === 'light' ? 'selected' : ''}>Fewest calories</option>
         <option value="newest" ${f.sort === 'newest' ? 'selected' : ''}>Newest first</option>
       </select>
       <button class="chip-toggle" data-action="filter-fav" aria-pressed="${f.favorites}">${icon(f.favorites ? 'heart-fill' : 'heart')}Favorites</button>
-      <button class="chip-toggle" data-action="filter-budget" aria-pressed="${f.budget}" title="Only recipes the randomizer is allowed to pick (price, proteins, allergies & dislikes)">${icon('check')}Fits my settings</button>
+      <button class="chip-toggle" data-action="filter-healthy" aria-pressed="${Boolean(f.healthy)}">${icon('leaf')}Healthy</button>
+      <button class="chip-toggle" data-action="filter-budget" aria-pressed="${f.budget}" title="Only recipes the randomizer is allowed to pick (price, health goals, proteins, allergies & dislikes)">${icon('check')}Fits my settings</button>
     </div>
     <p class="subtle" style="margin:0 0 .8rem">${list.length} recipe${list.length === 1 ? '' : 's'}</p>
     ${list.length ? '' : `<div class="panel empty"><h2>No recipes match</h2><p>Try a different search or filter.</p></div>`}
@@ -458,6 +524,32 @@ function renderSettings() {
           <label for="currency">Currency symbol</label>
           <input id="currency" class="input" style="max-width:6rem" maxlength="4" data-setting="currency" value="${esc(s.currency)}">
         </div>
+      </section>
+
+      <section class="panel">
+        <h2>Health &amp; macros</h2>
+        <label class="switch"><span><b>Healthier meals</b><br><small class="subtle">Only randomize meals with a good health score (more protein and fiber, sensible calories, less deep-fried and fat-heavy food). The healthiest come up most often.</small></span><input type="checkbox" data-setting="healthFocus" ${s.healthFocus ? 'checked' : ''}></label>
+        <div class="field-row">
+          <div class="field">
+            <label for="max-cal">Max calories per serving</label>
+            <input id="max-cal" class="input" type="number" inputmode="numeric" min="0" step="50" data-setting="maxCalories" value="${s.maxCalories || ''}" placeholder="No limit">
+          </div>
+          <div class="field">
+            <label for="min-pro">Min protein per serving</label>
+            <div class="money"><input id="min-pro" class="input" type="number" inputmode="numeric" min="0" step="5" data-setting="minProtein" value="${s.minProtein || ''}" placeholder="Any"><span>g</span></div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="day-cal">Daily calorie target</label>
+            <input id="day-cal" class="input" type="number" inputmode="numeric" min="0" step="50" data-setting="dailyCalories" value="${s.dailyCalories || ''}" placeholder="None">
+          </div>
+          <div class="field">
+            <label for="day-pro">Daily protein target</label>
+            <div class="money"><input id="day-pro" class="input" type="number" inputmode="numeric" min="0" step="5" data-setting="dailyProtein" value="${s.dailyProtein || ''}" placeholder="None"><span>g</span></div>
+          </div>
+        </div>
+        <small class="subtle">Each day on the plan shows its calories, protein, carbs and fat per person; targets add a progress bar. Macros are estimated from the ingredients unless a recipe publishes its own, so treat them as a guide.</small>
       </section>
 
       <section class="panel">
@@ -552,6 +644,8 @@ async function openRecipe(id, slotId) {
         <button class="btn primary">${icon('calendar')}Add to ${esc(relativeWeek(state.weekKey).toLowerCase())}</button>
       </form>
 
+      ${nutritionPanel(r)}
+
       <div class="recipe-cols">
         <div>
           <h3>Ingredients</h3>
@@ -584,6 +678,25 @@ async function openRecipe(id, slotId) {
         </div>
       </details>
     </div>`);
+}
+
+function nutritionPanel(r) {
+  const n = r.nutrition;
+  if (!n?.kcal) return '';
+  const src = { recipe: 'From the recipe', estimate: 'Estimated from the ingredients', rough: 'Rough estimate (some amounts were missing)', manual: 'Entered by you' }[n.source] || 'Estimated';
+  const cell = (v, unit, label, cls = '') => `<div class="nut ${cls}"><b>${v == null ? '–' : fmt(v)}<small>${unit}</small></b><span>${label}</span></div>`;
+  return `
+    <section class="nutrition" aria-label="Nutrition per serving">
+      <div class="nut-grid">
+        ${cell(n.kcal, '', 'kcal')}
+        ${cell(n.protein, 'g', 'protein', 'p')}
+        ${cell(n.carbs, 'g', 'carbs', 'c')}
+        ${cell(n.fat, 'g', 'fat', 'f')}
+        ${cell(n.fiber, 'g', 'fiber')}
+        <div class="nut score ${isHealthy(r) ? 'good' : ''}"><b>${r.healthScore ?? '–'}<small>/100</small></b><span>health score</span></div>
+      </div>
+      <p class="subtle">Per serving · ${src}</p>
+    </section>`;
 }
 
 function renderPickerList(slot, q, showAll) {
@@ -660,7 +773,7 @@ const actions = {
   randomize: async (el) => {
     await setPlan(await api('POST', `/api/weeks/${state.weekKey}/randomize`));
     const empty = state.plan.slots.filter((s) => !s.recipeId).length;
-    if (empty) toast(`Couldn't fill ${empty} meal${empty > 1 ? 's' : ''} — try loosening your price, protein or allergy settings.`, 'error');
+    if (empty) toast(`Couldn't fill ${empty} meal${empty > 1 ? 's' : ''} — try loosening your price, health, protein or allergy settings.`, 'error');
   },
   'clear-week': async () => {
     if (!confirm('Clear all unlocked meals for this week?')) return;
@@ -706,6 +819,7 @@ const actions = {
   },
   more: () => { state.recipeFilters.limit += PAGE * 2; render(); },
   'filter-fav': () => { state.recipeFilters.favorites = !state.recipeFilters.favorites; state.recipeFilters.limit = PAGE; render(); },
+  'filter-healthy': () => { state.recipeFilters.healthy = !state.recipeFilters.healthy; state.recipeFilters.limit = PAGE; render(); },
   'filter-budget': () => { state.recipeFilters.budget = !state.recipeFilters.budget; state.recipeFilters.limit = PAGE; render(); },
   'import-url': () => openImport(),
   'refresh-recipes': async () => {
@@ -918,7 +1032,7 @@ document.addEventListener('change', (e) => {
     document.documentElement.dataset.theme = el.value;
   } else if (el.dataset.setting) {
     const key = el.dataset.setting;
-    const value = el.type === 'checkbox' ? el.checked : key === 'weekStartsOn' ? Number(el.value) : key === 'maxPricePerServing' ? Number(el.value) || 0 : el.value;
+    const value = el.type === 'checkbox' ? el.checked : el.type === 'number' || key === 'weekStartsOn' ? Number(el.value) || 0 : el.value;
     busy(null, () => updateSettings({ [key]: value }).then(() => toast('Saved')));
   } else if (el.dataset.filter) {
     state.recipeFilters[el.dataset.filter] = el.value;

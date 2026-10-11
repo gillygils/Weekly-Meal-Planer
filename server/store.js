@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { withNutrition, NUTRITION_VERSION } from './lib/nutrition.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const SEED_FILE = path.join(here, 'seed', 'recipes.json');
@@ -15,6 +16,11 @@ export const DEFAULT_SETTINGS = {
   avoidAllergens: [],
   avoidIngredients: [],
   favoritesBoost: true,
+  healthFocus: false,
+  maxCalories: 0, // per serving, 0 = no limit
+  minProtein: 0, // grams per serving
+  dailyCalories: 0, // per person, 0 = no target
+  dailyProtein: 0,
   currency: '$',
   weekStartsOn: 1, // 0 = Sunday, 1 = Monday
 };
@@ -32,6 +38,10 @@ export function sanitizeSettings(input, base = DEFAULT_SETTINGS) {
   if (Array.isArray(input.avoidIngredients)) {
     s.avoidIngredients = [...new Set(input.avoidIngredients.map((x) => String(x).trim().slice(0, 40)).filter(Boolean))].slice(0, 60);
   }
+  if (input.healthFocus != null) s.healthFocus = Boolean(input.healthFocus);
+  for (const k of ['maxCalories', 'minProtein', 'dailyCalories', 'dailyProtein']) {
+    if (input[k] != null) s[k] = Math.min(10000, Math.max(0, Math.round(Number(input[k]) || 0)));
+  }
   if (input.favoritesBoost != null) s.favoritesBoost = Boolean(input.favoritesBoost);
   if (input.currency != null) s.currency = String(input.currency).slice(0, 4) || '$';
   if (input.weekStartsOn != null) s.weekStartsOn = Number(input.weekStartsOn) === 0 ? 0 : 1;
@@ -46,6 +56,7 @@ export class Store {
     fs.mkdirSync(dataDir, { recursive: true });
     this.db = this.load();
     this.mergeSeed();
+    this.backfillNutrition();
     this.saveNow();
   }
 
@@ -65,6 +76,19 @@ export class Store {
     if (!fs.existsSync(SEED_FILE)) return 0;
     const seed = JSON.parse(fs.readFileSync(SEED_FILE, 'utf8'));
     return this.addRecipes(seed);
+  }
+
+  /** Add or refresh macros on recipes saved before nutrition existed (or an older estimate). */
+  backfillNutrition() {
+    let n = 0;
+    for (const r of this.db.recipes) {
+      if (r.nutrition?.version === NUTRITION_VERSION || r.nutrition?.source === 'manual') continue;
+      // Older TheMealDB imports assumed 4 servings; let the estimator correct that.
+      if (r.id.startsWith('mealdb-') && r.servingsEstimated == null) r.servingsEstimated = true;
+      withNutrition(r);
+      n++;
+    }
+    return n;
   }
 
   addRecipes(list) {

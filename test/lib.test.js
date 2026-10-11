@@ -131,3 +131,34 @@ test('moving a meal swaps it with the target day', async () => {
   empty.slots[2].recipeId = null;
   assert.equal(row(moveMeal(empty, 'dinner', 0, 2)), '-BADEFG'); // onto an empty day
 });
+
+test('nutrition estimates and health score', async () => {
+  const { estimateNutrition, withNutrition, healthScore } = await import('../server/lib/nutrition.js');
+  const r = finalizeRecipe({ id: 'n1', name: 'Chicken & rice', servings: 2, ingredients: [
+    { name: 'chicken breast', measure: '400g' }, { name: 'basmati rice', measure: '1 cup' }, { name: 'broccoli', measure: '200g' }, { name: 'salt', measure: 'to taste' },
+  ] });
+  const n = estimateNutrition(r);
+  // 400g chicken ≈ 480 kcal / 90 g protein; 1 cup rice ≈ 185 g ≈ 666 kcal; broccoli ≈ 68 kcal. Per serving ≈ 607.
+  assert.ok(n.kcal > 560 && n.kcal < 660, `kcal ${n.kcal}`);
+  assert.ok(n.protein > 50 && n.protein < 62, `protein ${n.protein}`);
+  assert.equal(n.source, 'estimate');
+  assert.ok(healthScore(r, n) >= 80);
+  // Published nutrition wins over the estimate.
+  const reported = withNutrition({ ...r, reportedNutrition: { calories: '500 kcal', proteinContent: '45 g' } });
+  assert.equal(reported.nutrition.kcal, 500);
+  assert.equal(reported.nutrition.protein, 45);
+  assert.equal(reported.nutrition.source, 'recipe');
+  // Deep-frying oil isn't all eaten, and "50g/2oz" isn't 50 + 2.
+  const fried = estimateNutrition(finalizeRecipe({ id: 'n2', name: 'x', servings: 4, ingredients: [{ name: 'vegetable oil', measure: '2 quarts' }, { name: 'butter', measure: '50g/2oz' }] }));
+  assert.ok(fried.kcal < 700, `fried ${fried.kcal}`);
+});
+
+test('randomizer honors health goals', async () => {
+  const { withNutrition } = await import('../server/lib/nutrition.js');
+  const lean = (i) => withNutrition(finalizeRecipe({ id: `lean${i}`, name: `Lean ${i}`, category: 'Chicken', servings: 2, ingredients: [{ name: 'chicken breast', measure: '400g' }, { name: 'broccoli', measure: '300g' }, { name: 'brown rice', measure: '1 cup' }, { name: 'spinach', measure: '100g' }] }));
+  const heavy = (i) => withNutrition(finalizeRecipe({ id: `heavy${i}`, name: `Heavy ${i}`, category: 'Beef', servings: 2, ingredients: [{ name: 'ground beef', measure: '500g' }, { name: 'butter', measure: '100g' }, { name: 'cheddar', measure: '200g' }, { name: 'pasta', measure: '300g' }] }));
+  const recipes = [...Array.from({ length: 10 }, (_, i) => lean(i)), ...Array.from({ length: 10 }, (_, i) => heavy(i))];
+  assert.ok(recipes[0].healthScore >= 65 && recipes[10].healthScore < 65, `${recipes[0].healthScore} / ${recipes[10].healthScore}`);
+  const plan = randomizePlan(ensureSlots({ slots: [] }, ['dinner']), recipes, { meals: ['dinner'], excludedProteins: [], healthFocus: true, maxCalories: 800, minProtein: 30 });
+  assert.ok(plan.slots.every((s) => s.recipeId.startsWith('lean')));
+});

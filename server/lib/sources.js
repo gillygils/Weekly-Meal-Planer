@@ -4,6 +4,7 @@ import dns from 'node:dns/promises';
 import net from 'node:net';
 import { finalizeRecipe, cleanText, splitInstructions } from './recipes.js';
 import { parseIngredientLine } from './grocery.js';
+import { withNutrition } from './nutrition.js';
 
 const UA = 'WeeklyMealPlanner/1.0 (+self-hosted)';
 
@@ -14,6 +15,10 @@ async function getJson(url) {
 }
 
 function fromMealDb(m) {
+  return withNutrition(fromMealDbRaw(m));
+}
+
+function fromMealDbRaw(m) {
   const ingredients = [];
   for (let i = 1; i <= 20; i++) {
     const name = (m[`strIngredient${i}`] || '').trim();
@@ -22,6 +27,7 @@ function fromMealDb(m) {
   return finalizeRecipe({
     id: `mealdb-${m.idMeal}`,
     source: 'TheMealDB',
+    servingsEstimated: true,
     sourceUrl: m.strSource || `https://www.themealdb.com/meal/${m.idMeal}`,
     name: m.strMeal,
     category: m.strCategory || '',
@@ -48,7 +54,8 @@ export async function fetchMealDb(log = () => {}) {
 }
 
 function fromDummyJson(r) {
-  return finalizeRecipe({
+  return withNutrition(finalizeRecipe({
+    reportedNutrition: r.caloriesPerServing ? { calories: r.caloriesPerServing } : null,
     id: `dummyjson-${r.id}`,
     source: 'DummyJSON',
     sourceUrl: `https://dummyjson.com/recipes/${r.id}`,
@@ -61,7 +68,7 @@ function fromDummyJson(r) {
     tags: [...(r.tags || []), ...(r.mealType || [])],
     ingredients: (r.ingredients || []).map((line) => parseIngredientLine(line)),
     instructions: r.instructions || [],
-  });
+  }));
 }
 
 export async function fetchDummyJson() {
@@ -163,7 +170,8 @@ export function recipeFromJsonLd(node, url) {
   const category = cleanText(firstString(node.recipeCategory));
   const keywords = typeof node.keywords === 'string' ? node.keywords.split(',') : node.keywords || [];
   const host = new URL(url).hostname.replace(/^www\./, '');
-  return finalizeRecipe({
+  return withNutrition(finalizeRecipe({
+    reportedNutrition: node.nutrition || null,
     id: `url-${Buffer.from(url).toString('base64url').slice(-24)}-${Date.now().toString(36)}`,
     source: host,
     sourceUrl: url,
@@ -176,7 +184,7 @@ export function recipeFromJsonLd(node, url) {
     tags: keywords.map((k) => cleanText(k)).filter((k) => k && k.length < 30).slice(0, 8),
     ingredients,
     instructions: flattenInstructions(node.recipeInstructions),
-  });
+  }));
 }
 
 export async function importFromUrl(raw) {

@@ -44,6 +44,7 @@ function parseNumberToken(tok) {
 // Parse a measure string like "1 1/2 cups", "200g", "2 large", "To taste".
 export function parseMeasure(measure) {
   let s = String(measure || '').trim().toLowerCase()
+    .replace(/([a-z.)])\s*\/.*$/, '$1') // "650g/1lb 8oz" -> keep the first measure
     .replace(/(\d)([½¼¾⅓⅔⅛⅜⅝⅞⅕])/g, '$1 $2')
     .replace(/(\d)\s*-\s*\d+(\.\d+)?/g, '$1') // ranges: take the low end
     .replace(/(\d)([a-z])/g, '$1 $2');

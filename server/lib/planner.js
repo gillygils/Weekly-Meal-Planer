@@ -40,7 +40,18 @@ export function moveMeal(plan, meal, from, to) {
   return plan;
 }
 
-export function matchesFilters(recipe, meal, settings, { ignoreBudget = false } = {}) {
+export const HEALTHY_SCORE = 65;
+
+/** Health goals from settings: "healthier meals", max calories and min protein per serving. */
+export function meetsHealthGoals(recipe, settings) {
+  const n = recipe.nutrition;
+  if (settings.healthFocus && (recipe.healthScore ?? 0) < HEALTHY_SCORE) return false;
+  if (settings.maxCalories > 0 && (!n || n.kcal > settings.maxCalories)) return false;
+  if (settings.minProtein > 0 && (!n || (n.protein ?? 0) < settings.minProtein)) return false;
+  return true;
+}
+
+export function matchesFilters(recipe, meal, settings, { ignoreBudget = false, ignoreHealth = false } = {}) {
   if (recipe.hidden) return false;
   if (meal && !recipe.mealTypes.includes(meal)) return false;
   const excluded = settings.excludedProteins || [];
@@ -49,6 +60,7 @@ export function matchesFilters(recipe, meal, settings, { ignoreBudget = false } 
     if (excluded.includes('vegetarian') && recipe.mainProtein === 'vegetarian') return false;
   }
   if (!ignoreBudget && settings.maxPricePerServing > 0 && recipeCost(recipe) > settings.maxPricePerServing) return false;
+  if (!ignoreHealth && !meetsHealthGoals(recipe, settings)) return false;
   return true;
 }
 
@@ -57,7 +69,12 @@ function nameKey(r) {
 }
 
 function weightedPick(candidates, settings, rng) {
-  const weights = candidates.map((r) => (settings.favoritesBoost && r.favorite ? 3 : 1));
+  const weights = candidates.map((r) => {
+    let w = settings.favoritesBoost && r.favorite ? 3 : 1;
+    // With "healthier meals" on, the healthiest options come up more often too.
+    if (settings.healthFocus && r.healthScore != null) w *= 0.5 + r.healthScore / 50;
+    return w;
+  });
   const total = weights.reduce((a, b) => a + b, 0);
   let roll = rng() * total;
   for (let i = 0; i < candidates.length; i++) {
@@ -73,14 +90,15 @@ function weightedPick(candidates, settings, rng) {
  */
 export function pickRecipe({ meal, recipes, settings, usedIds, usedNames, recentIds, rng = Math.random }) {
   const passes = [
-    { budget: true, recent: true, dupNames: true },
-    { budget: true, recent: false, dupNames: true },
-    { budget: true, recent: false, dupNames: false },
-    { budget: false, recent: false, dupNames: false },
+    { budget: true, health: true, recent: true, dupNames: true },
+    { budget: true, health: true, recent: false, dupNames: true },
+    { budget: true, health: true, recent: false, dupNames: false },
+    { budget: true, health: false, recent: false, dupNames: false },
+    { budget: false, health: false, recent: false, dupNames: false },
   ];
   for (const pass of passes) {
     const candidates = recipes.filter((r) =>
-      matchesFilters(r, meal, settings, { ignoreBudget: !pass.budget }) &&
+      matchesFilters(r, meal, settings, { ignoreBudget: !pass.budget, ignoreHealth: !pass.health }) &&
       !usedIds.has(r.id) &&
       !(pass.dupNames && usedNames.has(nameKey(r))) &&
       !(pass.recent && recentIds.has(r.id)));

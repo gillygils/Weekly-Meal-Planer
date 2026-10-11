@@ -186,6 +186,9 @@ export function finalizeRecipe(r) {
     costOverride: null,
     favorite: false,
     addedAt: r.addedAt || new Date().toISOString(),
+    reportedNutrition: r.reportedNutrition || null,
+    servingsEstimated: Boolean(r.servingsEstimated),
+    creator: r.creator || '',
   };
 }
 

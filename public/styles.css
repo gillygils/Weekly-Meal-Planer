@@ -20,6 +20,10 @@
   --danger: #f87171;
   --warn-bg: #3b1212;
   --ok: #4ade80;
+  --ok-bg: #12301d;
+  --m-protein: #f97316;
+  --m-carbs: #60a5fa;
+  --m-fat: #facc15;
   --shadow: 0 1px 2px rgb(0 0 0 / .5), 0 4px 16px rgb(0 0 0 / .35);
   --shadow-lg: 0 10px 40px rgb(0 0 0 / .6);
   --radius: 1rem;
@@ -48,6 +52,10 @@
   --danger: #b91c1c;
   --warn-bg: #fee2e2;
   --ok: #15803d;
+  --ok-bg: #dcfce7;
+  --m-protein: #ea580c;
+  --m-carbs: #2563eb;
+  --m-fat: #ca8a04;
   --shadow: 0 1px 2px rgb(0 0 0 / .06), 0 4px 16px rgb(0 0 0 / .06);
   --shadow-lg: 0 10px 40px rgb(0 0 0 / .18);
 }
@@ -71,6 +79,10 @@
     --danger: #b91c1c;
     --warn-bg: #fee2e2;
     --ok: #15803d;
+    --ok-bg: #dcfce7;
+    --m-protein: #ea580c;
+    --m-carbs: #2563eb;
+    --m-fat: #ca8a04;
     --shadow: 0 1px 2px rgb(0 0 0 / .06), 0 4px 16px rgb(0 0 0 / .06);
     --shadow-lg: 0 10px 40px rgb(0 0 0 / .18);
   }
@@ -222,6 +234,7 @@ h1, h2, h3 { line-height: 1.2; margin: 0; }
 .chip svg { width: .95em; height: .95em; }
 .chip.price { color: var(--text); }
 .chip.over { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); }
+.chip.healthy { background: var(--ok-bg); color: var(--ok); }
 .chip.warn { background: var(--warn-bg); color: var(--danger); white-space: normal; }
 .avoid-note { margin: 0 0 .6rem; padding: .6rem .8rem; border-radius: var(--radius-sm); background: var(--warn-bg); color: var(--danger); font-weight: 600; font-size: .9rem; }
 .ing-list li.avoid { color: var(--danger); }
@@ -352,6 +365,37 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; user-select:
   .r-card .meal-body { padding-right: 3rem; }
   .meal[data-recipe] .meal-body { padding-right: 2.9rem; }
 }
+
+/* Day macro totals */
+.day-macros { margin-top: auto; display: grid; gap: .4rem; padding: .7rem .75rem .6rem; border-radius: var(--radius-sm); background: var(--surface-2); font-variant-numeric: tabular-nums; }
+.dm-top { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.dm-top b { font-size: 1.15rem; }
+.dm-top small, .dm-row small { color: var(--muted); font-size: .75rem; }
+.dm-row { display: flex; flex-wrap: wrap; gap: .15rem .8rem; font-size: .8rem; color: var(--muted); }
+.dm-row span { white-space: nowrap; }
+.macro-bar { display: flex; height: .45rem; border-radius: 999px; overflow: hidden; background: var(--surface-3); }
+.macro-bar i, .dot { display: block; background: var(--m-protein); }
+.macro-bar .c, .dot.c { background: var(--m-carbs); }
+.macro-bar .f, .dot.f { background: var(--m-fat); }
+.dot { display: inline-block; width: .55rem; height: .55rem; border-radius: 50%; margin-right: .3rem; vertical-align: .05em; }
+.meter { height: .3rem; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--text); opacity: .75; border-radius: inherit; }
+.meter.protein i { background: var(--m-protein); opacity: 1; }
+
+/* Recipe nutrition */
+.nutrition { display: grid; gap: .5rem; }
+.nutrition p { margin: 0; }
+.nut-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr)); gap: .5rem; }
+.nut { display: grid; gap: .1rem; padding: .6rem .7rem; border-radius: var(--radius-sm); background: var(--surface-2); font-variant-numeric: tabular-nums; border-top: 3px solid transparent; }
+.nut b { font-size: 1.25rem; }
+.nut b small { font-size: .75rem; font-weight: 600; color: var(--muted); margin-left: .1rem; }
+.nut span { font-size: .78rem; color: var(--muted); }
+.nut.p { border-top-color: var(--m-protein); }
+.nut.c { border-top-color: var(--m-carbs); }
+.nut.f { border-top-color: var(--m-fat); }
+.nut.score.good { background: var(--ok-bg); }
+.nut.score.good b { color: var(--ok); }
+.field-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: .8rem; }
 
 /* ---------- Groceries ---------- */
 .grocery-layout { display: grid; gap: 1rem; grid-template-columns: 1fr; }
