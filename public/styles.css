@@ -1,24 +1,28 @@
-/* ---------- Tokens ---------- */
+/* ---------- Tokens ----------
+   Black, dark grey and orange. Dark is the default; Settings can switch to
+   light or follow the device. */
 :root {
-  color-scheme: light;
-  --bg: #f4f6f5;
-  --surface: #ffffff;
-  --surface-2: #eef2f1;
-  --surface-3: #e3e9e7;
-  --text: #13201d;
-  --muted: #5b6b67;
-  --border: #dbe3e0;
-  --accent: #0f766e;
-  --accent-strong: #0b5f58;
-  --accent-soft: #d5efeb;
-  --on-accent: #ffffff;
-  --lock: #b45309;
-  --lock-soft: #fdecd3;
-  --fav: #e11d48;
-  --danger: #b91c1c;
-  --ok: #15803d;
-  --shadow: 0 1px 2px rgb(16 24 22 / .06), 0 4px 16px rgb(16 24 22 / .06);
-  --shadow-lg: 0 10px 40px rgb(16 24 22 / .18);
+  color-scheme: dark;
+  --bg: #0a0a0a;
+  --surface: #161616;
+  --surface-2: #1f1f1f;
+  --surface-3: #2a2a2a;
+  --text: #f4f4f5;
+  --muted: #a1a1aa;
+  --border: #2c2c2e;
+  --accent: #f97316;
+  --accent-strong: #fb923c;
+  --accent-soft: #2e1a0c;
+  --on-accent: #0a0a0a;
+  --lock: #f97316;
+  --lock-soft: #2e1a0c;
+  --today: #e4e4e7;
+  --fav: #f43f5e;
+  --danger: #f87171;
+  --warn-bg: #3b1212;
+  --ok: #4ade80;
+  --shadow: 0 1px 2px rgb(0 0 0 / .5), 0 4px 16px rgb(0 0 0 / .35);
+  --shadow-lg: 0 10px 40px rgb(0 0 0 / .6);
   --radius: 1rem;
   --radius-sm: .65rem;
   --gutter: clamp(1rem, 2.5vw, 2.5rem);
@@ -26,49 +30,53 @@
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --bg: #0b1412;
-    --surface: #121d1b;
-    --surface-2: #182624;
-    --surface-3: #22322f;
-    --text: #e7efed;
-    --muted: #93a7a2;
-    --border: #263735;
-    --accent: #2dd4bf;
-    --accent-strong: #5eead4;
-    --accent-soft: #123b37;
-    --on-accent: #04201c;
-    --lock: #fbbf24;
-    --lock-soft: #3a2a0c;
-    --fav: #fb7185;
-    --danger: #f87171;
-    --ok: #4ade80;
-    --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 4px 16px rgb(0 0 0 / .25);
-    --shadow-lg: 0 10px 40px rgb(0 0 0 / .5);
-  }
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f4f5;
+  --surface: #ffffff;
+  --surface-2: #f0f0f1;
+  --surface-3: #e4e4e7;
+  --text: #18181b;
+  --muted: #5f5f68;
+  --border: #e0e0e3;
+  --accent: #ea580c;
+  --accent-strong: #c2410c;
+  --accent-soft: #ffedd5;
+  --on-accent: #ffffff;
+  --lock: #ea580c;
+  --lock-soft: #ffedd5;
+  --today: #18181b;
+  --fav: #e11d48;
+  --danger: #b91c1c;
+  --warn-bg: #fee2e2;
+  --ok: #15803d;
+  --shadow: 0 1px 2px rgb(0 0 0 / .06), 0 4px 16px rgb(0 0 0 / .06);
+  --shadow-lg: 0 10px 40px rgb(0 0 0 / .18);
 }
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #0b1412;
-  --surface: #121d1b;
-  --surface-2: #182624;
-  --surface-3: #22322f;
-  --text: #e7efed;
-  --muted: #93a7a2;
-  --border: #263735;
-  --accent: #2dd4bf;
-  --accent-strong: #5eead4;
-  --accent-soft: #123b37;
-  --on-accent: #04201c;
-  --lock: #fbbf24;
-  --lock-soft: #3a2a0c;
-  --fav: #fb7185;
-  --danger: #f87171;
-  --ok: #4ade80;
-  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 4px 16px rgb(0 0 0 / .25);
-  --shadow-lg: 0 10px 40px rgb(0 0 0 / .5);
+@media (prefers-color-scheme: light) {
+  :root[data-theme="auto"] {
+    color-scheme: light;
+    --bg: #f4f4f5;
+    --surface: #ffffff;
+    --surface-2: #f0f0f1;
+    --surface-3: #e4e4e7;
+    --text: #18181b;
+    --muted: #5f5f68;
+    --border: #e0e0e3;
+    --accent: #ea580c;
+    --accent-strong: #c2410c;
+    --accent-soft: #ffedd5;
+    --on-accent: #ffffff;
+    --lock: #ea580c;
+    --lock-soft: #ffedd5;
+    --today: #18181b;
+    --fav: #e11d48;
+    --danger: #b91c1c;
+    --warn-bg: #fee2e2;
+    --ok: #15803d;
+    --shadow: 0 1px 2px rgb(0 0 0 / .06), 0 4px 16px rgb(0 0 0 / .06);
+    --shadow-lg: 0 10px 40px rgb(0 0 0 / .18);
+  }
 }
 
 /* Everything is sized in rem, and rem scales with the screen: phones, tablets,
@@ -217,6 +225,12 @@ h1, h2, h3 { line-height: 1.2; margin: 0; }
 .chip svg { width: .95em; height: .95em; }
 .chip.price { color: var(--text); }
 .chip.over { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); }
+.chip.warn { background: var(--warn-bg); color: var(--danger); white-space: normal; }
+.avoid-note { margin: 0 0 .6rem; padding: .6rem .8rem; border-radius: var(--radius-sm); background: var(--warn-bg); color: var(--danger); font-weight: 600; font-size: .9rem; }
+.ing-list li.avoid { color: var(--danger); }
+.ing-list li.avoid b { font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; padding: .05rem .4rem; border-radius: 999px; background: var(--warn-bg); margin-left: .3rem; }
+.chips.suggest .chip-toggle { border-style: dashed; color: var(--muted); font-size: .82rem; min-height: 2.1rem; }
+.chip-toggle svg { width: .95em; height: .95em; }
 .chip-toggle {
   display: inline-flex; align-items: center; gap: .4rem; min-height: 2.4rem;
   padding: .35rem .9rem; border-radius: 999px; border: 1px solid var(--border);
@@ -224,7 +238,7 @@ h1, h2, h3 { line-height: 1.2; margin: 0; }
 }
 .chip-toggle[data-meal] { text-transform: capitalize; }
 .chip-toggle[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-strong); }
-.chip-toggle.no[aria-pressed="true"] { background: color-mix(in srgb, var(--danger) 12%, var(--surface)); border-color: var(--danger); color: var(--danger); text-decoration: line-through; }
+.chip-toggle.no[aria-pressed="true"] { background: var(--warn-bg); border-color: var(--danger); color: var(--danger); }
 
 /* ---------- Layout ---------- */
 main { padding: 1rem var(--gutter) 2.5rem; max-width: 150rem; margin: 0 auto; outline: none; }
@@ -261,8 +275,8 @@ main { padding: 1rem var(--gutter) 2.5rem; max-width: 150rem; margin: 0 auto; ou
 .day-head { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; padding: 0 .2rem; }
 .day-head h2 { font-size: 1.05rem; }
 .day-head span { color: var(--muted); font-size: .85rem; }
-.day.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow); }
-.day.today .day-head h2::after { content: "Today"; margin-left: .5rem; font-size: .7rem; vertical-align: middle; padding: .15rem .5rem; border-radius: 999px; background: var(--accent); color: var(--on-accent); }
+.day.today { border-color: var(--today); box-shadow: 0 0 0 1px var(--today), var(--shadow); }
+.day.today .day-head h2::after { content: "Today"; margin-left: .5rem; font-size: .7rem; vertical-align: middle; padding: .15rem .5rem; border-radius: 999px; background: var(--today); color: var(--bg); }
 
 .meal-label { font-size: .72rem; font-weight: 750; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 .2rem -.35rem; }
 
@@ -283,7 +297,7 @@ main { padding: 1rem var(--gutter) 2.5rem; max-width: 150rem; margin: 0 auto; ou
   position: absolute; top: .5rem; left: .5rem;
   display: inline-flex; align-items: center; gap: .3rem;
   padding: .2rem .55rem; border-radius: 999px; font-size: .72rem; font-weight: 750;
-  background: var(--lock); color: #fff;
+  background: var(--lock); color: var(--on-accent);
 }
 .lock-flag svg { width: .9rem; height: .9rem; }
 .meal-body { padding: .65rem .75rem .25rem; display: grid; gap: .4rem; }
@@ -371,7 +385,7 @@ dialog {
   background: var(--surface); color: var(--text); box-shadow: var(--shadow-lg);
   overflow: hidden;
 }
-dialog::backdrop { background: rgb(5 12 10 / .55); backdrop-filter: blur(3px); }
+dialog::backdrop { background: rgb(0 0 0 / .65); backdrop-filter: blur(3px); }
 dialog[open] { animation: pop .18s ease-out; }
 @keyframes pop { from { opacity: 0; transform: translateY(12px) scale(.98); } }
 .modal-inner { max-height: inherit; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; }
@@ -411,7 +425,7 @@ dialog[open] { animation: pop .18s ease-out; }
 /* ---------- Toasts ---------- */
 .toasts { position: fixed; z-index: 100; left: 50%; translate: -50% 0; bottom: calc(var(--tabbar-h) + 1rem + env(safe-area-inset-bottom)); display: grid; gap: .5rem; width: min(30rem, calc(100vw - 2rem)); pointer-events: none; }
 .toast { padding: .8rem 1.1rem; border-radius: var(--radius-sm); background: var(--text); color: var(--bg); box-shadow: var(--shadow-lg); font-weight: 600; animation: pop .2s ease-out; }
-.toast.error { background: var(--danger); color: #fff; }
+.toast.error { background: var(--danger); color: var(--bg); }
 
 .skeleton { background: linear-gradient(90deg, var(--surface-2), var(--surface-3), var(--surface-2)); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: var(--radius); min-height: 14rem; }
 @keyframes shimmer { to { background-position: -200% 0; } }

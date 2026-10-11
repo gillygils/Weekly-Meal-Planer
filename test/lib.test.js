@@ -96,3 +96,23 @@ test('JSON-LD recipe import parsing', () => {
   assert.equal(r.mainProtein, 'fish');
   assert.equal(r.source, 'example.com');
 });
+
+test('allergies & dislikes matching', async () => {
+  const { createAvoidMatcher } = await import('../server/lib/recipes.js');
+  const f = createAvoidMatcher({ avoidAllergens: ['dairy', 'gluten', 'peanuts'], avoidIngredients: ['Mushrooms', 'cilantro'] });
+  assert.deepEqual(f(['coconut milk', 'butter beans', 'rice flour']), []);
+  assert.deepEqual(f(['unsalted butter']), ['Dairy']);
+  assert.deepEqual(f(['soy sauce']), ['Gluten / wheat']);
+  assert.deepEqual(f(['peanut butter']), ['Peanuts']);
+  assert.deepEqual(f(['button mushroom', 'fresh coriander']), ['Mushrooms', 'cilantro']);
+  assert.deepEqual(f(['nutmeg']), []);
+});
+
+test('randomizer never picks avoided ingredients', () => {
+  const recipes = [];
+  for (let i = 0; i < 20; i++) recipes.push(mk(`plain${i}`));
+  for (let i = 0; i < 20; i++) recipes.push(mk(`shroom${i}`, { ingredients: [{ name: 'beef', measure: '1' }, { name: 'chestnut mushrooms', measure: '200g' }] }));
+  const settings = { meals: ['dinner'], excludedProteins: [], avoidIngredients: ['mushroom'], avoidAllergens: [] };
+  const plan = randomizePlan(ensureSlots({ slots: [] }, ['dinner']), recipes, settings);
+  assert.ok(plan.slots.every((s) => s.recipeId.startsWith('plain')));
+});

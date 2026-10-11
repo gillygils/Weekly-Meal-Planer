@@ -192,3 +192,71 @@ export function finalizeRecipe(r) {
 export function recipeCost(r) {
   return r.costOverride ?? r.estimatedCost;
 }
+
+// ---------- Allergies & dislikes ----------
+
+// Allergen groups are stricter than "proteins to avoid": they also catch
+// hidden sources like fish sauce, butter or soy sauce (which contains wheat).
+export const ALLERGEN_GROUPS = {
+  peanuts: { label: 'Peanuts', words: ['peanut', 'groundnut', 'satay'], not: [] },
+  treenuts: { label: 'Tree nuts', words: ['almond', 'cashew', 'walnut', 'pecan', 'pistachio', 'hazelnut', 'macadamia', 'pine nut', 'brazil nut', 'chestnut', 'praline', 'marzipan', 'nutella', 'frangipane'], not: ['water chestnut'] },
+  dairy: { label: 'Dairy', words: ['milk', 'cheese', 'butter', 'cream', 'yogurt', 'yoghurt', 'ghee', 'creme fraiche', 'crème fraîche', 'mascarpone', 'ricotta', 'parmesan', 'parmigiano', 'mozzarella', 'cheddar', 'feta', 'paneer', 'buttermilk', 'custard', 'whey', 'halloumi', 'gruyere', 'gruyère', 'brie', 'camembert', 'quark', 'kefir', 'condensed milk', 'evaporated milk', 'ice cream'], not: ['coconut milk', 'coconut cream', 'almond milk', 'oat milk', 'soy milk', 'soya milk', 'rice milk', 'peanut butter', 'almond butter', 'cashew butter', 'nut butter', 'butter bean', 'butternut', 'cream of tartar', 'vegan cheese', 'dairy-free', 'cocoa butter', 'butterfly', 'butterhead'] },
+  gluten: { label: 'Gluten / wheat', words: ['flour', 'bread', 'breadcrumb', 'panko', 'pasta', 'spaghetti', 'penne', 'linguine', 'fettuccine', 'tagliatelle', 'macaroni', 'lasagne', 'lasagna', 'noodle', 'couscous', 'wheat', 'barley', 'rye', 'semolina', 'bulgur', 'bulghur', 'seitan', 'pastry', 'pizza dough', 'dough', 'tortilla', 'pita', 'naan', 'bun', 'baguette', 'brioche', 'croissant', 'cracker', 'biscuit', 'crouton', 'soy sauce', 'beer', 'malt', 'farro', 'spelt', 'orzo', 'gnocchi', 'udon', 'ramen', 'filo', 'phyllo', 'wonton', 'dumpling wrapper'], not: ['rice flour', 'corn flour', 'cornflour', 'almond flour', 'coconut flour', 'chickpea flour', 'gram flour', 'buckwheat flour', 'potato flour', 'tapioca flour', 'gluten-free', 'gluten free', 'rice noodle', 'glass noodle', 'rice vermicelli', 'corn tortilla', 'buckwheat', 'tamari'] },
+  eggs: { label: 'Eggs', words: ['egg', 'mayonnaise', 'mayo', 'meringue', 'aioli'], not: ['eggplant', 'egg replacer', 'vegan mayo'] },
+  soy: { label: 'Soy', words: ['soy', 'soya', 'tofu', 'tempeh', 'edamame', 'miso', 'tamari', 'soybean'], not: [] },
+  sesame: { label: 'Sesame', words: ['sesame', 'tahini', 'halva', 'halvah', 'za\'atar', 'zaatar'], not: [] },
+  fish: { label: 'Fish', words: [...PROTEIN_RULES.fish.words, 'fish sauce', 'worcestershire', 'caesar dressing', 'dashi', 'bonito'], not: [] },
+  shellfish: { label: 'Shellfish', words: [...PROTEIN_RULES.shellfish.words, 'oyster sauce', 'shrimp paste', 'prawn cracker'], not: ['oyster mushroom', 'crab apple'] },
+  mustard: { label: 'Mustard', words: ['mustard'], not: [] },
+  celery: { label: 'Celery', words: ['celery', 'celeriac'], not: [] },
+};
+
+// Common alternative names, so "cilantro" also catches "coriander", etc.
+const SYNONYMS = [
+  ['cilantro', 'coriander'], ['eggplant', 'aubergine'], ['zucchini', 'courgette'], ['shrimp', 'prawn'],
+  ['scallion', 'spring onion', 'green onion'], ['bell pepper', 'capsicum'], ['arugula', 'rocket'],
+  ['chickpea', 'garbanzo'], ['chili', 'chilli', 'chile'], ['ground beef', 'minced beef', 'beef mince'],
+];
+
+function singular(t) {
+  if (/ies$/.test(t)) return `${t.slice(0, -3)}*`; // berries -> berr* (berry, berries)
+  if (/oes$/.test(t)) return t.slice(0, -2); // tomatoes -> tomato
+  if (/[^s]s$/.test(t) && t.length > 3) return t.slice(0, -1); // mushrooms -> mushroom
+  return t;
+}
+
+function expandTerm(term) {
+  const t = term.toLowerCase().trim().replace(/\s+/g, ' ');
+  const base = singular(t);
+  const group = SYNONYMS.find((g) => g.includes(t) || g.includes(base));
+  return group || [base];
+}
+
+/**
+ * Build a function that returns which avoided things (allergen labels or
+ * custom ingredients) appear in a list of ingredient names.
+ */
+export function createAvoidMatcher(settings = {}) {
+  const rules = [];
+  for (const key of settings.avoidAllergens || []) {
+    const g = ALLERGEN_GROUPS[key];
+    if (g) rules.push({ label: g.label, words: g.words, not: g.not });
+  }
+  for (const term of settings.avoidIngredients || []) {
+    if (term && term.trim()) rules.push({ label: term.trim(), words: expandTerm(term), not: [] });
+  }
+  if (!rules.length) return () => [];
+  return (names) => {
+    const hits = [];
+    const texts = names.map((n) => String(n || '').toLowerCase());
+    for (const rule of rules) {
+      const hit = texts.some((raw) => {
+        let text = raw;
+        for (const n of rule.not) text = text.split(n).join(' ');
+        return rule.words.some((w) => containsWord(text, w));
+      });
+      if (hit) hits.push(rule.label);
+    }
+    return hits;
+  };
+}

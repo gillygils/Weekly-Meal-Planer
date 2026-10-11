@@ -8,7 +8,7 @@ import { Store, sanitizeSettings } from './store.js';
 import { ensureSlots, randomizePlan } from './lib/planner.js';
 import { buildGroceryList } from './lib/grocery.js';
 import { fetchAllSources, importFromUrl } from './lib/sources.js';
-import { PROTEINS } from './lib/recipes.js';
+import { PROTEINS, ALLERGEN_GROUPS } from './lib/recipes.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(here, '..', 'public');
@@ -105,7 +105,7 @@ function recentIds(key) {
 
 function summary(r) {
   const { instructions, ingredients, ...rest } = r;
-  return { ...rest, ingredientCount: ingredients.length };
+  return { ...rest, ingredientCount: ingredients.length, ingredientNames: ingredients.map((i) => i.name) };
 }
 
 function groceryFor(plan) {
@@ -126,7 +126,7 @@ const route = (method, pattern, handler) => {
   routes.push({ method, re, keys, handler });
 };
 
-route('GET', '/api/meta', () => ({ proteins: [...PROTEINS, 'vegetarian'], recipeCount: store.db.recipes.length, auth: Boolean(PASSWORD) }));
+route('GET', '/api/meta', () => ({ proteins: [...PROTEINS, 'vegetarian'], allergens: Object.fromEntries(Object.entries(ALLERGEN_GROUPS).map(([k, g]) => [k, g.label])), recipeCount: store.db.recipes.length, auth: Boolean(PASSWORD) }));
 
 route('GET', '/api/settings', () => store.db.settings);
 route('PUT', '/api/settings', async ({ body }) => {
@@ -260,9 +260,12 @@ route('DELETE', '/api/weeks/:key/grocery/extras/:id', ({ params }) => {
 
 // ---------- static files ----------
 
+// The browser shares the server's allergen matching code.
+const SHARED_LIB = { '/lib/recipes.js': path.join(here, 'lib', 'recipes.js') };
+
 function serveStatic(req, res, pathname) {
-  let file = path.normalize(path.join(PUBLIC_DIR, decodeURIComponent(pathname)));
-  if (!file.startsWith(PUBLIC_DIR)) return send(res, 403, { error: 'Forbidden' });
+  let file = SHARED_LIB[pathname] || path.normalize(path.join(PUBLIC_DIR, decodeURIComponent(pathname)));
+  if (!SHARED_LIB[pathname] && !file.startsWith(PUBLIC_DIR)) return send(res, 403, { error: 'Forbidden' });
   if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(PUBLIC_DIR, 'index.html');
   const ext = path.extname(file);
   res.writeHead(200, {

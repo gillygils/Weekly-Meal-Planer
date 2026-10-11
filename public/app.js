@@ -1,4 +1,5 @@
 // Weekly Meal Planner frontend. No framework, no build step.
+import { createAvoidMatcher } from './lib/recipes.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const main = $('#main');
@@ -56,8 +57,11 @@ async function api(method, url, body) {
   return data;
 }
 
-function toast(message, type = '') {
+function toast(message, type = '', key = '') {
+  // A keyed toast replaces the previous one with the same key instead of stacking.
+  if (key) document.querySelectorAll(`.toast[data-key="${key}"]`).forEach((t) => t.remove());
   const el = document.createElement('div');
+  if (key) el.dataset.key = key;
   el.className = `toast ${type}`;
   el.textContent = message;
   $('#toasts').append(el);
@@ -74,6 +78,26 @@ async function busy(btn, fn) {
 const money = (n) => `${state.settings.currency}${(Math.round(n * 100) / 100).toFixed(2)}`;
 const cost = (r) => r.costOverride ?? r.estimatedCost;
 const overBudget = (r) => state.settings.maxPricePerServing > 0 && cost(r) > state.settings.maxPricePerServing;
+
+// Allergies & dislikes, using the same matching code as the server's randomizer.
+let avoidMatch = () => [];
+const avoidCache = new Map();
+function setAvoidRules() {
+  avoidMatch = createAvoidMatcher(state.settings);
+  avoidCache.clear();
+}
+function avoidHits(r) {
+  if (!avoidCache.has(r.id)) avoidCache.set(r.id, avoidMatch(r.ingredientNames || []));
+  return avoidCache.get(r.id);
+}
+function fitsSettings(r, meal) {
+  const excluded = state.settings.excludedProteins;
+  if (meal && !r.mealTypes.includes(meal)) return false;
+  if (overBudget(r)) return false;
+  if (r.proteins.some((p) => excluded.includes(p))) return false;
+  if (excluded.includes('vegetarian') && r.mainProtein === 'vegetarian') return false;
+  return !avoidHits(r).length;
+}
 
 function thumb(r, size = 'medium') {
   if (!r.image) return '';
@@ -169,6 +193,8 @@ function chips(r) {
   const out = [`<span class="chip">${PROTEIN_EMOJI[p] || ''} ${esc(PROTEIN_LABEL[p] || p)}</span>`];
   out.push(`<span class="chip price ${overBudget(r) ? 'over' : ''}" title="Estimated cost per serving">${money(cost(r))}/serving</span>`);
   if (r.totalMinutes) out.push(`<span class="chip">${icon('clock')}${r.totalMinutes} min</span>`);
+  const hits = avoidHits(r);
+  if (hits.length) out.unshift(`<span class="chip warn" title="On your allergies & dislikes list">⚠ ${esc(hits.join(', '))}</span>`);
   return out.join('');
 }
 
@@ -296,12 +322,11 @@ function renderGroceries() {
 function filteredRecipes() {
   const f = state.recipeFilters;
   const q = f.q.trim().toLowerCase();
-  const excluded = state.settings.excludedProteins;
   let list = state.recipes.filter((r) => {
     if (f.favorites && !r.favorite) return false;
     if (f.protein && !(r.mainProtein === f.protein || r.proteins.includes(f.protein))) return false;
     if (f.meal === 'other' ? r.mealTypes.length : f.meal && !r.mealTypes.includes(f.meal)) return false;
-    if (f.budget && (overBudget(r) || r.proteins.some((p) => excluded.includes(p)) || (excluded.includes('vegetarian') && r.mainProtein === 'vegetarian'))) return false;
+    if (f.budget && !fitsSettings(r)) return false;
     if (q && !`${r.name} ${r.cuisine} ${r.category} ${r.tags.join(' ')} ${r.source}`.toLowerCase().includes(q)) return false;
     return true;
   });
@@ -345,7 +370,7 @@ function renderRecipes() {
         <option value="newest" ${f.sort === 'newest' ? 'selected' : ''}>Newest first</option>
       </select>
       <button class="chip-toggle" data-action="filter-fav" aria-pressed="${f.favorites}">${icon(f.favorites ? 'heart-fill' : 'heart')}Favorites</button>
-      <button class="chip-toggle" data-action="filter-budget" aria-pressed="${f.budget}" title="Only recipes the randomizer is allowed to pick (price + protein settings)">${icon('check')}Fits my settings</button>
+      <button class="chip-toggle" data-action="filter-budget" aria-pressed="${f.budget}" title="Only recipes the randomizer is allowed to pick (price, proteins, allergies & dislikes)">${icon('check')}Fits my settings</button>
     </div>
     <p class="subtle" style="margin:0 0 .8rem">${list.length} recipe${list.length === 1 ? '' : 's'}</p>
     ${list.length ? '' : `<div class="panel empty"><h2>No recipes match</h2><p>Try a different search or filter.</p></div>`}
@@ -368,7 +393,7 @@ function renderRecipes() {
 
 function renderSettings() {
   const s = state.settings;
-  const theme = load('theme', 'auto');
+  const theme = load('theme', 'dark');
   const proteins = state.meta.proteins;
   return `
     <div class="settings">
@@ -422,14 +447,37 @@ function renderSettings() {
       </section>
 
       <section class="panel">
+        <h2>Allergies &amp; dislikes</h2>
+        <div class="field">
+          <span class="label">Allergies</span>
+          <div class="chips">
+            ${Object.entries(state.meta.allergens).map(([k, label]) => `<button class="chip-toggle no" data-action="toggle-allergen" data-allergen="${k}" aria-pressed="${s.avoidAllergens.includes(k)}">${esc(label)}</button>`).join('')}
+          </div>
+          <small>These also catch hidden sources: butter and cheese for dairy, soy sauce and pasta for gluten, fish sauce for fish. Always double-check labels for a serious allergy.</small>
+        </div>
+        <div class="field">
+          <label for="avoid-in">Ingredients we don't eat</label>
+          <form class="add-item" data-form="add-avoid">
+            <input id="avoid-in" class="input" name="term" placeholder="e.g. mushrooms, olives, cilantro" autocomplete="off" maxlength="40">
+            <button class="btn primary">${icon('plus')}Add</button>
+          </form>
+          ${s.avoidIngredients.length ? `<div class="chips">${s.avoidIngredients.map((t) => `<button class="chip-toggle no" aria-pressed="true" data-action="remove-avoid" data-term="${esc(t)}" title="Remove">${esc(t)} ${icon('x')}</button>`).join('')}</div>` : ''}
+          <div class="chips suggest">
+            ${['mushrooms', 'olives', 'cilantro', 'coconut', 'eggplant', 'blue cheese', 'anchovies', 'capers'].filter((t) => !s.avoidIngredients.includes(t)).map((t) => `<button class="chip-toggle" data-action="add-avoid-suggestion" data-term="${t}">${icon('plus')}${t}</button>`).join('')}
+          </div>
+          <small>Recipes with any of these are never randomized in, and are flagged with ⚠ anywhere they appear.</small>
+        </div>
+      </section>
+
+      <section class="panel">
         <h2>Randomizer & display</h2>
         <label class="switch"><span><b>Prefer favorites</b><br><small class="subtle">Favorited recipes are 3× more likely to be picked.</small></span><input type="checkbox" data-setting="favoritesBoost" ${s.favoritesBoost ? 'checked' : ''}></label>
         <div class="field">
           <label for="theme">Theme (this device)</label>
           <select id="theme" class="input" data-action="theme">
-            <option value="auto" ${theme === 'auto' ? 'selected' : ''}>Match system</option>
-            <option value="light" ${theme === 'light' ? 'selected' : ''}>Light</option>
             <option value="dark" ${theme === 'dark' ? 'selected' : ''}>Dark</option>
+            <option value="light" ${theme === 'light' ? 'selected' : ''}>Light</option>
+            <option value="auto" ${theme === 'auto' ? 'selected' : ''}>Match system</option>
           </select>
         </div>
       </section>
@@ -484,7 +532,11 @@ async function openRecipe(id, slotId) {
         <div>
           <h3>Ingredients</h3>
           <p class="subtle" style="margin:-.3rem 0 .5rem">${scaleNote}</p>
-          <ul class="ing-list">${r.ingredients.map((i) => `<li><span class="m">${esc(i.measure)}</span><span>${esc(i.name)}</span></li>`).join('')}</ul>
+          ${avoidHits(r).length ? `<p class="avoid-note">⚠ Contains ${esc(avoidHits(r).join(', '))}, which is on your allergies &amp; dislikes list.</p>` : ''}
+          <ul class="ing-list">${r.ingredients.map((i) => {
+            const bad = avoidMatch([i.name]).length;
+            return `<li class="${bad ? 'avoid' : ''}"><span class="m">${esc(i.measure)}</span><span>${esc(i.name)}${bad ? ' <b>avoid</b>' : ''}</span></li>`;
+          }).join('')}</ul>
         </div>
         <div>
           <h3>Method</h3>
@@ -511,17 +563,10 @@ async function openRecipe(id, slotId) {
 }
 
 function renderPickerList(slot, q, showAll) {
-  const s = state.settings;
-  const excluded = s.excludedProteins;
   const query = q.trim().toLowerCase();
   const list = state.recipes.filter((r) => {
     if (query && !`${r.name} ${r.cuisine} ${r.category}`.toLowerCase().includes(query)) return false;
-    if (showAll) return true;
-    if (!r.mealTypes.includes(slot.meal)) return false;
-    if (overBudget(r)) return false;
-    if (r.proteins.some((p) => excluded.includes(p))) return false;
-    if (excluded.includes('vegetarian') && r.mainProtein === 'vegetarian') return false;
-    return true;
+    return showAll || fitsSettings(r, slot.meal);
   }).sort((a, b) => (b.favorite - a.favorite) || a.name.localeCompare(b.name)).slice(0, 80);
   if (!list.length) return `<p class="subtle">Nothing matches.</p>`;
   return list.map((r) => `
@@ -538,7 +583,7 @@ function openPicker(slotId) {
     <div class="modal-content" data-picker="${slotId}">
       <h2 id="modal-title">Choose ${esc(slot.meal)} for ${DAY_NAMES[date.getDay()]}</h2>
       <div class="search">${icon('search')}<input class="input" type="search" data-picker-q placeholder="Search recipes…" aria-label="Search recipes"></div>
-      <label class="switch" style="justify-content:flex-start"><input type="checkbox" data-picker-all><span>Show everything (ignore meal type, budget and protein settings)</span></label>
+      <label class="switch" style="justify-content:flex-start"><input type="checkbox" data-picker-all><span>Show everything (ignore meal type, budget, protein and allergy settings)</span></label>
       <p class="subtle" style="margin:0">Picking a recipe locks it in so the randomizer keeps it.</p>
       <div class="picker-list">${renderPickerList(slot, '', false)}</div>
     </div>`);
@@ -564,6 +609,11 @@ modal.addEventListener('click', (e) => { if (e.target === modal) modal.close(); 
 
 async function updateSettings(patch) {
   state.settings = await api('PUT', '/api/settings', { ...state.settings, ...patch });
+  setAvoidRules();
+  if ('avoidAllergens' in patch || 'avoidIngredients' in patch) {
+    const clash = state.plan.slots.filter((sl) => sl.recipeId && state.byId.has(sl.recipeId) && avoidHits(state.byId.get(sl.recipeId)).length).length;
+    if (clash) toast(`${clash} planned meal${clash > 1 ? 's' : ''} this week contain${clash > 1 ? '' : 's'} something on your list. They're marked ⚠ on the plan.`, '', 'clash');
+  }
   if ('meals' in patch || 'householdSize' in patch) await loadWeek();
   if ('weekStartsOn' in patch) { state.weekKey = weekStart(parseKey(state.weekKey)); await loadWeek(); }
   render();
@@ -586,7 +636,7 @@ const actions = {
   randomize: async (el) => {
     await setPlan(await api('POST', `/api/weeks/${state.weekKey}/randomize`));
     const empty = state.plan.slots.filter((s) => !s.recipeId).length;
-    if (empty) toast(`Couldn't fill ${empty} meal${empty > 1 ? 's' : ''} — try loosening your price or protein settings.`, 'error');
+    if (empty) toast(`Couldn't fill ${empty} meal${empty > 1 ? 's' : ''} — try loosening your price, protein or allergy settings.`, 'error');
   },
   'clear-week': async () => {
     if (!confirm('Clear all unlocked meals for this week?')) return;
@@ -648,6 +698,13 @@ const actions = {
     if (!meals.length) { toast('Plan at least one meal a day', 'error'); return; }
     return updateSettings({ meals });
   },
+  'toggle-allergen': (el) => {
+    const k = el.dataset.allergen;
+    const list = state.settings.avoidAllergens;
+    return updateSettings({ avoidAllergens: list.includes(k) ? list.filter((x) => x !== k) : [...list, k] });
+  },
+  'remove-avoid': (el) => updateSettings({ avoidIngredients: state.settings.avoidIngredients.filter((t) => t !== el.dataset.term) }),
+  'add-avoid-suggestion': (el) => updateSettings({ avoidIngredients: [...state.settings.avoidIngredients, el.dataset.term] }),
   'toggle-protein': (el) => {
     const p = el.dataset.protein;
     const ex = state.settings.excludedProteins;
@@ -702,8 +759,7 @@ document.addEventListener('change', (e) => {
     });
   } else if (el.dataset.action === 'theme') {
     saveLocal('theme', el.value);
-    if (el.value === 'auto') delete document.documentElement.dataset.theme;
-    else document.documentElement.dataset.theme = el.value;
+    document.documentElement.dataset.theme = el.value;
   } else if (el.dataset.setting) {
     const key = el.dataset.setting;
     const value = el.type === 'checkbox' ? el.checked : key === 'weekStartsOn' ? Number(el.value) : key === 'maxPricePerServing' ? Number(el.value) || 0 : el.value;
@@ -750,6 +806,12 @@ document.addEventListener('submit', (e) => {
   const data = Object.fromEntries(new FormData(form));
   const btn = $('button', form);
   const handlers = {
+    'add-avoid': async () => {
+      const terms = data.term.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean);
+      if (!terms.length) return;
+      await updateSettings({ avoidIngredients: [...state.settings.avoidIngredients, ...terms] });
+      $('#avoid-in')?.focus();
+    },
     'add-extra': async () => {
       if (!data.name.trim()) return;
       state.grocery = await api('POST', `/api/weeks/${state.weekKey}/grocery/extras`, { name: data.name });
@@ -805,6 +867,7 @@ async function boot() {
     const [settings, meta, recipes] = await Promise.all([api('GET', '/api/settings'), api('GET', '/api/meta'), api('GET', '/api/recipes')]);
     state.settings = settings;
     state.meta = meta;
+    setAvoidRules();
     setRecipes(recipes);
     state.weekKey = weekStart();
     await loadWeek();

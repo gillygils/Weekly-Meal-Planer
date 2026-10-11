@@ -15,8 +15,13 @@ A self-hostable weekly meal planner for your household. Randomize a week of meal
 - **Favorites** ♥. Favorited recipes are 3× more likely to be randomized (you can turn this off). You can filter the recipe library to favorites only.
 - **Target price per serving.** The randomizer only picks recipes at or under your target. Each recipe gets an estimated cost, and you can set your own price on any recipe.
 - **Proteins to avoid.** Mark fish, shellfish, pork, beef, etc. and the randomizer will never pick a recipe containing them.
+- **Allergies & dislikes.** Turn on allergen groups (peanuts, tree nuts, dairy, gluten/wheat, eggs, soy, sesame, fish, shellfish, mustard, celery) and list any ingredients you just don't eat (mushrooms, olives…).
+  - The randomizer never picks those recipes.
+  - Anything already planned that contains them is flagged with ⚠, and the matching ingredients are highlighted in the recipe.
+  - Allergen groups catch hidden sources too, like butter for dairy or soy sauce for gluten.
+  - Common alternative names are matched as well (cilantro/coriander, eggplant/aubergine, shrimp/prawn…).
 - **Meals per day.** Plan breakfast, lunch and/or dinner (dinner only by default).
-- **Responsive, modern UI.** It scales smoothly from phone to 4K TV, has light and dark themes, can be installed to a phone's home screen (PWA), and can be driven with a keyboard or TV remote.
+- **Responsive, modern UI.** It scales smoothly from phone to 4K TV, has a black, dark grey and orange theme (a light theme is available in Settings), can be installed to a phone's home screen (PWA), and can be driven with a keyboard or TV remote.
 - **Shared by the whole household.** Data lives on the server, so every device sees the same plan.
 
 ## Run it
@@ -52,7 +57,7 @@ If your server reaches the internet through an HTTP proxy, start Node with `NODE
 ## Notes
 
 - **Costs are estimates.** They come from a simple per-ingredient price table, so they're good for comparing recipes, not exact. Set your own price on any recipe (open it → *Edit price…*).
-- **Protein detection** reads each recipe's ingredients. Fish sauce, oyster sauce and Worcestershire don't count as fish/shellfish, but anchovies do. If you're avoiding a protein because of an **allergy**, still check the ingredients yourself.
+- **Protein and allergen detection** reads each recipe's ingredients. Fish sauce, oyster sauce and Worcestershire don't count as fish/shellfish, but anchovies do. If you're avoiding a protein because of an **allergy**, still check the ingredients yourself.
 - The bundled recipes live in `server/seed/recipes.json`. You can regenerate them with `npm run fetch-recipes`. New seed recipes are added to an existing database on startup, and your favorites and edits are never overwritten.
 - Removing a recipe hides it, so a later refresh won't bring it back.
 

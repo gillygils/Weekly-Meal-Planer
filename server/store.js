@@ -12,6 +12,8 @@ export const DEFAULT_SETTINGS = {
   meals: ['dinner'],
   maxPricePerServing: 0, // 0 = no limit
   excludedProteins: [],
+  avoidAllergens: [],
+  avoidIngredients: [],
   favoritesBoost: true,
   currency: '$',
   weekStartsOn: 1, // 0 = Sunday, 1 = Monday
@@ -26,6 +28,10 @@ export function sanitizeSettings(input, base = DEFAULT_SETTINGS) {
   }
   if (input.maxPricePerServing != null) s.maxPricePerServing = Math.max(0, Math.round((Number(input.maxPricePerServing) || 0) * 100) / 100);
   if (Array.isArray(input.excludedProteins)) s.excludedProteins = input.excludedProteins.map(String).slice(0, 20);
+  if (Array.isArray(input.avoidAllergens)) s.avoidAllergens = [...new Set(input.avoidAllergens.map(String))].slice(0, 20);
+  if (Array.isArray(input.avoidIngredients)) {
+    s.avoidIngredients = [...new Set(input.avoidIngredients.map((x) => String(x).trim().slice(0, 40)).filter(Boolean))].slice(0, 60);
+  }
   if (input.favoritesBoost != null) s.favoritesBoost = Boolean(input.favoritesBoost);
   if (input.currency != null) s.currency = String(input.currency).slice(0, 4) || '$';
   if (input.weekStartsOn != null) s.weekStartsOn = Number(input.weekStartsOn) === 0 ? 0 : 1;

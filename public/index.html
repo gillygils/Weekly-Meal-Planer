@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Weekly Meal Planner</title>
   <meta name="description" content="Plan the week's meals, lock in favorites and get a grocery list.">
-  <meta name="theme-color" content="#0f766e" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0b1412" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#0a0a0a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="/manifest.webmanifest">
@@ -14,7 +13,7 @@
   <link rel="apple-touch-icon" href="/icon.svg">
   <link rel="stylesheet" href="/styles.css">
   <script>
-    try { const t = localStorage.getItem('theme'); if (t && t !== 'auto') document.documentElement.dataset.theme = t; } catch {}
+    (function () { let t = 'dark'; try { t = JSON.parse(localStorage.getItem('theme')) || 'dark'; } catch {} document.documentElement.dataset.theme = t; })();
   </script>
 </head>
 <body>
