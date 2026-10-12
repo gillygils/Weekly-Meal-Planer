@@ -1378,6 +1378,28 @@ function renderSettings() {
           <button class="btn" data-action="refresh-recipes">${icon('globe')}Pull from recipe databases</button>
         </div>
       </section>
+
+      <section class="panel share-setup">
+        <h2>Share recipes from TikTok &amp; other apps</h2>
+        <p class="subtle" style="margin:0">Add "Meal Planner" to your phone's share menu, then in TikTok (or Safari, Instagram…) tap <b>Share → More → Meal Planner</b> and the recipe is imported.</p>
+        <details>
+          <summary><b>iPhone</b>: make a one-time Shortcut (about 2 minutes)</summary>
+          <ol>
+            <li>Open the <b>Shortcuts</b> app and tap <b>+</b> to make a new shortcut.</li>
+            <li>Tap the <b>ⓘ</b> button at the bottom and turn on <b>Show in Share Sheet</b>. At the top, tap <b>Images and 18 more</b> and leave only <b>URLs</b> and <b>Text</b> ticked.</li>
+            <li>Add the action <b>URL Encode</b>; it fills in <i>Shortcut Input</i> by itself.</li>
+            <li>Add the action <b>URL</b> and paste this, then tap after the <code>=</code> and pick the <i>URL Encoded Text</i> variable:
+              <div class="copy-row"><code>${esc(location.origin)}/share?text=</code><button class="btn sm" data-action="copy-text" data-text="${esc(location.origin)}/share?text=">${icon('copy')}Copy</button></div></li>
+            <li>Add the action <b>Open URLs</b>.</li>
+            <li>Name the shortcut <b>Meal Planner</b> and tap Done.</li>
+          </ol>
+          <p class="subtle">In TikTok, tap <b>Share → More</b>; "Meal Planner" is in the list of actions. Tap <b>Edit Actions</b> there to add it to your favorites so it's near the top. It opens the app in Safari, which asks for your PIN once a day like any other device.</p>
+        </details>
+        <details>
+          <summary><b>Android</b>: install the app</summary>
+          <p class="subtle">In Chrome, open the menu (⋮) and tap <b>Add to Home screen → Install</b>. "Meals" then shows up in the share menu of TikTok and other apps.</p>
+        </details>
+      </section>
     </div>`;
 }
 
@@ -1582,13 +1604,49 @@ async function editRecipe(id) {
   }, id);
 }
 
-function openImport() {
+/** Import a recipe page or TikTok link: finished recipes open, TikTok captions open in the editor to finish. */
+async function importRecipeLink(url) {
+  const res = await api('POST', '/api/recipes/import', { url });
+  if (res.draft) {
+    openEditor(res.draft);
+    return;
+  }
+  upsertRecipe(res.recipe);
+  toast(res.duplicate ? 'You already have that recipe' : `Imported "${res.recipe.name}"`);
+  render();
+  openRecipe(res.recipe.id);
+}
+
+/**
+ * Links shared to the app: Android's share sheet (installed app) and the iPhone
+ * Shortcut both open /share?url=…, or ?text=… with the link somewhere in the text.
+ */
+async function importShared() {
+  if (location.pathname !== '/share') return;
+  const q = new URLSearchParams(location.search);
+  const link = ['url', 'text', 'title'].map((k) => q.get(k) || '').join(' ').match(/https?:\/\/\S+/)?.[0];
+  history.replaceState(null, '', '/#recipes');
+  route();
+  if (!link) {
+    toast("That share didn't include a link", 'error');
+    return;
+  }
+  toast('Importing the shared recipe…', '', 'import');
+  try {
+    await importRecipeLink(link.replace(/[).,!?]+$/, ''));
+  } catch (e) {
+    openImport(link);
+    toast(e.message, 'error');
+  }
+}
+
+function openImport(prefill = '') {
   openModal(`
     <div class="modal-content">
       <h2 id="modal-title">Import a recipe link</h2>
       <p class="subtle" style="margin:0">Paste a recipe page or a TikTok video link. Recipe pages from most sites and creator blogs import complete. For a TikTok, the app grabs the caption, creator and cover image; if the ingredients aren't in the caption, you'll finish it in the editor while you watch. Different versions of a meal you already have are kept as separate recipes.</p>
       <form class="inline-form" data-form="import">
-        <input class="input" type="url" name="url" required placeholder="https://www.tiktok.com/@creator/video/… or a recipe page" aria-label="Recipe or TikTok link">
+        <input class="input" type="url" name="url" required value="${esc(prefill)}" placeholder="https://www.tiktok.com/@creator/video/… or a recipe page" aria-label="Recipe or TikTok link">
         <button class="btn primary">${icon('download')}Import</button>
       </form>
     </div>`);
@@ -1740,6 +1798,9 @@ const actions = {
     e.preventDefault();
     state.grocery = await api('DELETE', `/api/weeks/${state.weekKey}/grocery/extras/${el.dataset.id}`);
     render();
+  },
+  'copy-text': async (el) => {
+    try { await navigator.clipboard.writeText(el.dataset.text); toast('Copied'); } catch { toast('Copy failed — your browser blocked clipboard access', 'error'); }
   },
   'copy-list': async () => {
     const g = state.grocery;
@@ -2118,17 +2179,7 @@ document.addEventListener('submit', (e) => {
       render();
       $('[data-form="add-extra"] input')?.focus();
     },
-    import: async () => {
-      const res = await api('POST', '/api/recipes/import', { url: data.url });
-      if (res.draft) {
-        openEditor(res.draft);
-        return;
-      }
-      upsertRecipe(res.recipe);
-      toast(res.duplicate ? 'You already have that recipe' : `Imported "${res.recipe.name}"`);
-      render();
-      openRecipe(res.recipe.id);
-    },
+    import: () => importRecipeLink(data.url),
     'change-pin': async () => {
       await api('POST', '/api/auth/change', { current: data.current, pin: data.pin });
       form.reset();
@@ -2225,6 +2276,7 @@ async function boot() {
     state.weekKey = weekStart();
     await loadWeek();
     route();
+    await importShared();
   } catch (e) {
     main.innerHTML = `<div class="panel empty"><h2>Can't reach the server</h2><p>${esc(e.message)}</p><button class="btn primary" onclick="location.reload()">Retry</button></div>`;
   }

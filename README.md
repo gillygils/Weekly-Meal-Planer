@@ -40,6 +40,7 @@ A self-hostable weekly meal planner for your household. Randomize a week of meal
 - **Favorites** ♥. Favorited recipes are 3× more likely to be randomized (you can turn this off). You can filter the recipe library to favorites only.
 - **Target price per serving.** The randomizer only picks recipes at or under your target. Each recipe gets an estimated cost, and you can set your own price on any recipe.
 - **Proteins to avoid.** Mark fish, shellfish, pork, beef, etc. and the randomizer will never pick a recipe containing them.
+- **Share to the app.** Share a TikTok or recipe page from your phone straight into the app: on Android install the app to the home screen and pick "Meals" in the share menu; on iPhone make a small Shortcut (steps in Settings → Share recipes). Both open `/share?text=<link>`, which imports the recipe.
 - **Allergies & dislikes.** Turn on allergen groups (peanuts, tree nuts, dairy, gluten/wheat, eggs, soy, sesame, fish, shellfish, mustard, celery) and list any ingredients you just don't eat (mushrooms, olives…).
   - The randomizer never picks those recipes.
   - Anything already planned that contains them is flagged with ⚠, and the matching ingredients are highlighted in the recipe.

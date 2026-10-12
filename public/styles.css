@@ -760,3 +760,10 @@ dialog[open] { animation: pop .18s ease-out; }
 .low-tag svg, .low-note svg { width: .9rem; height: .9rem; }
 .g-for.low-note { color: var(--low); white-space: normal; display: inline-flex; align-items: center; gap: .3rem; }
 .pantry-item.is-low { background: color-mix(in srgb, var(--low) 8%, transparent); }
+
+/* Share-sheet setup steps (Settings) */
+.share-setup details { border-top: 1px solid var(--border); padding-top: .6rem; }
+.share-setup summary { cursor: pointer; padding: .3rem 0; }
+.share-setup ol { margin: .5rem 0; padding-left: 1.3rem; display: grid; gap: .5rem; }
+.share-setup code { background: var(--surface-2); padding: .15rem .4rem; border-radius: 6px; word-break: break-all; }
+.copy-row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .4rem; }
