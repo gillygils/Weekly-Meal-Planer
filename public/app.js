@@ -881,6 +881,7 @@ function acceptSuggestion(input, i) {
 
 document.addEventListener('input', (e) => {
   if (e.target.id === 'pantry-in') updateTypeahead(e.target);
+  else if (e.target.id === 'ntfy-topic') { const b = $('[data-action="ntfy-test"]'); if (b) b.disabled = !e.target.value.trim(); }
   else if (e.target.matches('[data-browse-q]')) { browse.q = e.target.value; refreshBrowse(); }
 });
 document.addEventListener('keydown', (e) => {
@@ -1883,6 +1884,9 @@ const actions = {
     toast('Topic made. Subscribe to it in the ntfy app, then send a test.');
   },
   'ntfy-test': async () => {
+    // Save a topic that was just typed in before testing it.
+    const typed = $('#ntfy-topic')?.value.trim();
+    if (typed && typed !== state.settings.ntfyTopic) state.settings = await api('PUT', '/api/settings', { ...state.settings, ntfyTopic: typed });
     await api('POST', '/api/notify/test');
     toast('Sent! It should show up on your phone in a few seconds.');
   },
