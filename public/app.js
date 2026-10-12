@@ -331,6 +331,14 @@ function slideFrom(before) {
 
 // ---------- rendering ----------
 
+/** Number of things still to buy, on the Groceries tab. */
+function updateBadge() {
+  const remaining = state.grocery ? state.grocery.items.filter((i) => !i.checked && !i.have).length + state.grocery.extras.filter((e) => !e.checked).length : 0;
+  const badge = $('#grocery-badge');
+  badge.hidden = !remaining;
+  badge.textContent = remaining > 99 ? '99+' : remaining;
+}
+
 function render() {
   document.querySelectorAll('.tabs a').forEach((a) => {
     if (a.dataset.tab === state.tab) a.setAttribute('aria-current', 'page');
@@ -339,10 +347,7 @@ function render() {
   $('#weekbar').hidden = !['plan', 'groceries'].includes(state.tab);
   $('#week-range').textContent = weekRange(state.weekKey);
   $('#week-sub').textContent = relativeWeek(state.weekKey);
-  const remaining = state.grocery ? state.grocery.items.filter((i) => !i.checked && !i.have).length + state.grocery.extras.filter((e) => !e.checked).length : 0;
-  const badge = $('#grocery-badge');
-  badge.hidden = !remaining;
-  badge.textContent = remaining > 99 ? '99+' : remaining;
+  updateBadge();
 
   const views = { plan: renderPlan, groceries: renderGroceries, pantry: renderPantry, recipes: renderRecipes, settings: renderSettings };
   main.innerHTML = views[state.tab]();
@@ -668,10 +673,10 @@ function renderGroceryList() {
       <span class="g-text">
         <span class="g-name">${esc(i.name)}</span>
         ${i.amount ? `<span class="g-amount">${esc(i.amount)}</span>` : ''}
-        <span class="g-for" title="${esc(i.recipes.join(', '))}">${esc(i.recipes.join(' · '))}</span>
+        <span class="g-for" title="${esc(i.recipes.join(', '))}">${i.low ? `<b class="low-tag">${icon('alert')}Running low</b>${i.recipes.length ? ' · ' : ''}` : ''}${esc(i.recipes.join(' · '))}</span>
       </span>
       ${bestPrice(i) && !i.price.pantry ? `<span class="g-price"><b>${money(bestPrice(i).cost)}</b><small>${esc(storeName(bestPrice(i).store))}</small></span>` : ''}
-      ${i.checked ? '' : `<button class="icon-btn sm have-btn" data-action="have-it" data-name="${esc(i.name)}" data-where="${placeFor(i.aisle)}" title="I already have this (adds it to your pantry)" aria-label="I already have ${esc(i.name)}">${icon('jar')}</button>`}
+      ${i.checked || i.low ? '' : `<button class="icon-btn sm have-btn" data-action="have-it" data-name="${esc(i.name)}" data-where="${placeFor(i.aisle)}" title="I already have this (adds it to your pantry)" aria-label="I already have ${esc(i.name)}">${icon('jar')}</button>`}
     </label>`;
 
   const extraRow = (e) => `
@@ -765,8 +770,9 @@ function renderPantry() {
         <section class="panel aisle">
           <h3><span>${PLACE_LABEL[place]}</span><span>${items.length}</span></h3>
           ${items.length ? items.sort((a, b) => a.name.localeCompare(b.name)).map((it) => `
-            <div class="g-item pantry-item">
-              <span class="g-text"><span class="g-name">${esc(it.name)}</span>${used.has(it.id) ? `<span class="g-for used">Covers this week: ${esc(used.get(it.id).join(', '))}</span>` : ''}</span>
+            <div class="g-item pantry-item ${it.low ? 'is-low' : ''}">
+              <span class="g-text"><span class="g-name">${esc(it.name)}</span>${it.low ? `<span class="g-for low-note">${icon('alert')}Running low · on your grocery list</span>` : used.has(it.id) ? `<span class="g-for used">Covers this week: ${esc(used.get(it.id).join(', '))}</span>` : ''}</span>
+              ${lowButton(it.name, it)}
               <button class="icon-btn sm" data-action="remove-pantry" data-id="${esc(it.id)}" aria-label="Remove ${esc(it.name)} (used up)" title="Used up">${icon('x')}</button>
             </div>`).join('') : '<p class="subtle" style="margin:.2rem .7rem .6rem">Nothing here yet.</p>'}
         </section>`).join('')}
@@ -1383,6 +1389,13 @@ function openModal(html) {
   modalBody.scrollTop = 0;
 }
 
+/** The "running low" triangle for an ingredient (or pantry item). */
+function lowButton(name, have) {
+  const low = Boolean(have?.low);
+  const label = low ? `${name} is running low (on your grocery list). Tap to undo.` : `Running low on ${name}? Tap to add it to your grocery list.`;
+  return `<button class="icon-btn xs low-btn" data-action="mark-low" data-name="${esc(name)}" ${have ? `data-id="${esc(have.id)}"` : ''} aria-pressed="${low}" title="${esc(label)}" aria-label="${esc(label)}">${icon('alert')}</button>`;
+}
+
 async function openRecipe(id, slotId) {
   let r;
   try { r = await api('GET', `/api/recipes/${encodeURIComponent(id)}`); } catch (e) { toast(e.message, 'error'); return; }
@@ -1425,10 +1438,11 @@ async function openRecipe(id, slotId) {
           <h3>Ingredients</h3>
           <p class="subtle" style="margin:-.3rem 0 .5rem">${scaleNote}</p>
           ${avoidHits(r).length ? `<p class="avoid-note">⚠ Contains ${esc(avoidHits(r).join(', '))}, which is on your allergies &amp; dislikes list.</p>` : ''}
-          <ul class="ing-list">${r.ingredients.map((i) => {
+          <ul class="ing-list">${r.ingredients.map((i, n) => {
             const bad = avoidMatch([i.name]).length;
-            return `<li class="${bad ? 'avoid' : ''}"><span class="m">${esc(i.measure)}</span><span>${esc(i.name)}${bad ? ' <b>avoid</b>' : ''}</span></li>`;
+            return `<li class="${bad ? 'avoid' : ''}"><span class="m">${esc(i.measure)}</span><span class="ing-name">${esc(i.name)}${bad ? ' <b>avoid</b>' : ''}</span>${lowButton(i.name, r.pantry?.[n])}</li>`;
           }).join('')}</ul>
+          <p class="subtle low-hint">${icon('alert')} Tap the triangle on anything you're running low on and it goes on your grocery list.</p>
         </div>
         <div>
           <h3>Method</h3>
@@ -1696,13 +1710,32 @@ const actions = {
     state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
     render();
   },
+  'mark-low': async (el) => {
+    const low = el.getAttribute('aria-pressed') !== 'true';
+    const res = await api('POST', '/api/pantry/low', { name: el.dataset.name, id: el.dataset.id, low });
+    const { item, ...pantry } = res;
+    state.pantry = pantry;
+    state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
+    if (modal.open && el.closest('.ing-list')) {
+      // Update the triangles in the open recipe without redrawing it (keeps your scroll position).
+      for (const b of modalBody.querySelectorAll('.ing-list .low-btn')) {
+        if (b === el || (item && b.dataset.id === item.id)) b.outerHTML = lowButton(b.dataset.name, item && { id: item.id, low: item.low });
+      }
+      updateBadge();
+    } else {
+      render();
+    }
+    const n = item?.name || el.dataset.name;
+    const nice = n.charAt(0).toUpperCase() + n.slice(1);
+    toast(low ? `${nice} is running low: added to your grocery list` : `${nice} isn't marked low anymore`, '', 'low');
+  },
   'remove-pantry': async (el) => {
     state.pantry = await api('DELETE', `/api/pantry/${encodeURIComponent(el.dataset.id)}`);
     state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
     render();
   },
   'toggle-hide': () => { state.hideChecked = !state.hideChecked; saveLocal('hideChecked', state.hideChecked); render(); },
-  'uncheck-all': async () => { state.grocery = await api('PATCH', `/api/weeks/${state.weekKey}/grocery`, { uncheckAll: true }); render(); },
+  'uncheck-all': async () => { state.pantry = null; state.grocery = await api('PATCH', `/api/weeks/${state.weekKey}/grocery`, { uncheckAll: true }); render(); },
   'remove-extra': async (el, e) => {
     e.preventDefault();
     state.grocery = await api('DELETE', `/api/weeks/${state.weekKey}/grocery/extras/${el.dataset.id}`);
@@ -1977,6 +2010,8 @@ document.addEventListener('change', (e) => {
   const el = e.target;
   if (el.dataset.action === 'check') {
     busy(null, async () => {
+      // Ticking a running-low item restocks it, which changes the pantry too.
+      if (state.grocery.items.find((i) => i.key === el.dataset.key)?.low) state.pantry = null;
       state.grocery = await api('PATCH', `/api/weeks/${state.weekKey}/grocery`, { key: el.dataset.key, checked: el.checked });
       render();
     });

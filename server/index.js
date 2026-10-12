@@ -8,7 +8,7 @@ import { Store, sanitizeSettings } from './store.js';
 import { ensureSlots, randomizePlan, moveMeal, activeSlots, isEasy, wantsEasy } from './lib/planner.js';
 import { pantryMatch, autoPlace, PLACES, STAPLES } from './lib/pantry.js';
 import { aiScanEnabled, scanPhotos, lookupBarcode, ScanError } from './lib/scan.js';
-import { buildGroceryList } from './lib/grocery.js';
+import { buildGroceryList, normalizeIngredientName, aisleFor } from './lib/grocery.js';
 import { fetchAllSources, importLink, normalizeUrl, pullCreatorSite, SUGGESTED_CREATORS } from './lib/sources.js';
 import { buildCustomRecipe } from './lib/custom.js';
 import { priceGroceryList, STORES } from './lib/pricing.js';
@@ -127,11 +127,27 @@ function summary(r) {
 function groceryFor(plan) {
   const byId = new Map(store.db.recipes.map((r) => [r.id, r]));
   plan.needAnyway ||= {};
+  // Pantry items marked "running low" go on the list until they're ticked off in the
+  // cart; they stay on this week's list (ticked) after that so the trip still adds up.
+  const restocking = (p) => p.low || p.restockedWeek === plan.key;
+  const lowShown = new Set();
   const list = buildGroceryList(activeSlots(plan), byId, store.db.settings.householdSize)
     .map((i) => {
       const p = plan.needAnyway[i.key] ? null : pantryMatch(i.key, store.db.pantry);
-      return { ...i, checked: Boolean(plan.checked[i.key]), have: p ? { id: p.id, name: p.name, where: p.where } : null };
+      const base = { ...i, checked: Boolean(plan.checked[i.key]) };
+      if (p && restocking(p)) {
+        lowShown.add(p.id);
+        return { ...base, have: null, low: { id: p.id, name: p.name } };
+      }
+      return { ...base, have: p ? { id: p.id, name: p.name, where: p.where } : null };
     });
+  for (const p of store.db.pantry) {
+    if (!restocking(p) || lowShown.has(p.id)) continue;
+    const key = normalizeIngredientName(p.name);
+    if (!key || list.some((i) => i.key === key)) continue;
+    list.push({ key, name: p.name.charAt(0).toUpperCase() + p.name.slice(1), aisle: aisleFor(key), amount: '', recipes: [], totals: {},
+      checked: Boolean(plan.checked[key]), have: null, low: { id: p.id, name: p.name } });
+  }
   const pricing = priceGroceryList(list, store.db.settings, store.db.priceBook);
   const byKey = new Map(pricing.items.map((p) => [p.key, p]));
   const items = list.map(({ totals, ...i }) => {
@@ -226,8 +242,15 @@ route('GET', '/api/recipes', () => store.db.recipes.filter((r) => !r.hidden).map
 route('GET', '/api/recipes/:id', ({ params }) => {
   const r = store.recipe(params.id);
   if (!r) throw new HttpError(404, 'Recipe not found');
-  return r;
+  return { ...r, pantry: pantryFor(r) };
 });
+/** For each ingredient, the pantry item that covers it (and whether it's running low). */
+function pantryFor(r) {
+  return r.ingredients.map((i) => {
+    const p = pantryMatch(i.name, store.db.pantry);
+    return p ? { id: p.id, name: p.name, low: Boolean(p.low) } : null;
+  });
+}
 route('PATCH', '/api/recipes/:id', ({ params, body }) => {
   const r = store.recipe(params.id);
   if (!r) throw new HttpError(404, 'Recipe not found');
@@ -481,6 +504,24 @@ route('GET', '/api/pantry/barcode/:code', async ({ params }) => {
 function markHave(items) {
   return items.map((it) => ({ ...it, have: Boolean(pantryMatch(it.name, store.db.pantry)) }));
 }
+// "Running low": flag a pantry item (or a recipe ingredient, adding it to the pantry) so it goes on the grocery list.
+route('POST', '/api/pantry/low', ({ body }) => {
+  const name = String(body.name || '').trim().slice(0, 60);
+  if (!name) throw new HttpError(400, 'Which item?');
+  const low = body.low !== false;
+  let p = body.id ? store.db.pantry.find((x) => x.id === body.id) : pantryMatch(name, store.db.pantry);
+  if (!p && low) {
+    const clean = normalizeIngredientName(name) || name.toLowerCase();
+    p = { id: crypto.randomUUID(), name: clean, where: autoPlace(clean), addedAt: new Date().toISOString() };
+    store.db.pantry.push(p);
+  }
+  if (p) {
+    p.low = low;
+    delete p.restockedWeek;
+  }
+  store.save();
+  return { ...pantryState(), item: p || null };
+});
 route('DELETE', '/api/pantry/:id', ({ params }) => {
   store.db.pantry = store.db.pantry.filter((p) => p.id !== params.id);
   store.save();
@@ -494,7 +535,15 @@ route('PATCH', '/api/weeks/:key/grocery', ({ params, body }) => {
     plan.checked = {};
     for (const e of plan.extras) e.checked = false;
   }
+  if (body.uncheckAll) {
+    for (const p of store.db.pantry) if (p.restockedWeek === plan.key) { p.low = true; delete p.restockedWeek; }
+  }
   if (typeof body.key === 'string') {
+    // Ticking a running-low item means it's restocked; unticking it puts the flag back.
+    const lowId = groceryFor(plan).items.find((i) => i.key === body.key)?.low?.id;
+    const p = lowId && store.db.pantry.find((x) => x.id === lowId);
+    if (p && body.checked) { p.low = false; p.restockedWeek = plan.key; }
+    if (p && !body.checked && p.restockedWeek === plan.key) { p.low = true; delete p.restockedWeek; }
     if (body.checked) plan.checked[body.key] = true;
     else delete plan.checked[body.key];
   }

@@ -19,6 +19,7 @@ A self-hostable weekly meal planner for your household. Randomize a week of meal
 - **Pantry tab ("already have").** List what's in your pantry, spice rack, fridge and freezer. Grocery items you already have are moved to "Already have" automatically and left out of price totals.
   - "Rice" covers basmati rice and "chicken" covers chicken thighs, but "chicken" doesn't cover chicken stock.
   - Tap the jar on any list item to add it to the pantry. Tap **Need to buy** when you've run out.
+  - **Running low ⚠:** tap the triangle next to any ingredient in a recipe (or any pantry item) and it goes on the grocery list, even if no meal this week needs it. Ticking it off in the cart counts as restocked.
   - **Suggestions as you type** from a built-in list of about 450 common US pantry items: spices, dried herbs, seasoning blends, oils and fats, butter and dairy, vinegars, sauces, baking goods, grains, canned goods and freezer staples. "Auto place" files each one in the right spot (cumin → Spices, butter → Fridge).
   - **Browse the list** to tick everything you have in one go, which is handy when setting up.
   - Matching knows that garlic salt isn't salt, brown sugar isn't sugar and ground ginger isn't fresh ginger, while stock and broth (or chili flakes and red pepper flakes) count as the same thing.
