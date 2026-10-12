@@ -1496,9 +1496,36 @@ function lowButton(name, have) {
   return `<button class="icon-btn xs low-btn" data-action="mark-low" data-name="${esc(name)}" ${have ? `data-id="${esc(have.id)}"` : ''} aria-pressed="${low}" title="${esc(label)}" aria-label="${esc(label)}">${icon('alert')}</button>`;
 }
 
+/** "Didn't get to it? Add to next week": same day and meal by default, locked in. */
+function carryOverForm(r, fromSlot, nextPlan, nextKey) {
+  const usable = nextPlan.slots.filter((x) => !x.off).sort((a, b) => a.day - b.day || MEALS.indexOf(a.meal) - MEALS.indexOf(b.meal));
+  const open = usable.filter((x) => !x.locked);
+  if (!open.length) return '';
+  const pick = open.find((x) => x.day === fromSlot.day && x.meal === fromSlot.meal)
+    || open.find((x) => x.meal === fromSlot.meal && !x.recipeId) || open.find((x) => x.meal === fromSlot.meal) || open[0];
+  const options = usable.map((x) => {
+    const label = `${DAY_NAMES[addDays(parseKey(nextKey), x.day).getDay()]} ${x.meal}`;
+    const cur = x.recipeId && state.byId.get(x.recipeId);
+    if (x.locked) return `<option value="${x.id}" disabled>${label} (locked${cur ? `: ${esc(cur.name.slice(0, 24))}` : ''})</option>`;
+    return `<option value="${x.id}" ${x === pick ? 'selected' : ''}>${label}${cur ? ` (replace ${esc(cur.name.slice(0, 26))})` : ' (open)'}</option>`;
+  }).join('');
+  return `
+      <form class="inline-form carry-form" data-form="carry-next" data-week="${nextKey}">
+        <span class="carry-label">Didn't get to it?</span>
+        <select class="input" name="slot" aria-label="Day and meal next week">${options}</select>
+        <button class="btn">${icon('chevron-right')}Add to next week</button>
+      </form>`;
+}
+
 async function openRecipe(id, slotId) {
   let r;
-  try { r = await api('GET', `/api/recipes/${encodeURIComponent(id)}`); } catch (e) { toast(e.message, 'error'); return; }
+  // Opened from a meal on the plan: also load next week, so it can be carried over if you don't get to it.
+  const fromSlot = slotId && state.plan.slots.find((x) => x.id === slotId && x.recipeId === id);
+  const nextKey = isoDate(addDays(parseKey(state.weekKey), 7));
+  let nextPlan = null;
+  try {
+    [r, nextPlan] = await Promise.all([api('GET', `/api/recipes/${encodeURIComponent(id)}`), fromSlot ? api('GET', `/api/weeks/${nextKey}`) : null]);
+  } catch (e) { toast(e.message, 'error'); return; }
   const s = state.settings;
   const target = defaultSlotFor(r, slotId);
   const usable = state.plan.slots.filter((slot) => !slot.off).sort((a, b) => a.day - b.day || MEALS.indexOf(a.meal) - MEALS.indexOf(b.meal));
@@ -1530,6 +1557,7 @@ async function openRecipe(id, slotId) {
         <select class="input" name="slot" aria-label="Day and meal">${slotOptions}</select>
         <button class="btn primary">${icon('calendar')}Add to ${esc(relativeWeek(state.weekKey).toLowerCase())}</button>
       </form>` : `<p class="subtle">Every meal ${esc(relativeWeek(state.weekKey).toLowerCase())} is locked. Unlock one on the plan to swap this recipe in.</p>`}
+      ${nextPlan ? carryOverForm(r, fromSlot, nextPlan, nextKey) : ''}
 
       ${nutritionPanel(r)}
 
@@ -2312,6 +2340,15 @@ document.addEventListener('submit', (e) => {
       state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
       render();
       toast(`Saved for ${storeName(form.dataset.store)}`, '', 'price');
+    },
+    'carry-next': async () => {
+      const id = $('[data-recipe]', modalBody).dataset.recipe;
+      const week = form.dataset.week;
+      const next = await api('PATCH', `/api/weeks/${week}/slots/${data.slot}`, { recipeId: id, locked: true });
+      modal.close();
+      const slot = next.slots.find((x) => x.id === data.slot);
+      const day = slot ? DAY_NAMES[addDays(parseKey(week), slot.day).getDay()] : '';
+      toast(`Added to next ${day} ${slot?.meal || ''} and locked in`);
     },
     'add-to-plan': async () => {
       const id = $('[data-recipe]', modalBody).dataset.recipe;

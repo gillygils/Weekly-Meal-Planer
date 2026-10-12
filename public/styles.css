@@ -791,3 +791,7 @@ dialog[open] { animation: pop .18s ease-out; }
 .freeze-list li small { color: var(--muted); }
 .notify-setup h3 { margin: .6rem 0 0; font-size: 1rem; }
 .steps-list { margin: .2rem 0 .4rem; padding-left: 1.3rem; display: grid; gap: .35rem; color: var(--muted); }
+
+/* "Didn't get to it? Add to next week" */
+.carry-form { padding-top: .2rem; }
+.carry-label { color: var(--muted); font-weight: 650; font-size: .9rem; flex: 0 0 auto; }
