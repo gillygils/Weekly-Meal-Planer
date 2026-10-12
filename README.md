@@ -7,7 +7,7 @@ A self-hostable weekly meal planner for your household. Randomize a week of meal
 - **Week by week planning.** Every week has its own plan. Move between weeks with the arrows, or tap the date to jump back to this week.
 - **Randomize** fills every unlocked meal. It avoids repeats within a week, and avoids last and next week's meals when it can. Versions of the same dish (Chicken Alfredo, Fettuccine Alfredo…) count as one, and it remembers the last 40 meals it showed you that week, so clicking 🎲 again keeps bringing up something new.
 - **Lock** 🔒 a meal you like and the randomizer will keep it. You can also re-roll 🎲 a single meal, or choose one by hand (hand-picked meals are locked automatically).
-- **Didn't get to it?** Open a meal on the plan and use **Add to next week** to put it on next week's plan (same day by default, locked in).
+- **Didn't get to it?** Tap ↪ on a meal card to add it to next week (same day if it's free, locked in). Open the meal to pick a different day.
 - **Drag meals between days.** Drag a meal onto another day and the two meals swap places. Every other day stays the same, and each meal keeps its own lock.
   - Mouse: drag the tile.
   - Phone or tablet: press and hold the tile, or drag the ⠿ handle on its photo.

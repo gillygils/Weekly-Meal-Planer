@@ -517,6 +517,7 @@ function renderSlot(s) {
         <button class="icon-btn sm lock" data-action="lock" data-slot="${s.id}" aria-pressed="${s.locked}" title="${s.locked ? 'Unlock (randomizer can change it)' : 'Lock in (randomizer will keep it)'}" aria-label="${s.locked ? 'Unlock' : 'Lock'} ${esc(r.name)}">${icon(s.locked ? 'lock' : 'unlock')}</button>
         <button class="icon-btn sm" data-action="reroll" data-slot="${s.id}" ${s.locked ? 'disabled' : ''} title="New recipe for just this meal" aria-label="New recipe for just this meal">${icon('dice')}</button>
         <button class="icon-btn sm" data-action="choose" data-slot="${s.id}" title="Choose a recipe" aria-label="Choose a recipe">${icon('swap')}</button>
+        <button class="icon-btn sm" data-action="carry-slot" data-slot="${s.id}" title="Didn't get to it? Add to next week" aria-label="Add ${esc(r.name)} to next week">${icon('next-week')}</button>
         <button class="icon-btn sm fav push" data-action="fav" data-id="${esc(r.id)}" aria-pressed="${r.favorite}" title="${r.favorite ? 'Remove favorite' : 'Favorite'}" aria-label="Favorite">${icon(r.favorite ? 'heart-fill' : 'heart')}</button>
       </div>
     </article>`;
@@ -1496,13 +1497,30 @@ function lowButton(name, have) {
   return `<button class="icon-btn xs low-btn" data-action="mark-low" data-name="${esc(name)}" ${have ? `data-id="${esc(have.id)}"` : ''} aria-pressed="${low}" title="${esc(label)}" aria-label="${esc(label)}">${icon('alert')}</button>`;
 }
 
+/** Where a meal goes next week: the same day and meal if it's free, else another open slot for that meal. */
+function carrySlot(fromSlot, nextPlan) {
+  const open = nextPlan.slots.filter((x) => !x.off && !x.locked).sort((a, b) => a.day - b.day || MEALS.indexOf(a.meal) - MEALS.indexOf(b.meal));
+  return open.find((x) => x.day === fromSlot.day && x.meal === fromSlot.meal)
+    || open.find((x) => x.meal === fromSlot.meal && !x.recipeId) || open.find((x) => x.meal === fromSlot.meal) || open[0] || null;
+}
+
+/** One tap from the meal card: add it to next week (locked in). */
+async function carryToNextWeek(slotId) {
+  const from = state.plan.slots.find((x) => x.id === slotId);
+  if (!from?.recipeId) return;
+  const nextKey = isoDate(addDays(parseKey(state.weekKey), 7));
+  const target = carrySlot(from, await api('GET', `/api/weeks/${nextKey}`));
+  if (!target) throw new Error("Every meal next week is locked. Unlock one first.");
+  await api('PATCH', `/api/weeks/${nextKey}/slots/${target.id}`, { recipeId: from.recipeId, locked: true });
+  const day = DAY_NAMES[addDays(parseKey(nextKey), target.day).getDay()];
+  toast(`Added to next ${day} ${target.meal} and locked in. Open the meal to pick a different day.`, '', 'carry');
+}
+
 /** "Didn't get to it? Add to next week": same day and meal by default, locked in. */
 function carryOverForm(r, fromSlot, nextPlan, nextKey) {
   const usable = nextPlan.slots.filter((x) => !x.off).sort((a, b) => a.day - b.day || MEALS.indexOf(a.meal) - MEALS.indexOf(b.meal));
-  const open = usable.filter((x) => !x.locked);
-  if (!open.length) return '';
-  const pick = open.find((x) => x.day === fromSlot.day && x.meal === fromSlot.meal)
-    || open.find((x) => x.meal === fromSlot.meal && !x.recipeId) || open.find((x) => x.meal === fromSlot.meal) || open[0];
+  const pick = carrySlot(fromSlot, nextPlan);
+  if (!pick) return '';
   const options = usable.map((x) => {
     const label = `${DAY_NAMES[addDays(parseKey(nextKey), x.day).getDay()]} ${x.meal}`;
     const cur = x.recipeId && state.byId.get(x.recipeId);
@@ -1829,6 +1847,7 @@ const actions = {
   'open-recipe': (el) => openRecipe(el.dataset.id, el.dataset.slot),
   'close-modal': () => modal.close(),
   'scan-open': (el) => openScan(el.dataset.mode),
+  'carry-slot': (el) => carryToNextWeek(el.dataset.slot),
   'browse-pantry': () => openBrowse(),
   'browse-pick': (el) => {
     const n = el.dataset.name;
