@@ -6,7 +6,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { Store, sanitizeSettings } from './store.js';
 import { ensureSlots, randomizePlan, moveMeal, activeSlots, isEasy, wantsEasy } from './lib/planner.js';
-import { pantryMatch, PLACES, STAPLES } from './lib/pantry.js';
+import { pantryMatch, autoPlace, PLACES, STAPLES } from './lib/pantry.js';
 import { aiScanEnabled, scanPhotos, lookupBarcode, ScanError } from './lib/scan.js';
 import { buildGroceryList } from './lib/grocery.js';
 import { fetchAllSources, importLink, normalizeUrl, pullCreatorSite, SUGGESTED_CREATORS } from './lib/sources.js';
@@ -423,11 +423,13 @@ route('PUT', '/api/prices', ({ body }) => {
 const pantryState = () => ({ items: store.db.pantry, places: PLACES, staples: STAPLES });
 route('GET', '/api/pantry', pantryState);
 route('POST', '/api/pantry', ({ body }) => {
-  const place = (w) => (PLACES.includes(w) ? w : 'pantry');
+  // "auto" files each item where it usually lives (cumin -> spices, chicken -> freezer).
+  const place = (w, name) => (PLACES.includes(w) ? w : autoPlace(name));
   // Either { name: "rice, cumin", where } typed in, or { items: [{ name, where }] } from a scan.
   const entries = Array.isArray(body.items)
-    ? body.items.slice(0, 200).map((i) => ({ name: String(i?.name || '').trim().slice(0, 60), where: place(i?.where) }))
-    : String(body.name || '').split(',').map((n) => ({ name: n.trim().slice(0, 60), where: place(body.where) }));
+    ? body.items.slice(0, 200).map((i) => ({ name: String(i?.name || '').trim().slice(0, 60), where: i?.where }))
+    : String(body.name || '').split(',').map((n) => ({ name: n.trim().slice(0, 60), where: body.where }));
+  for (const e of entries) e.where = place(e.where, e.name);
   const list = entries.filter((e) => e.name);
   if (!list.length) throw new HttpError(400, 'Type what you have.');
   const have = new Set(store.db.pantry.map((p) => p.name.toLowerCase()));
@@ -527,7 +529,10 @@ route('DELETE', '/api/weeks/:key/grocery/extras/:id', ({ params }) => {
 // ---------- static files ----------
 
 // The browser shares the server's allergen matching code.
-const SHARED_LIB = { '/lib/recipes.js': path.join(here, 'lib', 'recipes.js') };
+const SHARED_LIB = {
+  '/lib/recipes.js': path.join(here, 'lib', 'recipes.js'),
+  '/lib/pantry-catalog.js': path.join(here, 'lib', 'pantry-catalog.js'),
+};
 
 function serveStatic(req, res, pathname) {
   let file = SHARED_LIB[pathname] || path.normalize(path.join(PUBLIC_DIR, decodeURIComponent(pathname)));

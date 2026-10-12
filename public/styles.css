@@ -722,3 +722,20 @@ dialog[open] { animation: pop .18s ease-out; }
   .scan-row { grid-template-columns: auto minmax(0, 1fr); }
   .scan-row select, .scan-row .chip { grid-column: 2; }
 }
+
+/* Pantry type-ahead and "browse the list" */
+.typeahead { position: relative; flex: 1 1 12rem; min-width: 0; }
+.typeahead .input { width: 100%; }
+.suggest-list { position: absolute; z-index: 20; inset: calc(100% + 4px) 0 auto; margin: 0; padding: .3rem; list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 12px 30px rgb(0 0 0 / .35); max-height: 18rem; overflow-y: auto; }
+.suggest-list li { display: flex; justify-content: space-between; gap: .8rem; align-items: center; padding: .6rem .7rem; border-radius: 8px; cursor: pointer; min-height: 2.6rem; }
+.suggest-list li small { color: var(--muted); flex: none; }
+.suggest-list li[aria-selected="true"], .suggest-list li:hover { background: var(--accent); color: var(--on-accent); }
+.suggest-list li[aria-selected="true"] small, .suggest-list li:hover small { color: inherit; opacity: .85; }
+.modal-content.browse { display: grid; gap: .9rem; }
+.modal-content.browse .modal-head p { margin: .3rem 0 .7rem; padding-right: 2.5rem; }
+.browse-group h3 { font-size: .95rem; margin: 0 0 .45rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.browse-group .chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.browse-group .chip-toggle[disabled] { opacity: .55; cursor: default; }
+.browse-foot { position: sticky; bottom: 0; padding: .7rem 0 .2rem; background: linear-gradient(transparent, var(--surface) 35%); }
+.modal-content.browse > .modal-head { position: sticky; top: 0; z-index: 3; background: var(--surface); padding-bottom: .5rem; margin-bottom: -.4rem; }
+.modal-close { z-index: 5; }

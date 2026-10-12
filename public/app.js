@@ -1,5 +1,6 @@
 // Weekly Meal Planner frontend. No framework, no build step.
 import { createAvoidMatcher } from './lib/recipes.js';
+import { PANTRY_CATALOG, CATALOG_GROUPS, suggestPantry } from './lib/pantry-catalog.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const main = $('#main');
@@ -738,13 +739,19 @@ function renderPantry() {
       <h2>What do you already have?</h2>
       <p class="subtle">Anything listed here is checked off the grocery list automatically whenever a meal needs it: spices, rice, meat in the freezer, anything. "Rice" covers basmati or jasmine; "chicken" covers breasts or thighs. Remove things when you run out.</p>
       <form class="inline-form" data-form="add-pantry">
-        <input id="pantry-in" class="input" name="name" placeholder="e.g. chicken thighs, rice, cumin" autocomplete="off" maxlength="200" aria-label="Item you have" required>
+        <div class="typeahead">
+          <input id="pantry-in" class="input" name="name" placeholder="Start typing: cumin, olive oil, rice…" autocomplete="off" maxlength="200"
+            aria-label="Item you have" role="combobox" aria-autocomplete="list" aria-controls="pantry-suggest" aria-expanded="false" required>
+          <ul id="pantry-suggest" class="suggest-list" role="listbox" hidden></ul>
+        </div>
         <select class="input" name="where" aria-label="Where it is">
+          <option value="auto">Auto place</option>
           ${pantry.places.map((p) => `<option value="${p}">${PLACE_LABEL[p]}</option>`).join('')}
         </select>
         <button class="btn primary">${icon('plus')}Add</button>
       </form>
       <div class="scan-btns">
+        <button class="btn" data-action="browse-pantry">${icon('book')}Browse the list</button>
         <button class="btn" data-action="scan-open" data-mode="photo">${icon('camera')}Scan a shelf</button>
         <button class="btn ghost" data-action="scan-open" data-mode="barcode">${icon('barcode')}Scan barcodes</button>
       </div>
@@ -761,6 +768,141 @@ function renderPantry() {
             </div>`).join('') : '<p class="subtle" style="margin:.2rem .7rem .6rem">Nothing here yet.</p>'}
         </section>`).join('')}
     </div>`;
+}
+
+// ---------- pantry type-ahead and "browse the list" ----------
+
+const typeahead = { items: [], active: -1 };
+const pantryHave = () => new Set((state.pantry?.items || []).map((p) => p.name.toLowerCase()));
+
+/** The comma-separated part being typed right now. */
+function currentToken(input) {
+  const before = input.value.slice(0, input.selectionStart ?? input.value.length);
+  return before.slice(before.lastIndexOf(',') + 1).trim();
+}
+
+function updateTypeahead(input) {
+  const list = $('#pantry-suggest');
+  if (!list) return;
+  const token = currentToken(input);
+  typeahead.items = token.length ? suggestPantry(token, { have: pantryHave(), limit: 7 }) : [];
+  // Highlight the first suggestion unless what's typed already is that item.
+  typeahead.active = typeahead.items.length && typeahead.items[0].name !== token.toLowerCase() ? 0 : -1;
+  drawTypeahead(input);
+}
+
+function drawTypeahead(input) {
+  const list = $('#pantry-suggest');
+  const open = typeahead.items.length > 0;
+  list.hidden = !open;
+  input.setAttribute('aria-expanded', String(open));
+  list.innerHTML = typeahead.items.map((it, i) => `
+    <li id="sugg-${i}" role="option" aria-selected="${i === typeahead.active}" data-sugg="${i}">
+      <span>${esc(it.name)}</span><small>${PLACE_LABEL[it.where]}</small>
+    </li>`).join('');
+  if (typeahead.active >= 0) input.setAttribute('aria-activedescendant', `sugg-${typeahead.active}`);
+  else input.removeAttribute('aria-activedescendant');
+}
+
+/** Put the chosen suggestion in place of the word being typed, ready for the next one. */
+function acceptSuggestion(input, i) {
+  const it = typeahead.items[i];
+  if (!it) return;
+  const pos = input.selectionStart ?? input.value.length;
+  const before = input.value.slice(0, pos);
+  const start = before.lastIndexOf(',') + 1;
+  const after = input.value.slice(pos).replace(/^[^,]*,?\s*/, '');
+  const head = input.value.slice(0, start).replace(/\s*$/, start ? ' ' : '');
+  input.value = `${head}${it.name}, ${after}`;
+  const caret = head.length + it.name.length + 2;
+  input.setSelectionRange(caret, caret);
+  typeahead.items = [];
+  drawTypeahead(input);
+  input.focus();
+}
+
+document.addEventListener('input', (e) => {
+  if (e.target.id === 'pantry-in') updateTypeahead(e.target);
+  else if (e.target.matches('[data-browse-q]')) { browse.q = e.target.value; refreshBrowse(); }
+});
+document.addEventListener('keydown', (e) => {
+  const input = e.target;
+  if (input.id !== 'pantry-in' || !typeahead.items.length) return;
+  const n = typeahead.items.length;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    const a = typeahead.active;
+    typeahead.active = e.key === 'ArrowDown' ? (a + 1) % n : a <= 0 ? n - 1 : a - 1;
+    drawTypeahead(input);
+  } else if ((e.key === 'Enter' || e.key === 'Tab') && typeahead.active >= 0) {
+    e.preventDefault();
+    acceptSuggestion(input, typeahead.active);
+  } else if (e.key === 'Escape') {
+    typeahead.items = [];
+    drawTypeahead(input);
+  }
+});
+// pointerdown (not click) so the input keeps focus and the phone keyboard stays up.
+document.addEventListener('pointerdown', (e) => {
+  const li = e.target.closest('[data-sugg]');
+  if (li) {
+    e.preventDefault();
+    acceptSuggestion($('#pantry-in'), Number(li.dataset.sugg));
+  } else if (!e.target.closest('.typeahead') && $('#pantry-suggest') && !$('#pantry-suggest').hidden) {
+    typeahead.items = [];
+    drawTypeahead($('#pantry-in'));
+  }
+});
+
+const browse = { picked: new Set(), q: '' };
+
+function openBrowse() {
+  browse.picked = new Set();
+  browse.q = '';
+  openModal(`
+    <div class="modal-content browse">
+      <div class="modal-head">
+        <h2 id="modal-title">What do you have?</h2>
+        <p class="subtle">Tap everything in your cupboards, spice rack, fridge and freezer, then add them all at once.</p>
+        <input class="input" type="search" data-browse-q placeholder="Filter, e.g. paprika" aria-label="Filter the list" autocomplete="off">
+      </div>
+      <div class="browse-groups">${renderBrowseGroups()}</div>
+      <div class="browse-foot"><button class="btn primary" data-action="browse-add" disabled>${icon('plus')}Add 0 items</button></div>
+    </div>`);
+}
+
+function renderBrowseGroups() {
+  const have = pantryHave();
+  const q = browse.q.trim().toLowerCase();
+  const html = CATALOG_GROUPS.map((g) => {
+    const items = PANTRY_CATALOG.filter((i) => i.group === g && (!q || [i.name, ...i.also].some((n) => n.includes(q))));
+    if (!items.length) return '';
+    return `
+      <section class="browse-group">
+        <h3>${esc(g)}</h3>
+        <div class="chips">${items.map((i) => {
+          const owned = have.has(i.name);
+          const on = owned || browse.picked.has(i.name);
+          return `<button class="chip-toggle" data-action="browse-pick" data-name="${esc(i.name)}" aria-pressed="${on}" ${owned ? 'disabled title="Already in your pantry"' : ''}>${on ? icon('check') : ''}${esc(i.name)}</button>`;
+        }).join('')}</div>
+      </section>`;
+  }).join('');
+  return html || '<p class="subtle">Nothing matches. Close this and type it in instead.</p>';
+}
+
+function refreshBrowse() {
+  const box = $('.browse-groups', modalBody);
+  if (box) box.innerHTML = renderBrowseGroups();
+  refreshBrowseButton();
+}
+
+function refreshBrowseButton() {
+  const btn = $('[data-action="browse-add"]', modalBody);
+  if (btn) {
+    const n = browse.picked.size;
+    btn.disabled = !n;
+    btn.innerHTML = `${icon('plus')}Add ${n} item${n === 1 ? '' : 's'}`;
+  }
 }
 
 // ---------- camera scanning (pantry) ----------
@@ -1505,6 +1647,24 @@ const actions = {
   'open-recipe': (el) => openRecipe(el.dataset.id, el.dataset.slot),
   'close-modal': () => modal.close(),
   'scan-open': (el) => openScan(el.dataset.mode),
+  'browse-pantry': () => openBrowse(),
+  'browse-pick': (el) => {
+    const n = el.dataset.name;
+    if (browse.picked.has(n)) browse.picked.delete(n); else browse.picked.add(n);
+    const on = browse.picked.has(n);
+    el.setAttribute('aria-pressed', String(on));
+    el.innerHTML = `${on ? icon('check') : ''}${esc(n)}`;
+    refreshBrowseButton();
+  },
+  'browse-add': async () => {
+    const items = PANTRY_CATALOG.filter((i) => browse.picked.has(i.name)).map(({ name, where }) => ({ name, where }));
+    if (!items.length) return;
+    state.pantry = await api('POST', '/api/pantry', { items });
+    state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
+    modal.close();
+    render();
+    toast(`Added ${items.length} item${items.length === 1 ? '' : 's'} to your pantry`, '', 'pantry');
+  },
   'scan-mode': (el) => { stopCamera(); return openScan(el.dataset.mode); },
   'grocery-view': (el) => { state.groceryView = el.dataset.view; saveLocal('groceryView', state.groceryView); render(); },
   'edit-price': (el, e) => { e.preventDefault(); openPriceEditor(el.dataset.key, el.dataset.store); },
@@ -1907,6 +2067,7 @@ document.addEventListener('submit', (e) => {
       toast(`Added ${items.length} item${items.length === 1 ? '' : 's'} to your pantry`, '', 'pantry');
     },
     'add-pantry': async () => {
+      typeahead.items = [];
       state.pantry = await api('POST', '/api/pantry', { name: data.name, where: data.where });
       state.grocery = await api('GET', `/api/weeks/${state.weekKey}/grocery`);
       render();

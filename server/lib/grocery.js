@@ -110,7 +110,10 @@ export function normalizeIngredientName(name) {
   let n = String(name || '').toLowerCase()
     .replace(/\(.*?\)/g, ' ')
     .split(',')[0]
+    // The spice isn't the fresh root or leaf, so keep "ground" on these two.
+    .replace(/\bground (ginger|coriander)\b/g, 'ground_$1')
     .replace(STRIP_WORDS, ' ')
+    .replace(/\bground_/g, 'ground ')
     .replace(/[^a-z0-9' -]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
@@ -142,11 +145,23 @@ const AISLES = [
 
 export const AISLE_ORDER = [...AISLES.map(([a]) => a), 'Other'];
 
+const SPICE_NAME = new RegExp([
+  String.raw`\b(salt|seeds?|peppercorns?|seasoning|spice|rub|masala)$`,
+  String.raw`\b(chili|chilli|red pepper|parsley|onion) flakes?$`,
+  String.raw`\b(white|lemon|aleppo|cayenne) pepper$`,
+  String.raw`^(ground (ginger|coriander)|granulated garlic|dried (minced )?onion)$`,
+  String.raw`^dried (basil|parsley|cilantro|mint|dill|thyme|rosemary|sage|chives?|marjoram|tarragon|oregano|lemongrass|lavender|chiles?|chilies|chipotle( peppers?)?)$`,
+  String.raw`\b(sumac|fenugreek|mace|juniper|annatto|achiote|gochugaru|za'atar|zaatar|ras el hanout|berbere|furikake|togarashi|herbes de provence|msg|sazon|guajillo|ancho chiles?|chiles de arbol|marjoram|tarragon|savory)\b`,
+].join('|'));
+
 export function aisleFor(name) {
   // The longest matching phrase wins, so "olive oil" beats "olive" and
   // "coconut milk" beats "milk". Ties go to the earlier aisle.
   const n = String(name || '').toLowerCase();
   if (/^(pepper|salt|salt and pepper|salt & pepper)$/.test(n)) return 'Spices & Seasonings';
+  // "Garlic salt", "celery seed", "lemon pepper", "dried thyme": what it ends in (or being a dried herb) decides,
+  // not the longest word in it.
+  if (SPICE_NAME.test(n)) return 'Spices & Seasonings';
   let best = 'Other';
   let bestLen = 0;
   for (const [aisle, words] of AISLES) {

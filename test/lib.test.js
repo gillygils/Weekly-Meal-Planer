@@ -364,3 +364,24 @@ test('pantry scanning: barcode products and photo results', async () => {
   // Without an API key, photo scanning says how to turn it on instead of failing oddly.
   if (!aiScanEnabled()) await assert.rejects(scanPhotos([{ type: 'image/jpeg', data: 'x' }]), (e) => e.status === 501);
 });
+
+test('pantry catalog: suggestions, auto placement and variety matching', async () => {
+  const { suggestPantry, PANTRY_CATALOG } = await import('../server/lib/pantry-catalog.js');
+  const { pantryMatch, autoPlace } = await import('../server/lib/pantry.js');
+  const { aisleFor } = await import('../server/lib/grocery.js');
+  const names = PANTRY_CATALOG.map((i) => i.name);
+  assert.equal(new Set(names).size, names.length, 'no duplicate names');
+  assert.equal(suggestPantry('cum')[0].name, 'cumin');
+  assert.equal(suggestPantry('evoo')[0].name, 'extra virgin olive oil');
+  assert.ok(!suggestPantry('cum', { have: new Set(['cumin']) }).some((i) => i.name === 'cumin'), 'leaves out what you have');
+  assert.equal(autoPlace('cumin'), 'spices');
+  assert.equal(autoPlace('unsalted butter'), 'fridge');
+  assert.equal(autoPlace('ground beef'), 'freezer');
+  assert.equal(autoPlace('jasmine rice'), 'pantry');
+  for (const n of ['garlic salt', 'celery seed', 'dried thyme', 'lemon pepper', 'ground ginger']) assert.equal(aisleFor(n), 'Spices & Seasonings', n);
+  const covers = (have, need) => Boolean(pantryMatch(need, [{ name: have }]));
+  for (const [have, need] of [['kosher salt', 'salt'], ['olive oil', 'extra virgin olive oil'], ['chicken broth', 'chicken stock'],
+    ['red pepper flakes', 'chilli flakes'], ['black peppercorns', 'black pepper'], ['butter', 'unsalted butter']]) assert.ok(covers(have, need), `${have} covers ${need}`);
+  for (const [have, need] of [['garlic salt', 'salt'], ['salt', 'garlic salt'], ['brown sugar', 'sugar'], ['peanut butter', 'butter'],
+    ['smoked paprika', 'paprika'], ['cream cheese', 'cream'], ['ground ginger', 'ginger'], ['dried minced onion', 'onion'], ['white pepper', 'pepper']]) assert.ok(!covers(have, need), `${have} doesn't cover ${need}`);
+});
