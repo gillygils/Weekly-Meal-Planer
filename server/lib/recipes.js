@@ -267,7 +267,12 @@ export function createAvoidMatcher(settings = {}) {
     if (g) rules.push({ label: g.label, words: g.words, not: g.not });
   }
   for (const term of settings.avoidIngredients || []) {
-    if (term && term.trim()) rules.push({ label: term.trim(), words: expandTerm(term), not: [] });
+    if (!term || !term.trim()) continue;
+    const words = expandTerm(term);
+    // Disliking olives (or avocado, sesame…) isn't disliking their oil: "olive oil"
+    // only counts when the oil itself is on the list.
+    const not = words.some((w) => /\boils?\b/.test(w)) ? [] : words.map((w) => `${w} oil`);
+    rules.push({ label: term.trim(), words, not });
   }
   if (!rules.length) return () => [];
   return (names) => {

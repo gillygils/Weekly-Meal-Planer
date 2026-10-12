@@ -385,3 +385,14 @@ test('pantry catalog: suggestions, auto placement and variety matching', async (
   for (const [have, need] of [['garlic salt', 'salt'], ['salt', 'garlic salt'], ['brown sugar', 'sugar'], ['peanut butter', 'butter'],
     ['smoked paprika', 'paprika'], ['cream cheese', 'cream'], ['ground ginger', 'ginger'], ['dried minced onion', 'onion'], ['white pepper', 'pepper']]) assert.ok(!covers(have, need), `${have} doesn't cover ${need}`);
 });
+
+test('disliking an ingredient does not flag its oil', async () => {
+  const { createAvoidMatcher } = await import('../server/lib/recipes.js');
+  const hits = (terms, names, allergens = []) => createAvoidMatcher({ avoidIngredients: terms, avoidAllergens: allergens })(names);
+  assert.deepEqual(hits(['olives'], ['extra virgin olive oil']), []);
+  assert.deepEqual(hits(['olives'], ['kalamata olives']), ['olives']);
+  assert.deepEqual(hits(['olive oil'], ['olive oil']), ['olive oil']);
+  assert.deepEqual(hits(['avocado'], ['avocado oil']), []);
+  assert.deepEqual(hits(['sesame'], ['toasted sesame oil']), []);
+  assert.deepEqual(hits([], ['peanut oil'], ['peanuts']), ['Peanuts'], 'allergies still count oils');
+});
