@@ -396,6 +396,7 @@ function renderPlan() {
           </span>
         </div>
         ${slots.map((s) => `${enabled.length > 1 ? `<div class="meal-label">${s.meal}</div>` : ''}${renderSlot(s)}`).join('')}
+        ${thawTonight(isoDate(date)).map((t) => `<div class="thaw-note">${icon('snow')}<span><b>Tonight:</b> move ${esc(nameList(t.items.map((i) => i.name)))} to the fridge for ${esc(longDay(t.date))}</span></div>`).join('')}
         ${dayMacros(slots.filter((s) => !s.off))}
       </section>`);
   }
@@ -413,6 +414,7 @@ function renderPlan() {
       <button class="btn primary lg" data-action="randomize">${icon('dice')}<span>Randomize${locked ? ' unlocked' : ''}</span></button>
     </div>
     ${filled.length === 0 ? `<div class="panel empty" style="margin-bottom:1rem"><h2>Nothing planned yet</h2><p>Hit <b>Randomize</b> to fill the week. Lock the meals you like and randomize again to swap out the rest.</p></div>` : ''}
+    ${thawTonight(isoDate(new Date())).length ? `<div class="panel thaw-banner">${icon('snow')}<div><b>Tonight: move to the fridge to thaw</b>${thawTonight(isoDate(new Date())).map((t) => `<span>${esc(nameList(t.items.map((i) => i.name)))} for ${esc(longDay(t.date))}'s ${esc(t.recipe)}</span>`).join('')}</div></div>` : ''}
     <div class="week-grid">${days.join('')}</div>`;
 }
 
@@ -455,6 +457,28 @@ function weekMacros(filled) {
         <span><strong>${healthy}</strong> healthy</span>`;
 }
 
+// ---- Freezer & thaw (meat that would sit in the fridge too long) ----
+const freshTasks = () => (state.settings.freezeAlerts && state.grocery?.freshness?.tasks) || [];
+const shortDay = (iso) => parseKey(iso).toLocaleDateString(undefined, { weekday: 'short' });
+const longDay = (iso) => parseKey(iso).toLocaleDateString(undefined, { weekday: 'long' });
+const nameList = (names) => (names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`);
+
+/** "❄ Freeze chicken thighs after shopping" or "Thaw ground beef Monday night" on a meal card. */
+function freezeNote(s) {
+  const t = freshTasks().find((x) => x.slotId === s.id);
+  if (!t) return '';
+  const freeze = t.items.filter((i) => i.why === 'freeze').map((i) => i.name);
+  const frozen = t.items.filter((i) => i.why !== 'freeze').map((i) => i.name);
+  const all = nameList([...freeze, ...frozen]);
+  const title = freeze.length
+    ? `${nameList(freeze)} only keeps ${t.items.find((i) => i.why === 'freeze').days} days in the fridge (USDA). Freeze it when you get home and thaw it in the fridge ${longDay(t.thawOn)} night.`
+    : `Move it from the freezer to the fridge ${longDay(t.thawOn)} night to thaw.`;
+  return `<div class="freeze-note" title="${esc(title)}">${icon('snow')}<span>${freeze.length ? `Freeze ${esc(nameList(freeze))}` : 'From the freezer'} · thaw ${esc(shortDay(t.thawOn))} night</span></div>`;
+}
+
+/** Tonight's thaw jobs for a given date. */
+const thawTonight = (iso) => freshTasks().filter((t) => t.thawOn === iso);
+
 function renderSlot(s) {
   if (s.off) {
     const oneOff = s.skip === true;
@@ -485,6 +509,7 @@ function renderSlot(s) {
         <div class="meal-body">
           <div class="meal-name">${esc(r.name)}</div>
           <div class="meal-meta">${chips(r)}</div>
+          ${freezeNote(s)}
         </div>
       </button>
       <button class="icon-btn sm grip" data-drag-handle title="Drag to another day (or use the arrow keys)" aria-label="Move ${esc(r.name)} to another day. Use the arrow keys.">${icon('grip')}</button>
@@ -649,6 +674,29 @@ function openPriceEditor(key, storeKey) {
 const placeFor = (aisle) => (/Spices/.test(aisle) ? 'spices' : /Meat|Frozen/.test(aisle) ? 'freezer' : /Dairy|Produce/.test(aisle) ? 'fridge' : 'pantry');
 const PLACE_LABEL = { pantry: 'Pantry', spices: 'Spices', fridge: 'Fridge', freezer: 'Freezer' };
 
+/** When you shopped, and what to freeze when you unpack. */
+function shoppingPanel() {
+  const f = state.grocery.freshness;
+  if (!state.settings.freezeAlerts || !f) return '';
+  const freeze = f.tasks.flatMap((t) => t.items.filter((i) => i.why === 'freeze').map((i) => ({ ...i, date: t.date, recipe: t.recipe })));
+  if (!freeze.length && f.assumed) return '';
+  return `
+    <section class="panel shop-panel">
+      <div class="shop-date">
+        ${icon('calendar')}
+        <label for="shopped-on">${f.assumed ? 'Shopping on' : 'Shopped on'}</label>
+        <input id="shopped-on" class="input" type="date" data-action="shopped-on" value="${esc(f.shoppedOn)}">
+        <small class="subtle">${f.assumed ? 'Guessed. It sets itself when you tick off most of the list.' : 'From when you ticked off the list. Change it if that’s off.'}</small>
+      </div>
+      ${freeze.length ? `
+        <div class="freeze-list">
+          <b>${icon('snow')}${f.assumed ? 'Freeze when you get home' : 'Freeze these'}</b>
+          <ul>${freeze.map((i) => `<li><span>${esc(i.name)}</span><small>${esc(longDay(i.date))}: ${esc(i.recipe)} · keeps ${i.days} days in the fridge</small></li>`).join('')}</ul>
+          <small class="subtle">You'll see a reminder on the plan (and on your phone, if notifications are on) the night before to move each one to the fridge to thaw.</small>
+        </div>` : ''}
+    </section>`;
+}
+
 function renderGroceryList() {
   const g = state.grocery;
   const need = g.items.filter((i) => !i.have);
@@ -673,7 +721,7 @@ function renderGroceryList() {
       <span class="g-text">
         <span class="g-name">${esc(i.name)}</span>
         ${i.amount ? `<span class="g-amount">${esc(i.amount)}</span>` : ''}
-        <span class="g-for" title="${esc(i.recipes.join(', '))}">${i.low ? `<b class="low-tag">${icon('alert')}Running low</b>${i.recipes.length ? ' · ' : ''}` : ''}${esc(i.recipes.join(' · '))}</span>
+        <span class="g-for" title="${esc(i.recipes.join(', '))}">${i.freezeFor && state.settings.freezeAlerts ? `<b class="freeze-tag">${icon('snow')}Freeze for ${esc(i.freezeFor.map(shortDay).join(', '))}</b> · ` : ''}${i.low ? `<b class="low-tag">${icon('alert')}Running low</b>${i.recipes.length ? ' · ' : ''}` : ''}${esc(i.recipes.join(' · '))}</span>
       </span>
       ${bestPrice(i) && !i.price.pantry ? `<span class="g-price"><b>${money(bestPrice(i).cost)}</b><small>${esc(storeName(bestPrice(i).store))}</small></span>` : ''}
       ${i.checked || i.low ? '' : `<button class="icon-btn sm have-btn" data-action="have-it" data-name="${esc(i.name)}" data-where="${placeFor(i.aisle)}" title="I already have this (adds it to your pantry)" aria-label="I already have ${esc(i.name)}">${icon('jar')}</button>`}
@@ -710,6 +758,7 @@ function renderGroceryList() {
       <input class="input" name="name" placeholder="Add an item (paper towels, snacks…)" autocomplete="off" maxlength="120" aria-label="Add grocery item">
       <button class="btn primary">${icon('plus')}Add</button>
     </form>
+    ${shoppingPanel()}
     ${total + have.length === 0 ? `<div class="panel empty"><h2>Your list is empty</h2><p>Plan some meals for this week and their ingredients show up here automatically.</p><a class="btn primary" href="#plan">${icon('calendar')}Go to plan</a></div>` : ''}
     ${total && !toBuy.length && !extrasToBuy.length ? `<div class="panel empty" style="margin-bottom:1rem"><h2>Everything's in the cart 🎉</h2><p>Nothing left to grab.</p></div>` : ''}
     <div class="aisles">
@@ -1379,6 +1428,34 @@ function renderSettings() {
         </div>
       </section>
 
+      <section class="panel notify-setup">
+        <h2>Freezer &amp; thaw reminders</h2>
+        <label class="switch"><span><b>Warn about meat that won't keep</b><br><small class="subtle">Raw chicken, ground meat and fish keep 1–2 days in the fridge; steaks and chops 3–5 (USDA). Meals later in the week get a ❄ to freeze it after shopping, plus a reminder to thaw it the night before.</small></span><input type="checkbox" data-setting="freezeAlerts" ${s.freezeAlerts ? 'checked' : ''}></label>
+        <div class="field">
+          <label for="thaw-hour">Thaw reminder time</label>
+          <select id="thaw-hour" class="input" data-setting="thawHour">
+            ${Array.from({ length: 24 }, (_, h) => `<option value="${h}" ${h === s.thawHour ? 'selected' : ''}>${new Date(2000, 0, 1, h).toLocaleTimeString(undefined, { hour: 'numeric' })} the day before</option>`).join('')}
+          </select>
+        </div>
+        <h3>Phone notifications</h3>
+        <p class="subtle" style="margin:0">Reminders go to your phone through <b>ntfy</b>, a free notification app (no account needed).</p>
+        <ol class="steps-list">
+          <li>Install <b>ntfy</b> from the App Store or Google Play.</li>
+          <li>Pick a topic name below (or tap <b>Make one</b>). Anyone who knows it can see the reminders, so keep it hard to guess.</li>
+          <li>In the ntfy app tap <b>+</b>, enter the same topic and subscribe. Do it on each phone that should get reminders.</li>
+          <li>Tap <b>Send a test</b>.</li>
+        </ol>
+        <div class="inline-form">
+          <input id="ntfy-topic" class="input" data-setting="ntfyTopic" value="${esc(s.ntfyTopic)}" placeholder="Topic, e.g. mealweek-k3x9q2" aria-label="ntfy topic" autocomplete="off" spellcheck="false">
+          <button class="btn" data-action="ntfy-make">${icon('dice')}Make one</button>
+          <button class="btn primary" data-action="ntfy-test" ${s.ntfyTopic ? '' : 'disabled'}>Send a test</button>
+        </div>
+        <details>
+          <summary class="subtle">Using your own ntfy server?</summary>
+          <div class="field"><label for="ntfy-server">ntfy server</label><input id="ntfy-server" class="input" data-setting="ntfyServer" value="${esc(s.ntfyServer)}" placeholder="https://ntfy.sh"></div>
+        </details>
+      </section>
+
       <section class="panel share-setup">
         <h2>Share recipes from TikTok &amp; other apps</h2>
         <p class="subtle" style="margin:0">Add "Meal Planner" to your phone's share menu, then in TikTok (or Safari, Instagram…) tap <b>Share → More → Meal Planner</b> and the recipe is imported.</p>
@@ -1674,7 +1751,7 @@ async function updateSettings(patch) {
     const clash = state.plan.slots.filter((sl) => sl.recipeId && state.byId.has(sl.recipeId) && avoidHits(state.byId.get(sl.recipeId)).length).length;
     if (clash) toast(`${clash} planned meal${clash > 1 ? 's' : ''} this week contain${clash > 1 ? '' : 's'} something on your list. They're marked ⚠ on the plan.`, '', 'clash');
   }
-  if (['meals', 'mealDays', 'householdSize', 'stores', 'storeLevels', 'tripThreshold', 'countPantry'].some((k) => k in patch)) await loadWeek();
+  if (['meals', 'mealDays', 'householdSize', 'stores', 'storeLevels', 'tripThreshold', 'countPantry', 'freezeAlerts'].some((k) => k in patch)) await loadWeek();
   if ('weekStartsOn' in patch) { state.weekKey = weekStart(parseKey(state.weekKey)); await loadWeek(); }
   render();
 }
@@ -1798,6 +1875,16 @@ const actions = {
     e.preventDefault();
     state.grocery = await api('DELETE', `/api/weeks/${state.weekKey}/grocery/extras/${el.dataset.id}`);
     render();
+  },
+  'ntfy-make': async () => {
+    const id = Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => 'abcdefghjkmnpqrstuvwxyz23456789'[b % 31]).join('');
+    await updateSettings({ ntfyTopic: `mealweek-${id}` });
+    render();
+    toast('Topic made. Subscribe to it in the ntfy app, then send a test.');
+  },
+  'ntfy-test': async () => {
+    await api('POST', '/api/notify/test');
+    toast('Sent! It should show up on your phone in a few seconds.');
   },
   'copy-text': async (el) => {
     try { await navigator.clipboard.writeText(el.dataset.text); toast('Copied'); } catch { toast('Copy failed — your browser blocked clipboard access', 'error'); }
@@ -2073,7 +2160,12 @@ document.addEventListener('change', (e) => {
     busy(null, async () => {
       // Ticking a running-low item restocks it, which changes the pantry too.
       if (state.grocery.items.find((i) => i.key === el.dataset.key)?.low) state.pantry = null;
-      state.grocery = await api('PATCH', `/api/weeks/${state.weekKey}/grocery`, { key: el.dataset.key, checked: el.checked });
+      state.grocery = await api('PATCH', `/api/weeks/${state.weekKey}/grocery`, { key: el.dataset.key, checked: el.checked, today: isoDate(new Date()) });
+      if (el.checked && !state.grocery.freshness?.assumed && state.grocery.freshness?.shoppedOn === isoDate(new Date()) && !state.shopToastShown?.[state.weekKey]) {
+        state.shopToastShown = { ...state.shopToastShown, [state.weekKey]: true };
+        const n = freshTasks().flatMap((t) => t.items.filter((i) => i.why === 'freeze')).length;
+        if (n) toast(`Shopping done! ${n} item${n > 1 ? 's' : ''} to freeze when you unpack (see the top of the list)`, '', 'shop');
+      }
       render();
     });
   } else if (el.dataset.action === 'check-extra') {
@@ -2120,6 +2212,11 @@ document.addEventListener('input', (e) => {
       input.focus();
       input.setSelectionRange(pos, pos);
     }, 180);
+  } else if (el.dataset.action === 'shopped-on') {
+    busy(null, async () => {
+      state.grocery = await api('PATCH', `/api/weeks/${state.weekKey}/grocery`, { shoppedOn: el.value || null });
+      render();
+    });
   } else if (el.matches('[data-picker-q]')) {
     refreshPicker();
   } else if (el.matches('[data-scan-photo]')) {
@@ -2271,6 +2368,9 @@ async function boot() {
     const [settings, meta, recipes] = await Promise.all([api('GET', '/api/settings'), api('GET', '/api/meta'), api('GET', '/api/recipes')]);
     state.settings = settings;
     state.meta = meta;
+    // Reminder times follow this household's clock.
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz && settings.timeZone !== tz) api('PUT', '/api/settings', { timeZone: tz }).then((x) => { state.settings = x; }).catch(() => {});
     setAvoidRules();
     setRecipes(recipes);
     state.weekKey = weekStart();

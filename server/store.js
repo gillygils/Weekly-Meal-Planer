@@ -38,6 +38,11 @@ export const DEFAULT_SETTINGS = {
   currency: '$',
   weekStartsOn: 1, // 0 = Sunday, 1 = Monday
   easyDays: [], // weekdays (0 = Sunday) where the randomizer picks easy meals
+  freezeAlerts: true, // warn when meat would sit in the fridge too long, and remind to thaw it
+  timeZone: '', // the household's time zone (set by the browser), for reminder times
+  ntfyTopic: '', // phone notifications through ntfy; empty = off
+  ntfyServer: 'https://ntfy.sh',
+  thawHour: 18, // local hour for "move it to the fridge tonight" reminders
 };
 
 export function sanitizeSettings(input, base = DEFAULT_SETTINGS) {
@@ -82,6 +87,11 @@ export function sanitizeSettings(input, base = DEFAULT_SETTINGS) {
   if (input.favoritesBoost != null) s.favoritesBoost = Boolean(input.favoritesBoost);
   if (input.currency != null) s.currency = String(input.currency).slice(0, 4) || '$';
   if (Array.isArray(input.easyDays)) s.easyDays = [...new Set(input.easyDays.map(Number).filter((d) => Number.isInteger(d) && d >= 0 && d <= 6))].sort();
+  if (input.freezeAlerts != null) s.freezeAlerts = Boolean(input.freezeAlerts);
+  if (input.timeZone != null && /^[A-Za-z_+\-/0-9]{0,64}$/.test(String(input.timeZone))) s.timeZone = String(input.timeZone);
+  if (input.ntfyTopic != null) s.ntfyTopic = String(input.ntfyTopic).trim().replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64);
+  if (input.ntfyServer != null) s.ntfyServer = /^https?:\/\/[^\s]+$/i.test(String(input.ntfyServer).trim()) ? String(input.ntfyServer).trim().slice(0, 200) : 'https://ntfy.sh';
+  if (input.thawHour != null) s.thawHour = Math.min(23, Math.max(0, Math.round(Number(input.thawHour) || 0)));
   if (input.weekStartsOn != null) s.weekStartsOn = Number(input.weekStartsOn) === 0 ? 0 : 1;
   return s;
 }

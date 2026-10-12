@@ -8,6 +8,8 @@ import { Store, sanitizeSettings } from './store.js';
 import { ensureSlots, randomizePlan, moveMeal, activeSlots, isEasy, wantsEasy } from './lib/planner.js';
 import { pantryMatch, autoPlace, PLACES, STAPLES } from './lib/pantry.js';
 import { aiScanEnabled, scanPhotos, lookupBarcode, ScanError } from './lib/scan.js';
+import { freshnessPlan, localNow, addDaysIso } from './lib/freshness.js';
+import { sendNotification, listNames } from './lib/notify.js';
 import { buildGroceryList, normalizeIngredientName, aisleFor } from './lib/grocery.js';
 import { fetchAllSources, importLink, normalizeUrl, pullCreatorSite, SUGGESTED_CREATORS } from './lib/sources.js';
 import { buildCustomRecipe } from './lib/custom.js';
@@ -154,8 +156,80 @@ function groceryFor(plan) {
     const p = byKey.get(i.key);
     return p ? { ...i, price: { buy: p.buy, at: p.at, best: p.best, pantry: p.pantry } } : i;
   });
-  return { week: plan.key, items, extras: plan.extras, pricing: { stores: pricing.stores, totals: pricing.totals, plan: pricing.plan, realCount: pricing.realCount } };
+  const freshness = freshnessFor(plan);
+  // Tag the meat you should freeze when you unpack, with the day it's for.
+  const freezeBy = new Map();
+  for (const t of freshness.tasks) for (const i of t.items) if (i.why === 'freeze') {
+    const k = normalizeIngredientName(i.name);
+    freezeBy.set(k, [...(freezeBy.get(k) || []), t.date]);
+  }
+  for (const i of items) if (freezeBy.has(i.key)) i.freezeFor = [...new Set(freezeBy.get(i.key))].sort();
+  return { week: plan.key, items, extras: plan.extras, freshness, pricing: { stores: pricing.stores, totals: pricing.totals, plan: pricing.plan, realCount: pricing.realCount } };
 }
+
+/**
+ * Which meals need their meat frozen after shopping, and when to thaw it.
+ * Before you've shopped it assumes the day before the week starts (or today).
+ */
+function freshnessFor(plan) {
+  const settings = store.db.settings;
+  if (!settings.freezeAlerts) return { shoppedOn: plan.shoppedOn || null, assumed: false, tasks: [] };
+  const today = localNow(settings.timeZone).date;
+  const weekEnd = addDaysIso(plan.key, 6);
+  const assumedDay = today >= plan.key && today <= weekEnd ? today : addDaysIso(plan.key, -1);
+  const shoppedOn = plan.shoppedOn || assumedDay;
+  const byId = new Map(store.db.recipes.map((r) => [r.id, r]));
+  const freezerMatch = (name) => {
+    const p = pantryMatch(name, store.db.pantry);
+    return p && p.where === 'freezer' && !p.low ? p : null;
+  };
+  return { shoppedOn, assumed: !plan.shoppedOn, tasks: freshnessPlan({ plan, byId, shoppedOn, freezerMatch }) };
+}
+
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const dayName = (iso) => new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' });
+let appOrigin = '';
+
+/** Phone notification, if set up. Failures are logged, never thrown at the user. */
+async function notify(msg) {
+  if (!store.db.settings.ntfyTopic) return false;
+  try {
+    await sendNotification(store.db.settings, { ...msg, click: appOrigin ? `${appOrigin}/#plan` : undefined });
+    return true;
+  } catch (e) {
+    console.error('Notification failed:', e.message);
+    return false;
+  }
+}
+
+/** "Freeze when you unpack" right after the list gets ticked off. */
+function notifyFreeze(plan) {
+  const freeze = freshnessFor(plan).tasks.flatMap((t) => t.items.filter((i) => i.why === 'freeze').map((i) => `${i.name} (${dayName(t.date)})`));
+  if (freeze.length) notify({ title: 'Freeze when you unpack', message: `Put these in the freezer: ${listNames(freeze)}. You'll get a reminder to thaw each one the night before.`, tags: ['snowflake'] });
+}
+
+/** Evening-before reminders to move frozen meat to the fridge. Runs every few minutes. */
+async function thawReminders() {
+  const settings = store.db.settings;
+  if (!settings.ntfyTopic || !settings.freezeAlerts) return;
+  const now = localNow(settings.timeZone);
+  if (now.hour < settings.thawHour) return;
+  for (const plan of Object.values(store.db.weeks)) {
+    if (plan.key > addDaysIso(now.date, 7) || plan.key < addDaysIso(now.date, -7)) continue;
+    ensureSlots(plan, settings.meals, settings.mealDays);
+    plan.notified ||= {};
+    for (const t of freshnessFor(plan).tasks) {
+      const id = `thaw:${t.slotId}:${t.date}:${t.recipeId}`;
+      if (t.thawOn !== now.date || plan.notified[id]) continue;
+      plan.notified[id] = new Date().toISOString();
+      store.save();
+      await notify({ title: `Thaw tonight for ${dayName(t.date)}`, message: `Move ${listNames(t.items.map((i) => i.name))} from the freezer to the fridge for ${dayName(t.date)}'s ${t.meal}: ${t.recipe}.`, tags: ['meat_on_bone'] });
+    }
+  }
+}
+const REMINDER_EVERY_MS = Number(process.env.REMINDER_EVERY_MS) || 5 * 60 * 1000;
+setInterval(() => { thawReminders().catch((e) => console.error(e)); }, REMINDER_EVERY_MS).unref();
+setTimeout(() => { thawReminders().catch((e) => console.error(e)); }, 10_000).unref();
 
 let refreshing = null;
 
@@ -232,6 +306,14 @@ route('POST', '/api/auth/signout-all', ({ req, res }) => {
 route('GET', '/api/meta', () => ({ stores: STORES, proteins: [...PROTEINS, 'vegetarian'], allergens: Object.fromEntries(Object.entries(ALLERGEN_GROUPS).map(([k, g]) => [k, g.label])), recipeCount: store.db.recipes.length, auth: Boolean(PASSWORD), suggestedCreators: SUGGESTED_CREATORS }));
 
 route('GET', '/api/settings', () => store.db.settings);
+route('POST', '/api/notify/test', async () => {
+  try {
+    await sendNotification(store.db.settings, { title: 'Meal Planner', message: "Notifications work! You'll get freeze and thaw reminders here.", tags: ['white_check_mark'], click: appOrigin ? `${appOrigin}/#plan` : undefined });
+  } catch (e) {
+    throw new HttpError(502, `Couldn't send it: ${e.message}`);
+  }
+  return { ok: true };
+});
 route('PUT', '/api/settings', async ({ body }) => {
   store.db.settings = sanitizeSettings(body, store.db.settings);
   store.save();
@@ -557,6 +639,19 @@ route('PATCH', '/api/weeks/:key/grocery', ({ params, body }) => {
     const e = plan.extras.find((x) => x.id === body.extraId);
     if (e) e.checked = Boolean(body.checked);
   }
+  if (body.uncheckAll) delete plan.shoppedOn;
+  if ('shoppedOn' in body) {
+    // Set by hand ("we shopped Saturday") or cleared.
+    if (body.shoppedOn === null) delete plan.shoppedOn;
+    else if (DATE_RE.test(String(body.shoppedOn))) plan.shoppedOn = String(body.shoppedOn);
+  } else if (body.checked && !plan.shoppedOn && DATE_RE.test(String(body.today || ''))) {
+    // Most of the list ticked off = you went shopping today.
+    const need = groceryFor(plan).items.filter((i) => !i.have);
+    if (need.length >= 3 && need.filter((i) => i.checked).length / need.length >= 0.75) {
+      plan.shoppedOn = String(body.today);
+      notifyFreeze(plan);
+    }
+  }
   store.save();
   return groceryFor(plan);
 });
@@ -647,6 +742,9 @@ const server = http.createServer(async (req, res) => {
         const auth = store.db.auth;
         if (!auth?.hash) throw new HttpError(401, 'Set a PIN to start using the app.');
         if (!sessionValid(auth, readCookie(req))) throw new HttpError(401, 'Enter your PIN.');
+        // Remembered so notifications can link back to the app.
+        const host = req.headers['x-forwarded-host'] || req.headers.host;
+        if (host) appOrigin = `${String(req.headers['x-forwarded-proto'] || 'http').split(',')[0]}://${host}`;
       }
       // Photo scans carry images, everything else is small.
       const limit = pathname === '/api/pantry/scan' ? 12_000_000 : 1_000_000;

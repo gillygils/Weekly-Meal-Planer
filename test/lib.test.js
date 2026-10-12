@@ -403,3 +403,29 @@ test('oil exclusion handles caption spellings', async () => {
   for (const n of ['Olive Oil', 'olive-oil spray', 'olive or avocado oil', 'olive/avocado oil', 'olive & avocado oil']) assert.deepEqual(m([n]), [], n);
   for (const n of ['olives and olive oil', 'olive tapenade', 'olives/capers']) assert.deepEqual(m([n]), ['olives'], n);
 });
+
+test('fridge life and the freeze / thaw plan', async () => {
+  const { fridgeLife, freshnessPlan } = await import('../server/lib/freshness.js');
+  assert.equal(fridgeLife('chicken thighs, boneless').days, 2);
+  assert.equal(fridgeLife('lean minced steak').kind, 'ground meat');
+  assert.equal(fridgeLife('sirloin steak').days, 4);
+  assert.equal(fridgeLife('bacon').days, 7);
+  for (const n of ['chicken broth', 'beef tomatoes', 'kidney beans', 'artichoke hearts', 'canned tuna', 'chicken breasts, cooked and shredded', 'prosciutto', 'onion']) assert.equal(fridgeLife(n), null, n);
+  const r = (id, ings) => ({ id, name: id, ingredients: ings.map((name) => ({ name, measure: '1' })) });
+  const byId = new Map([['a', r('a', ['chicken thighs', 'rice'])], ['b', r('b', ['ground beef'])], ['c', r('c', ['sirloin steak'])], ['d', r('d', ['raw frozen prawns'])]]);
+  // Week starts Monday Oct 13; shopped Sunday Oct 12.
+  const plan = { key: '2026-10-13', slots: [
+    { id: '0-dinner', day: 0, meal: 'dinner', recipeId: 'a' }, // Mon: chicken, 1 day after shopping: fine
+    { id: '2-dinner', day: 2, meal: 'dinner', recipeId: 'a' }, // Wed: chicken, 3 days: freeze
+    { id: '3-dinner', day: 3, meal: 'dinner', recipeId: 'c' }, // Thu: steak, 4 days: fine
+    { id: '4-dinner', day: 4, meal: 'dinner', recipeId: 'b' }, // Fri: ground beef from the freezer: thaw
+    { id: '5-dinner', day: 5, meal: 'dinner', recipeId: 'd' }, // Sat: bought frozen: thaw
+    { id: '6-dinner', day: 6, meal: 'dinner', recipeId: 'c', off: true },
+  ] };
+  const tasks = freshnessPlan({ plan, byId, shoppedOn: '2026-10-12', freezerMatch: (n) => (/ground beef/.test(n) ? { name: 'ground beef' } : null) });
+  assert.deepEqual(tasks.map((t) => [t.slotId, t.thawOn, t.items.map((i) => `${i.name}:${i.why}`).join()]), [
+    ['2-dinner', '2026-10-14', 'chicken thighs:freeze'],
+    ['4-dinner', '2026-10-16', 'ground beef:freezer'],
+    ['5-dinner', '2026-10-17', 'raw frozen prawns:freezer'],
+  ]);
+});

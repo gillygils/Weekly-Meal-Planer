@@ -767,3 +767,27 @@ dialog[open] { animation: pop .18s ease-out; }
 .share-setup ol { margin: .5rem 0; padding-left: 1.3rem; display: grid; gap: .5rem; }
 .share-setup code { background: var(--surface-2); padding: .15rem .4rem; border-radius: 6px; word-break: break-all; }
 .copy-row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .4rem; }
+
+/* Freezer & thaw */
+.freeze-note { display: flex; gap: .35rem; align-items: center; margin-top: .45rem; font-size: .8rem; font-weight: 650; color: var(--m-carbs); }
+.freeze-note svg, .thaw-note svg, .freeze-tag svg, .freeze-list b svg, .thaw-banner > svg { width: 1rem; height: 1rem; flex: none; }
+.thaw-note { display: flex; gap: .45rem; align-items: flex-start; margin: .2rem 0 .4rem; padding: .55rem .7rem; border-radius: .8rem; font-size: .85rem;
+  background: color-mix(in srgb, var(--m-carbs) 13%, transparent); color: var(--text); border: 1px solid color-mix(in srgb, var(--m-carbs) 35%, transparent); }
+.thaw-note svg { color: var(--m-carbs); margin-top: .1rem; }
+.thaw-banner { display: flex; gap: .8rem; align-items: flex-start; padding: .9rem 1.1rem; margin-bottom: 1rem; border-color: color-mix(in srgb, var(--m-carbs) 45%, transparent); }
+.thaw-banner > svg { width: 1.6rem; height: 1.6rem; color: var(--m-carbs); }
+.thaw-banner div { display: grid; gap: .2rem; }
+.freeze-tag { color: var(--m-carbs); font-weight: 700; display: inline-flex; gap: .25rem; align-items: center; }
+.shop-panel { padding: .9rem 1.1rem; margin-bottom: 1rem; display: grid; gap: .8rem; }
+.shop-date { display: flex; flex-wrap: wrap; gap: .5rem .7rem; align-items: center; }
+.shop-date > svg { width: 1.1rem; height: 1.1rem; color: var(--muted); }
+.shop-date label { font-weight: 700; }
+.shop-date .input { width: auto; min-height: 2.4rem; padding: .3rem .6rem; color-scheme: dark; }
+:root[data-theme="light"] .shop-date .input { color-scheme: light; }
+.freeze-list b { display: inline-flex; gap: .4rem; align-items: center; color: var(--m-carbs); }
+.freeze-list ul { list-style: none; margin: .4rem 0; padding: 0; display: grid; gap: .3rem; }
+.freeze-list li { display: grid; padding: .45rem .7rem; border-radius: .7rem; background: var(--surface-2); }
+.freeze-list li span { font-weight: 650; text-transform: capitalize; }
+.freeze-list li small { color: var(--muted); }
+.notify-setup h3 { margin: .6rem 0 0; font-size: 1rem; }
+.steps-list { margin: .2rem 0 .4rem; padding-left: 1.3rem; display: grid; gap: .35rem; color: var(--muted); }
