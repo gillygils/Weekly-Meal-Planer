@@ -130,7 +130,9 @@ h1, h2, h3 { line-height: 1.2; margin: 0; }
   -webkit-backdrop-filter: saturate(1.4) blur(14px);
   border-bottom: 1px solid var(--border);
 }
-.brand { display: flex; align-items: center; gap: .6rem; font-weight: 750; font-size: 1.15rem; letter-spacing: -.01em; margin-right: auto; }
+.brand { display: flex; align-items: center; gap: .6rem; font-weight: 750; font-size: 1.15rem; letter-spacing: -.01em; margin-right: auto; color: var(--text); text-decoration: none; border-radius: .7rem; }
+.brand:hover .brand-name { color: var(--accent); }
+.brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .brand-mark { width: 2rem; height: 2rem; color: var(--accent); }
 
 .tabs { display: flex; gap: .25rem; }

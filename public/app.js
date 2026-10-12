@@ -2157,6 +2157,12 @@ function route() {
   scrollToToday();
 }
 window.addEventListener('hashchange', route);
+// The logo goes to the plan; when you're already there it scrolls back to the top.
+document.querySelector('.brand').addEventListener('click', (e) => {
+  if (state.tab !== 'plan') return;
+  e.preventDefault();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
 
 // When the days are stacked in one column (phones), jump straight to today.
 function scrollToToday() {
