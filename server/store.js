@@ -30,6 +30,7 @@ export const DEFAULT_SETTINGS = {
   storeLevels: {}, // price level overrides, % vs. average
   tripThreshold: 5, // a second store trip has to save at least this much
   countPantry: false, // include spices, oils and sauces in price totals
+  showPriceTabs: false, // the Prices and Shop plan views on the Groceries tab
   creators: [
     { name: 'Hunt4Shredz', handle: '@hunt4shredz', url: 'https://www.hunt4shredz.com' },
     { name: 'AmateurProChef', handle: '@amateurprochef', url: 'https://amateurprochef.com' },
@@ -77,6 +78,7 @@ export function sanitizeSettings(input, base = DEFAULT_SETTINGS) {
   }
   if (input.tripThreshold != null) s.tripThreshold = Math.max(0, Math.min(500, Number(input.tripThreshold) || 0));
   if (input.countPantry != null) s.countPantry = Boolean(input.countPantry);
+  if (input.showPriceTabs != null) s.showPriceTabs = Boolean(input.showPriceTabs);
   if (input.favoritesBoost != null) s.favoritesBoost = Boolean(input.favoritesBoost);
   if (input.currency != null) s.currency = String(input.currency).slice(0, 4) || '$';
   if (Array.isArray(input.easyDays)) s.easyDays = [...new Set(input.easyDays.map(Number).filter((d) => Number.isInteger(d) && d >= 0 && d <= 6))].sort();

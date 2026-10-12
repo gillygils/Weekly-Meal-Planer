@@ -16,7 +16,7 @@ A self-hostable weekly meal planner for your household. Randomize a week of meal
   - **Healthier meals** mode only randomizes recipes with a good health score and favors the healthiest. You can also cap calories or require a minimum amount of protein per serving.
   - Macros come from the recipe itself when it publishes them; otherwise they're estimated from the ingredients.
 - **Grocery list tab.** The week's ingredients are merged, scaled to your household size, and sorted by aisle. Tick items as they go in the cart (they move to an "In the cart" section), add your own items (paper towels, snacks…), and copy or share the list.
-- **Pantry ("already have").** List what's in your pantry, spice rack, fridge and freezer. Grocery items you already have are moved to "Already have" automatically and left out of price totals.
+- **Pantry tab ("already have").** List what's in your pantry, spice rack, fridge and freezer. Grocery items you already have are moved to "Already have" automatically and left out of price totals.
   - "Rice" covers basmati rice and "chicken" covers chicken thighs, but "chicken" doesn't cover chicken stock.
   - Tap the jar on any list item to add it to the pantry. Tap **Need to buy** when you've run out.
   - **Suggestions as you type** from a built-in list of about 450 common US pantry items: spices, dried herbs, seasoning blends, oils and fats, butter and dairy, vinegars, sauces, baking goods, grains, canned goods and freezer staples. "Auto place" files each one in the right spot (cumin → Spices, butter → Fridge).
@@ -24,7 +24,7 @@ A self-hostable weekly meal planner for your household. Randomize a week of meal
   - Matching knows that garlic salt isn't salt, brown sugar isn't sugar and ground ginger isn't fresh ginger, while stock and broth (or chili flakes and red pepper flakes) count as the same thing.
   - **Scan a shelf:** take a photo of your spice rack, a pantry shelf or your oils and Claude reads the labels into a list (needs an Anthropic API key, see [Photo scanning](#photo-scanning)). You check and fix the list before anything is added.
   - **Scan barcodes:** point the camera at barcodes and each product is looked up on [Open Food Facts](https://world.openfoodfacts.org) (free, no key). Live camera scanning works in Chrome on Android; on iPhone, type the number under the barcode or use photo scanning.
-- **Store prices and the cheapest shop.** Pick the two stores you use (Meijer, Aldi, Walmart, Target, Kroger, Costco and more).
+- **Store prices and the cheapest shop** (optional: turn on *Show Prices and Shop plan tabs* in Settings → Stores & prices). Pick the two stores you use (Meijer, Aldi, Walmart, Target, Kroger, Costco and more). Meal costs per serving don't depend on these tabs.
   - **Compare prices:** each item's price at both stores, and which one is cheaper.
   - **Shopping plan:** compares "all at store A", "all at store B" and splitting the trip. A split is only recommended when it saves at least the amount you set. Each store gets its own list, sorted by aisle.
   - Tap any price to enter the real price and aisle. It's saved and used every week from then on.

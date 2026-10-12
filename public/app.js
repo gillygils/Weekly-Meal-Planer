@@ -344,9 +344,9 @@ function render() {
   badge.hidden = !remaining;
   badge.textContent = remaining > 99 ? '99+' : remaining;
 
-  const views = { plan: renderPlan, groceries: renderGroceries, recipes: renderRecipes, settings: renderSettings };
+  const views = { plan: renderPlan, groceries: renderGroceries, pantry: renderPantry, recipes: renderRecipes, settings: renderSettings };
   main.innerHTML = views[state.tab]();
-  document.title = `${{ plan: 'Plan', groceries: 'Groceries', recipes: 'Recipes', settings: 'Settings' }[state.tab]} · Meal Planner`;
+  document.title = `${{ plan: 'Plan', groceries: 'Groceries', pantry: 'Pantry', recipes: 'Recipes', settings: 'Settings' }[state.tab]} · Meal Planner`;
 }
 
 function chips(r) {
@@ -493,11 +493,14 @@ function renderSlot(s) {
 }
 
 function renderGroceries() {
-  const views = [['list', 'List', 'cart'], ['pantry', 'Pantry', 'jar'], ['compare', 'Prices', 'tag'], ['plan', 'Shop plan', 'route']];
-  const body = { list: renderGroceryList, pantry: renderPantry, compare: renderPriceCompare, plan: renderShoppingPlan }[state.groceryView] || renderGroceryList;
+  // Store prices and the shopping plan are optional extras (Settings → Stores & prices).
+  if (!state.settings.showPriceTabs) return renderGroceryList();
+  const views = [['list', 'List', 'cart'], ['compare', 'Prices', 'tag'], ['plan', 'Shop plan', 'route']];
+  const body = { list: renderGroceryList, compare: renderPriceCompare, plan: renderShoppingPlan }[state.groceryView] || renderGroceryList;
+  const current = body === renderGroceryList ? 'list' : state.groceryView;
   return `
     <div class="segmented" role="tablist" aria-label="Grocery view">
-      ${views.map(([k, label, ic]) => `<button role="tab" aria-selected="${state.groceryView === k}" data-action="grocery-view" data-view="${k}">${icon(ic)}<span>${label}</span></button>`).join('')}
+      ${views.map(([k, label, ic]) => `<button role="tab" aria-selected="${current === k}" data-action="grocery-view" data-view="${k}">${icon(ic)}<span>${label}</span></button>`).join('')}
     </div>
     ${body()}`;
 }
@@ -718,7 +721,7 @@ function renderGroceryList() {
         <h3><span>${icon('jar')}Already have</span><span>${have.length}</span></h3>
         <p class="subtle">These match your pantry, so they're left off the list and out of the price totals.</p>
         ${have.map(haveRow).join('')}
-        <button class="btn sm ghost" data-action="grocery-view" data-view="pantry">${icon('jar')}Manage pantry</button>
+        <a class="btn sm ghost" href="#pantry">${icon('jar')}Manage pantry</a>
       </section>` : ''}`;
 }
 
@@ -1246,6 +1249,7 @@ function renderSettings() {
           <label for="trip">Worth a second trip if it saves at least</label>
           <div class="money"><span>${esc(s.currency)}</span><input id="trip" class="input" type="number" min="0" step="1" data-setting="tripThreshold" value="${s.tripThreshold}"></div>
         </div>
+        <label class="switch"><span><b>Show Prices and Shop plan tabs</b><br><small class="subtle">Compare your two stores item by item and plan the cheapest trip, on the Groceries tab. Meal costs per serving don't depend on these.</small></span><input type="checkbox" data-setting="showPriceTabs" ${s.showPriceTabs ? 'checked' : ''}></label>
         <label class="switch"><span><b>Count spices &amp; staples</b><br><small class="subtle">Include spices, oils and sauces in price totals and the shopping plan.</small></span><input type="checkbox" data-setting="countPantry" ${s.countPantry ? 'checked' : ''}></label>
         <small class="subtle">Meijer, Aldi, Walmart and Target don't publish prices for other apps to use, so the app starts with estimates (typical US prices adjusted by each store's usual price level, which you can tune above). Tap any price on the Groceries tab to save the real one and the aisle; your prices are remembered and used every week.</small>
       </section>
@@ -2146,7 +2150,7 @@ document.addEventListener('submit', (e) => {
 
 function route() {
   const tab = location.hash.slice(1) || 'plan';
-  state.tab = ['plan', 'groceries', 'recipes', 'settings'].includes(tab) ? tab : 'plan';
+  state.tab = ['plan', 'groceries', 'pantry', 'recipes', 'settings'].includes(tab) ? tab : 'plan';
   if (modal.open) modal.close();
   render();
   window.scrollTo({ top: 0 });
