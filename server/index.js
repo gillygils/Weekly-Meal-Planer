@@ -534,13 +534,28 @@ const SHARED_LIB = {
   '/lib/pantry-catalog.js': path.join(here, 'lib', 'pantry-catalog.js'),
 };
 
+// A fingerprint of the app's code. index.html and the scripts ask for
+// "/app.js?v=<this>", so after an update browsers and Cloudflare fetch the new
+// files instead of reusing an old cached copy under the same address.
+const CODE_FILES = () => [
+  ...fs.readdirSync(PUBLIC_DIR).filter((f) => /\.(js|css|html)$/.test(f)).map((f) => path.join(PUBLIC_DIR, f)),
+  ...Object.values(SHARED_LIB),
+];
+const ASSET_VERSION = crypto.createHash('sha1').update(CODE_FILES().map((f) => fs.readFileSync(f)).join('\0')).digest('hex').slice(0, 10);
+
+/** Add ?v=<version> to the app's own CSS/JS references in HTML and JS import lines. */
+function versionAssets(text, ext) {
+  if (ext === '.html') return text.replace(/(href|src)="(\/(?:styles\.css|app\.js))"/g, `$1="$2?v=${ASSET_VERSION}"`);
+  return text.replace(/(from\s+['"])(\.\/lib\/[\w.-]+\.js)(['"])/g, `$1$2?v=${ASSET_VERSION}$3`);
+}
+
 function serveStatic(req, res, pathname) {
   let file = SHARED_LIB[pathname] || path.normalize(path.join(PUBLIC_DIR, decodeURIComponent(pathname)));
   if (!SHARED_LIB[pathname] && !file.startsWith(PUBLIC_DIR)) return send(res, 403, { error: 'Forbidden' });
   if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(PUBLIC_DIR, 'index.html');
   const ext = path.extname(file);
   const stat = fs.statSync(file);
-  const etag = `"${stat.size.toString(36)}-${Math.round(stat.mtimeMs).toString(36)}"`;
+  const etag = `"${stat.size.toString(36)}-${Math.round(stat.mtimeMs).toString(36)}-${ASSET_VERSION}"`;
   // App code is always revalidated (a cheap 304 when unchanged), so after an
   // update browsers and Cloudflare never keep running the old version.
   const code = ['.html', '.js', '.css', '.webmanifest'].includes(ext);
@@ -553,6 +568,11 @@ function serveStatic(req, res, pathname) {
   if (req.headers['if-none-match'] === etag) {
     res.writeHead(304, headers);
     return res.end();
+  }
+  if (ext === '.html' || ext === '.js') {
+    const body = versionAssets(fs.readFileSync(file, 'utf8'), ext);
+    res.writeHead(200, headers);
+    return res.end(req.method === 'HEAD' ? undefined : body);
   }
   res.writeHead(200, headers);
   if (req.method === 'HEAD') return res.end();
