@@ -269,19 +269,23 @@ export function createAvoidMatcher(settings = {}) {
   for (const term of settings.avoidIngredients || []) {
     if (!term || !term.trim()) continue;
     const words = expandTerm(term);
-    // Disliking olives (or avocado, sesame…) isn't disliking their oil: "olive oil"
-    // only counts when the oil itself is on the list.
-    const not = words.some((w) => /\boils?\b/.test(w)) ? [] : words.map((w) => `${w} oil`);
-    rules.push({ label: term.trim(), words, not });
+    // Disliking olives (or avocado, sesame…) isn't disliking their oil: "olive oil",
+    // "olive or avocado oil" and "olive/avocado oil" only count when the oil itself is on the list.
+    const esc = (w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const notRe = words.some((w) => /\boils?\b/.test(w)) ? null
+      : new RegExp(`\\b(?:${words.map(esc).join('|')})(?: (?:or|and|&) [a-z]+)? oils?\\b`, 'g');
+    rules.push({ label: term.trim(), words, not: [], notRe });
   }
   if (!rules.length) return () => [];
   return (names) => {
     const hits = [];
-    const texts = names.map((n) => String(n || '').toLowerCase());
+    // Captions and web pages write "olive-oil", "olive/avocado oil" or use odd spaces.
+    const texts = names.map((n) => String(n || '').toLowerCase().replace(/\s*\/\s*/g, ' or ').replace(/[\s\u00a0\u2000-\u200b\u202f_-]+/g, ' '));
     for (const rule of rules) {
       const hit = texts.some((raw) => {
         let text = raw;
         for (const n of rule.not) text = text.split(n).join(' ');
+        if (rule.notRe) text = text.replace(rule.notRe, ' ');
         return rule.words.some((w) => containsWord(text, w));
       });
       if (hit) hits.push(rule.label);

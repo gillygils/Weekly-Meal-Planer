@@ -396,3 +396,10 @@ test('disliking an ingredient does not flag its oil', async () => {
   assert.deepEqual(hits(['sesame'], ['toasted sesame oil']), []);
   assert.deepEqual(hits([], ['peanut oil'], ['peanuts']), ['Peanuts'], 'allergies still count oils');
 });
+
+test('oil exclusion handles caption spellings', async () => {
+  const { createAvoidMatcher } = await import('../server/lib/recipes.js');
+  const m = createAvoidMatcher({ avoidIngredients: ['olives'] });
+  for (const n of ['Olive Oil', 'olive-oil spray', 'olive or avocado oil', 'olive/avocado oil', 'olive & avocado oil']) assert.deepEqual(m([n]), [], n);
+  for (const n of ['olives and olive oil', 'olive tapenade', 'olives/capers']) assert.deepEqual(m([n]), ['olives'], n);
+});
