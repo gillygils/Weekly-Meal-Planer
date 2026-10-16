@@ -4,9 +4,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { withNutrition, NUTRITION_VERSION } from './lib/nutrition.js';
-import { finalizeRecipe, isEasyRecipe } from './lib/recipes.js';
+import { finalizeRecipe, isEasyRecipe, isRecoveryRecipe } from './lib/recipes.js';
 import { parseIngredientLine } from './lib/grocery.js';
 import { easyMealDrafts } from './lib/easy-meals.js';
+import { postpartumMealDrafts } from './lib/postpartum-meals.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const SEED_FILE = path.join(here, 'seed', 'recipes.json');
@@ -38,6 +39,7 @@ export const DEFAULT_SETTINGS = {
   currency: '$',
   weekStartsOn: 1, // 0 = Sunday, 1 = Monday
   easyDays: [], // weekdays (0 = Sunday) where the randomizer picks easy meals
+  postpartumMode: false, // favor postpartum-recovery meals
   freezeAlerts: true, // warn when meat would sit in the fridge too long, and remind to thaw it
   timeZone: '', // the household's time zone (set by the browser), for reminder times
   ntfyTopic: '', // phone notifications through ntfy; empty = off
@@ -88,6 +90,7 @@ export function sanitizeSettings(input, base = DEFAULT_SETTINGS) {
   if (input.currency != null) s.currency = String(input.currency).slice(0, 4) || '$';
   if (Array.isArray(input.easyDays)) s.easyDays = [...new Set(input.easyDays.map(Number).filter((d) => Number.isInteger(d) && d >= 0 && d <= 6))].sort();
   if (input.freezeAlerts != null) s.freezeAlerts = Boolean(input.freezeAlerts);
+  if (input.postpartumMode != null) s.postpartumMode = Boolean(input.postpartumMode);
   if (input.timeZone != null && /^[A-Za-z_+\-/0-9]{0,64}$/.test(String(input.timeZone))) s.timeZone = String(input.timeZone);
   if (input.ntfyTopic != null) s.ntfyTopic = String(input.ntfyTopic).trim().replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64);
   if (input.ntfyServer != null) s.ntfyServer = /^https?:\/\/[^\s]+$/i.test(String(input.ntfyServer).trim()) ? String(input.ntfyServer).trim().slice(0, 200) : 'https://ntfy.sh';
@@ -126,7 +129,8 @@ export class Store {
     if (!fs.existsSync(SEED_FILE)) return 0;
     const seed = JSON.parse(fs.readFileSync(SEED_FILE, 'utf8'));
     const easy = easyMealDrafts(parseIngredientLine).map((d) => withNutrition(finalizeRecipe(d)));
-    return this.addRecipes([...seed, ...easy]);
+    const recovery = postpartumMealDrafts(parseIngredientLine).map((d) => withNutrition(finalizeRecipe(d)));
+    return this.addRecipes([...seed, ...easy, ...recovery]);
   }
 
   /** Add or refresh macros on recipes saved before nutrition existed (or an older estimate). */
@@ -134,11 +138,13 @@ export class Store {
     let n = 0;
     for (const r of this.db.recipes) {
       if (typeof r.easyFlag !== 'boolean') r.easyFlag = isEasyRecipe(r);
-      if (r.nutrition?.version === NUTRITION_VERSION || r.nutrition?.source === 'manual') continue;
-      // Older TheMealDB imports assumed 4 servings; let the estimator correct that.
-      if (r.id.startsWith('mealdb-') && r.servingsEstimated == null) r.servingsEstimated = true;
-      withNutrition(r);
-      n++;
+      if (!(r.nutrition?.version === NUTRITION_VERSION || r.nutrition?.source === 'manual')) {
+        // Older TheMealDB imports assumed 4 servings; let the estimator correct that.
+        if (r.id.startsWith('mealdb-') && r.servingsEstimated == null) r.servingsEstimated = true;
+        withNutrition(r);
+        n++;
+      }
+      r.recoveryFlag = isRecoveryRecipe(r);
     }
     return n;
   }

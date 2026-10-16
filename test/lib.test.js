@@ -429,3 +429,29 @@ test('fridge life and the freeze / thaw plan', async () => {
     ['5-dinner', '2026-10-17', 'raw frozen prawns:freezer'],
   ]);
 });
+
+test('postpartum mode favors recovery meals, and easy ones on easy days', async () => {
+  const { postpartumMealDrafts } = await import('../server/lib/postpartum-meals.js');
+  const { finalizeRecipe, isRecoveryRecipe } = await import('../server/lib/recipes.js');
+  const { withNutrition } = await import('../server/lib/nutrition.js');
+  const { parseIngredientLine } = await import('../server/lib/grocery.js');
+  const drafts = postpartumMealDrafts(parseIngredientLine).map((d) => withNutrition(finalizeRecipe(d)));
+  assert.ok(drafts.length >= 30);
+  assert.ok(drafts.every((r) => r.postpartum && r.benefits && isRecoveryRecipe(r)));
+  const steak = drafts.find((r) => r.name === 'Steak, Eggs & Avocado Bowl');
+  assert.ok(steak && steak.easy && steak.mealTypes.includes('dinner'));
+  // A pool of ordinary meals plus the recovery ones.
+  const plain = Array.from({ length: 40 }, (_, i) => ({ ...mk(`plain${i}`), easyFlag: i % 2 === 0 }));
+  const recipes = [...plain, ...drafts];
+  const settings = { meals: ['dinner'], excludedProteins: [], postpartumMode: true, easyDays: [0, 6] };
+  const byId = new Map(recipes.map((r) => [r.id, r]));
+  for (let t = 0; t < 20; t++) {
+    const plan = ensureSlots({ key: '2026-10-19', slots: [] }, ['dinner']);
+    randomizePlan(plan, recipes, settings);
+    for (const s of plan.slots) {
+      const r = byId.get(s.recipeId);
+      assert.ok(r.postpartum, 'every meal is a recovery meal');
+      if (s.day >= 5) assert.ok(r.easy, 'weekend meals are easy too');
+    }
+  }
+});

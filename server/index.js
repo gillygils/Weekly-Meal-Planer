@@ -15,7 +15,7 @@ import { fetchAllSources, importLink, normalizeUrl, pullCreatorSite, SUGGESTED_C
 import { buildCustomRecipe } from './lib/custom.js';
 import { priceGroceryList, STORES } from './lib/pricing.js';
 import { PIN_RE, hashPin, verifyPin, createSession, sessionValid, endSession, pruneSessions, readCookie, sessionCookie, clearCookie, clientIp, Throttle } from './lib/pin.js';
-import { PROTEINS, ALLERGEN_GROUPS } from './lib/recipes.js';
+import { PROTEINS, ALLERGEN_GROUPS, isRecoveryRecipe } from './lib/recipes.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(here, '..', 'public');
@@ -123,7 +123,7 @@ function recentIds(key) {
 
 function summary(r) {
   const { instructions, ingredients, ...rest } = r;
-  return { ...rest, ingredientCount: ingredients.length, ingredientNames: ingredients.map((i) => i.name) };
+  return { ...rest, recoveryFlag: isRecoveryRecipe(r), ingredientCount: ingredients.length, ingredientNames: ingredients.map((i) => i.name) };
 }
 
 function groceryFor(plan) {

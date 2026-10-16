@@ -1,5 +1,5 @@
 // Week plan structure and the randomizer.
-import { MEAL_TYPES, recipeCost, createAvoidMatcher, isEasyRecipe } from './recipes.js';
+import { MEAL_TYPES, recipeCost, createAvoidMatcher, isEasyRecipe, isRecoveryRecipe } from './recipes.js';
 
 export const DAY_COUNT = 7;
 
@@ -114,6 +114,8 @@ function weightedPick(candidates, settings, rng, preferEasy = false) {
     let w = settings.favoritesBoost && r.favorite ? 3 : 1;
     // On easy days, the hand-picked easy meals (grilled cheese, tacos…) come up most.
     if (preferEasy && r.easy === true) w *= 3;
+    // In postpartum mode the built-in recovery meals come up more than other good matches.
+    if (settings.postpartumMode && r.postpartum === true) w *= 3;
     // With "healthier meals" on, the healthiest options come up more often too.
     if (settings.healthFocus && r.healthScore != null) w *= 0.5 + r.healthScore / 50;
     return w;
@@ -163,6 +165,7 @@ export function pickRecipe({ meal, recipes, settings, usedIds, usedNames, recent
 }
 
 export const isEasy = (r) => (typeof r.easyFlag === 'boolean' ? r.easyFlag : isEasyRecipe(r));
+export const isRecovery = (r) => (r.postpartum != null ? Boolean(r.postpartum) : typeof r.recoveryFlag === 'boolean' ? r.recoveryFlag : isRecoveryRecipe(r));
 
 /** True when this slot falls on one of the "easy meals" days in Settings. */
 export const wantsEasy = (plan, s, settings) => (settings.easyDays || []).includes(weekdayOf(plan.key, s.day));
@@ -174,6 +177,9 @@ export function randomizePlan(plan, recipes, settings, { recentIds = new Set(), 
   const avoid = createAvoidMatcher(settings);
   const pool = recipes.filter((r) => !avoid(r.ingredients.map((i) => i.name)).length);
   const easyPool = pool.filter(isEasy);
+  const recovery = Boolean(settings.postpartumMode);
+  const recoveryPool = recovery ? pool.filter(isRecovery) : [];
+  const recoveryEasyPool = recoveryPool.filter(isEasy);
   const usedIds = new Set();
   const usedNames = new Set();
   const usedDishes = [];
@@ -194,9 +200,19 @@ export function randomizePlan(plan, recipes, settings, { recentIds = new Set(), 
     if (!reroll(s)) continue;
     // Re-rolling a single slot should give something different from what's there now.
     if ((onlySlotId || onlyDay != null) && s.recipeId) usedIds.add(s.recipeId);
-    // Easy days pick from the easy recipes first, and only fall back if none fit.
+    // Easy days pick from the easy recipes first; postpartum mode from the recovery
+    // recipes. With both, easy recovery meals come first, then any easy meal, then any
+    // recovery meal, and only then everything else.
     const args = { meal: s.meal, settings, usedIds, usedNames, usedDishes, seenIds, seenDishes, recentIds, rng };
-    const pick = (wantsEasy(plan, s, settings) && pickRecipe({ ...args, recipes: easyPool, preferEasy: true })) || pickRecipe({ ...args, recipes: pool });
+    const easy = wantsEasy(plan, s, settings);
+    const tiers = [
+      ...(easy && recovery ? [[recoveryEasyPool, true]] : []),
+      ...(easy ? [[easyPool, true]] : []),
+      ...(recovery ? [[recoveryPool, false]] : []),
+      [pool, false],
+    ];
+    let pick = null;
+    for (const [recipes, preferEasy] of tiers) if ((pick = pickRecipe({ ...args, recipes, preferEasy }))) break;
     s.recipeId = pick ? pick.id : null;
     if (pick) {
       usedIds.add(pick.id);

@@ -42,7 +42,8 @@ const DB = [
   [['tuna', 'canned tuna', 'tinned tuna', 'tuna steak'], 116, 25.5, 0, 1, 0, { each: 140, buy: [142, 'g', 1.6, '5 oz can'] }],
   [['shrimp', 'prawn', 'prawns', 'king prawn'], 85, 20, 0, 0.5, 0, { each: 12, buy: [LB, 'g', 9.5, '1 lb bag'] }],
   [['scallop', 'crab', 'lobster', 'mussel', 'clam', 'squid', 'calamari', 'octopus'], 90, 16, 3, 1, 0, { buy: [LB, 'g', 13, 'per lb'], loose: true }],
-  [['anchovy', 'anchovies', 'sardine', 'sardines'], 210, 25, 0, 11, 0, { each: 4, buy: [56, 'g', 2.5, '2 oz tin'], pantry: true }],
+  [['anchovy', 'anchovies'], 210, 25, 0, 11, 0, { each: 4, canG: 56, buy: [56, 'g', 2.5, '2 oz tin'], pantry: true }],
+  [['sardine', 'sardines', 'canned sardines'], 208, 24.6, 0, 11.5, 0, { each: 25, canG: 106, buy: [106, 'g', 1.8, '3.75 oz can'] }],
 
   // ---- Dairy & eggs ----
   [['egg', 'eggs'], 143, 12.6, 0.7, 9.5, 0, { each: 50, cup: 243, buy: [12, 'each', 3.4, 'dozen'] }],
@@ -106,7 +107,7 @@ const DB = [
   // ---- Grains, pasta, bread ----
   [['rice', 'white rice', 'basmati rice', 'jasmine rice', 'long grain rice', 'arborio rice', 'risotto rice', 'sushi rice'], 360, 6.6, 79, 0.6, 1.3, { cup: 185, buy: [907, 'g', 2.8, '2 lb bag'] }],
   [['brown rice', 'wild rice'], 367, 7.5, 76, 2.7, 3.4, { cup: 190, buy: [907, 'g', 3, '2 lb bag'] }],
-  [['cooked rice', 'microwave rice', 'leftover rice'], 130, 2.7, 28, 0.3, 0.4, { cup: 158, buy: [250, 'g', 1.8, 'pouch'] }],
+  [['cooked rice', 'microwave rice', 'leftover rice', 'cooked brown rice', 'cooked white rice', 'cooked jasmine rice', 'cooked basmati rice'], 130, 2.7, 28, 0.3, 0.4, { cup: 158, buy: [250, 'g', 1.8, 'pouch'] }],
   [['pasta', 'spaghetti', 'penne', 'fusilli', 'rigatoni', 'linguine', 'fettuccine', 'tagliatelle', 'macaroni', 'farfalle', 'orzo', 'lasagne sheets', 'lasagna noodles', 'lasagne', 'lasagna', 'shells', 'orecchiette', 'pappardelle', 'conchiglie', 'ziti', 'bucatini'], 371, 13, 75, 1.5, 3.2, { cup: 100, buy: [454, 'g', 1.6, '1 lb box'] }],
   [['protein pasta', 'chickpea pasta', 'lentil pasta'], 350, 20, 55, 6, 8, { cup: 100, buy: [227, 'g', 2.8, '8 oz box'] }],
   [['egg noodles', 'noodles', 'ramen', 'udon', 'soba', 'lo mein', 'chow mein noodles', 'rice noodles', 'vermicelli', 'glass noodles', 'rice vermicelli', 'instant ramen'], 360, 10, 75, 2, 2.5, { each: 85, cup: 100, buy: [340, 'g', 2.2, 'pack'] }],
@@ -234,7 +235,7 @@ export function toGrams(qty, unit, entry) {
   if (VOLUME_ML[unit]) return (qty * VOLUME_ML[unit] / 236.6) * (entry?.cup || 240);
   if (unit === '' || unit === 'piece') return qty * (entry?.each || (unit === 'piece' ? 100 : 50));
   if (unit === 'clove') return qty * (entry?.words.includes('garlic') ? 5 : entry?.each || 5);
-  if (unit === 'can') return qty * (entry?.each && entry.each >= 150 ? entry.each : 400);
+  if (unit === 'can') return qty * (entry?.canG || (entry?.each && entry.each >= 150 ? entry.each : 400));
   if (unit === 'pack' && entry?.each) return qty * entry.each;
   if (unit === 'loaf') return qty * 450;
   if (unit === 'jar') return qty * (entry?.each && entry.each >= 150 ? entry.each : 680);

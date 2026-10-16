@@ -73,7 +73,7 @@
    "fiber": 3,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -166,7 +166,7 @@
    "fiber": 5,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -259,7 +259,7 @@
    "fiber": 1,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 23
  },
@@ -349,7 +349,7 @@
    "fiber": 1,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -436,7 +436,7 @@
    "fiber": 4,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 88
  },
@@ -520,7 +520,7 @@
    "fiber": 9,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -601,7 +601,7 @@
    "fiber": 3,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -688,15 +688,15 @@
   "creator": "",
   "nutrition": {
    "kcal": 380,
-   "protein": 26,
-   "carbs": 33,
-   "fat": 15,
+   "protein": 31,
+   "carbs": 21,
+   "fat": 19,
    "fiber": 2,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
-  "healthScore": 76
+  "healthScore": 77
  },
  {
   "id": "dummyjson-9",
@@ -771,7 +771,7 @@
    "fiber": 3,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -860,7 +860,7 @@
    "fiber": 6,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 100
  },
@@ -969,7 +969,7 @@
    "fiber": 5,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 96
  },
@@ -1077,7 +1077,7 @@
    "fiber": 10,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 100
  },
@@ -1185,7 +1185,7 @@
    "fiber": 6,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -1298,7 +1298,7 @@
    "fiber": 4,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -1389,7 +1389,7 @@
    "fiber": 6,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -1492,7 +1492,7 @@
    "fiber": 3,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 91
  },
@@ -1597,7 +1597,7 @@
    "fiber": 16,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -1689,15 +1689,15 @@
   "creator": "",
   "nutrition": {
    "kcal": 550,
-   "protein": 33,
-   "carbs": 38,
-   "fat": 28,
+   "protein": 38,
+   "carbs": 22,
+   "fat": 34,
    "fiber": 3,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
-  "healthScore": 77
+  "healthScore": 72
  },
  {
   "id": "dummyjson-19",
@@ -1812,7 +1812,7 @@
    "fiber": 4,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -1914,7 +1914,7 @@
    "fiber": 3,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 51
  },
@@ -2005,7 +2005,7 @@
    "fiber": 3,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 75
  },
@@ -2082,7 +2082,7 @@
    "fiber": 4,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -2159,7 +2159,7 @@
    "fiber": 1,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -2255,7 +2255,7 @@
    "fiber": 3,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -2330,7 +2330,7 @@
    "fiber": 5,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 46
  },
@@ -2403,7 +2403,7 @@
    "fiber": 4,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 30
  },
@@ -2499,7 +2499,7 @@
    "fiber": 6,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -2593,7 +2593,7 @@
    "fiber": 13,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -2679,7 +2679,7 @@
    "fiber": 12,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 73
  },
@@ -2746,7 +2746,7 @@
    "fiber": 7,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -2830,7 +2830,7 @@
    "fiber": 6,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 46
  },
@@ -2916,7 +2916,7 @@
    "fiber": 2,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -2999,7 +2999,7 @@
    "fiber": 5,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -3072,7 +3072,7 @@
    "fiber": 0,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 31
  },
@@ -3138,7 +3138,7 @@
    "fiber": 1,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 23
  },
@@ -3228,7 +3228,7 @@
    "fiber": 5,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 90
  },
@@ -3320,7 +3320,7 @@
    "fiber": 3,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 89
  },
@@ -3407,7 +3407,7 @@
    "fiber": 4,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -3492,7 +3492,7 @@
    "fiber": 7,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -3567,7 +3567,7 @@
    "fiber": 5,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -3652,7 +3652,7 @@
    "fiber": 2,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -3748,7 +3748,7 @@
    "fiber": 4,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 91
  },
@@ -3827,7 +3827,7 @@
    "fiber": 2,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 36
  },
@@ -3919,7 +3919,7 @@
    "fiber": 2,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 71
  },
@@ -4002,7 +4002,7 @@
    "fiber": 3,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -4076,7 +4076,7 @@
    "fiber": 4,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 77
  },
@@ -4172,7 +4172,7 @@
    "fiber": 4,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 79
  },
@@ -4250,7 +4250,7 @@
    "fiber": 4,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -4345,7 +4345,7 @@
    "fiber": 8,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -4420,7 +4420,7 @@
    "fiber": 3,
    "source": "recipe",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 37
  },
@@ -4504,7 +4504,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 83
  },
@@ -4574,7 +4574,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -4666,7 +4666,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 24
  },
@@ -4754,7 +4754,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -4837,7 +4837,7 @@
    "fiber": 4,
    "source": "rough",
    "coverage": 0.63,
-   "version": 5
+   "version": 6
   },
   "healthScore": 35
  },
@@ -4935,7 +4935,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -5015,7 +5015,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 75
  },
@@ -5104,7 +5104,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -5174,7 +5174,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -5273,7 +5273,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 79
  },
@@ -5374,7 +5374,7 @@
    "fiber": 12,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 69
  },
@@ -5448,7 +5448,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 24
  },
@@ -5539,7 +5539,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 74
  },
@@ -5635,7 +5635,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 40
  },
@@ -5721,7 +5721,7 @@
    "fiber": 5,
    "source": "rough",
    "coverage": 0.7,
-   "version": 5
+   "version": 6
   },
   "healthScore": 94
  },
@@ -5827,7 +5827,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.77,
-   "version": 5
+   "version": 6
   },
   "healthScore": 41
  },
@@ -5956,7 +5956,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.84,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -6076,7 +6076,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.94,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -6211,7 +6211,7 @@
    "fiber": 17,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 78
  },
@@ -6328,7 +6328,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -6402,7 +6402,7 @@
    "fiber": 15,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 23
  },
@@ -6478,7 +6478,7 @@
    "fiber": 6,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -6547,7 +6547,7 @@
    "fiber": 13,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 27
  },
@@ -6615,7 +6615,7 @@
    "fiber": 3,
    "source": "rough",
    "coverage": 0.6,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -6704,7 +6704,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -6815,7 +6815,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 21
  },
@@ -6893,7 +6893,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -7010,7 +7010,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 89
  },
@@ -7135,7 +7135,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 81
  },
@@ -7232,7 +7232,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -7346,7 +7346,7 @@
    "fiber": 4,
    "source": "rough",
    "coverage": 0.53,
-   "version": 5
+   "version": 6
   },
   "healthScore": 96
  },
@@ -7433,7 +7433,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 54
  },
@@ -7501,7 +7501,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 69
  },
@@ -7643,7 +7643,7 @@
    "fiber": 17,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -7741,7 +7741,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 77
  },
@@ -7851,7 +7851,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 32
  },
@@ -7958,7 +7958,7 @@
    "fiber": 25,
    "source": "estimate",
    "coverage": 0.85,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -8077,7 +8077,7 @@
    "fiber": 16,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 90
  },
@@ -8205,7 +8205,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -8311,7 +8311,7 @@
    "fiber": 15,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 69
  },
@@ -8418,7 +8418,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 81
  },
@@ -8540,7 +8540,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.94,
-   "version": 5
+   "version": 6
   },
   "healthScore": 37
  },
@@ -8639,7 +8639,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -8725,7 +8725,7 @@
    "fiber": 15,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 86
  },
@@ -8837,7 +8837,7 @@
    "fiber": 13,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 85
  },
@@ -8919,7 +8919,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 78
  },
@@ -9020,7 +9020,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 81
  },
@@ -9120,7 +9120,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 89
  },
@@ -9239,7 +9239,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -9329,7 +9329,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -9406,7 +9406,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -9504,7 +9504,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 78
  },
@@ -9589,7 +9589,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -9708,7 +9708,7 @@
    "fiber": 11,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 85
  },
@@ -9809,7 +9809,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 58
  },
@@ -9911,7 +9911,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.69,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -10036,7 +10036,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 36
  },
@@ -10150,7 +10150,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 0.79,
-   "version": 5
+   "version": 6
   },
   "healthScore": 70
  },
@@ -10234,7 +10234,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -10357,7 +10357,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 95
  },
@@ -10448,7 +10448,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.55,
-   "version": 5
+   "version": 6
   },
   "healthScore": 17
  },
@@ -10538,7 +10538,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -10612,7 +10612,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.71,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -10718,7 +10718,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.79,
-   "version": 5
+   "version": 6
   },
   "healthScore": 74
  },
@@ -10800,7 +10800,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -10907,7 +10907,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.93,
-   "version": 5
+   "version": 6
   },
   "healthScore": 79
  },
@@ -11008,7 +11008,7 @@
    "fiber": 6,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 82
  },
@@ -11099,7 +11099,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 80
  },
@@ -11197,7 +11197,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -11281,7 +11281,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -11389,7 +11389,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -11499,7 +11499,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.93,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -11595,7 +11595,7 @@
    "fiber": 15,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 100
  },
@@ -11688,7 +11688,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 57
  },
@@ -11800,7 +11800,7 @@
    "fiber": 14,
    "source": "estimate",
    "coverage": 0.85,
-   "version": 5
+   "version": 6
   },
   "healthScore": 86
  },
@@ -11867,7 +11867,7 @@
    "fiber": 17,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -11974,7 +11974,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 0.93,
-   "version": 5
+   "version": 6
   },
   "healthScore": 82
  },
@@ -12061,7 +12061,7 @@
    "fiber": 13,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -12143,7 +12143,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 85
  },
@@ -12227,7 +12227,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 70
  },
@@ -12302,7 +12302,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 35
  },
@@ -12379,7 +12379,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 41
  },
@@ -12454,7 +12454,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 32
  },
@@ -12552,7 +12552,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 28
  },
@@ -12645,7 +12645,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -12746,7 +12746,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 14
  },
@@ -12828,7 +12828,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 29
  },
@@ -12907,7 +12907,7 @@
    "fiber": 12,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 27
  },
@@ -12998,7 +12998,7 @@
    "fiber": 3,
    "source": "rough",
    "coverage": 0.7,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -13089,7 +13089,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 70
  },
@@ -13200,7 +13200,7 @@
    "fiber": 11,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 74
  },
@@ -13299,7 +13299,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 70
  },
@@ -13394,7 +13394,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 37
  },
@@ -13461,7 +13461,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -13524,7 +13524,7 @@
    "fiber": 8,
    "source": "rough",
    "coverage": 0.5,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -13617,7 +13617,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -13706,7 +13706,7 @@
    "fiber": 12,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 82
  },
@@ -13808,7 +13808,7 @@
    "fiber": 11,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -13894,7 +13894,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -13985,7 +13985,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -14119,7 +14119,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 78
  },
@@ -14240,7 +14240,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -14367,7 +14367,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.93,
-   "version": 5
+   "version": 6
   },
   "healthScore": 46
  },
@@ -14462,7 +14462,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 40
  },
@@ -14554,7 +14554,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 46
  },
@@ -14671,7 +14671,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.79,
-   "version": 5
+   "version": 6
   },
   "healthScore": 31
  },
@@ -14791,7 +14791,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 70
  },
@@ -14912,7 +14912,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 36
  },
@@ -15018,7 +15018,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 51
  },
@@ -15130,7 +15130,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.85,
-   "version": 5
+   "version": 6
   },
   "healthScore": 83
  },
@@ -15235,7 +15235,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 10
  },
@@ -15322,7 +15322,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -15406,7 +15406,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.43,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -15498,7 +15498,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 82
  },
@@ -15599,7 +15599,7 @@
    "fiber": 3,
    "source": "rough",
    "coverage": 0.62,
-   "version": 5
+   "version": 6
   },
   "healthScore": 22
  },
@@ -15668,7 +15668,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 69
  },
@@ -15739,7 +15739,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -15846,7 +15846,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 25
  },
@@ -15928,7 +15928,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -16008,7 +16008,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 51
  },
@@ -16138,7 +16138,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 18
  },
@@ -16221,7 +16221,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 28
  },
@@ -16314,7 +16314,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 57
  },
@@ -16411,7 +16411,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 31
  },
@@ -16520,7 +16520,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 51
  },
@@ -16629,7 +16629,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.79,
-   "version": 5
+   "version": 6
   },
   "healthScore": 22
  },
@@ -16709,7 +16709,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.71,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -16791,7 +16791,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -16873,7 +16873,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -16959,7 +16959,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -17070,7 +17070,7 @@
    "fiber": 10,
    "source": "rough",
    "coverage": 0.6,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -17168,7 +17168,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 36
  },
@@ -17270,7 +17270,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 32
  },
@@ -17342,7 +17342,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 69
  },
@@ -17431,7 +17431,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -17504,7 +17504,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -17578,7 +17578,7 @@
    "fiber": 11,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -17664,7 +17664,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 69
  },
@@ -17766,7 +17766,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -17852,7 +17852,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 35
  },
@@ -17917,7 +17917,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -17993,7 +17993,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 40
  },
@@ -18074,7 +18074,7 @@
    "fiber": 15,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -18146,7 +18146,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 31
  },
@@ -18273,7 +18273,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 70
  },
@@ -18347,7 +18347,7 @@
    "fiber": 1,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 24
  },
@@ -18421,7 +18421,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -18522,7 +18522,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -18622,7 +18622,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -18703,7 +18703,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -18803,7 +18803,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 0.77,
-   "version": 5
+   "version": 6
   },
   "healthScore": 26
  },
@@ -18885,7 +18885,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 100
  },
@@ -18982,7 +18982,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -19099,7 +19099,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -19199,7 +19199,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -19284,7 +19284,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 57
  },
@@ -19377,7 +19377,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -19452,7 +19452,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -19549,7 +19549,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 24
  },
@@ -19629,7 +19629,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 93
  },
@@ -19756,7 +19756,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.94,
-   "version": 5
+   "version": 6
   },
   "healthScore": 70
  },
@@ -19872,7 +19872,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -19994,7 +19994,7 @@
    "fiber": 5,
    "source": "rough",
    "coverage": 0.62,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -20128,7 +20128,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 0.95,
-   "version": 5
+   "version": 6
   },
   "healthScore": 74
  },
@@ -20284,7 +20284,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.94,
-   "version": 5
+   "version": 6
   },
   "healthScore": 36
  },
@@ -20382,7 +20382,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -20486,7 +20486,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -20602,7 +20602,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 82
  },
@@ -20711,7 +20711,7 @@
    "fiber": 11,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 54
  },
@@ -20813,7 +20813,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -20935,7 +20935,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 80
  },
@@ -21035,7 +21035,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 83
  },
@@ -21132,7 +21132,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -21255,7 +21255,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.93,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -21353,7 +21353,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -21454,7 +21454,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -21589,7 +21589,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -21727,7 +21727,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -21851,7 +21851,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -21979,7 +21979,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.94,
-   "version": 5
+   "version": 6
   },
   "healthScore": 40
  },
@@ -22093,7 +22093,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -22187,7 +22187,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 36
  },
@@ -22279,7 +22279,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -22362,7 +22362,7 @@
    "fiber": 4,
    "source": "rough",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -22426,7 +22426,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 51
  },
@@ -22506,7 +22506,7 @@
    "fiber": 1,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -22591,7 +22591,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -22673,7 +22673,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -22759,7 +22759,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 32
  },
@@ -22844,7 +22844,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -22949,7 +22949,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 80
  },
@@ -23041,7 +23041,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -23108,7 +23108,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -23185,7 +23185,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -23269,7 +23269,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -23358,7 +23358,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 36
  },
@@ -23432,7 +23432,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -23518,7 +23518,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 83
  },
@@ -23621,7 +23621,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 80
  },
@@ -23712,7 +23712,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -23790,7 +23790,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 46
  },
@@ -23886,7 +23886,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 85
  },
@@ -23955,7 +23955,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -24059,7 +24059,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -24130,7 +24130,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -24231,7 +24231,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -24327,7 +24327,7 @@
    "fiber": 11,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 68
  },
@@ -24426,7 +24426,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -24510,7 +24510,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -24596,7 +24596,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -24691,7 +24691,7 @@
    "fiber": 16,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 35
  },
@@ -24772,7 +24772,7 @@
    "fiber": 3,
    "source": "rough",
    "coverage": 0.44,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -24882,7 +24882,7 @@
    "fiber": 6,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 37
  },
@@ -24958,7 +24958,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 29
  },
@@ -25055,7 +25055,7 @@
    "fiber": 11,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -25146,7 +25146,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 82
  },
@@ -25237,7 +25237,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 57
  },
@@ -25345,7 +25345,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.85,
-   "version": 5
+   "version": 6
   },
   "healthScore": 73
  },
@@ -25449,7 +25449,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -25536,7 +25536,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -25604,7 +25604,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 86
  },
@@ -25686,7 +25686,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 54
  },
@@ -25823,7 +25823,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -25935,7 +25935,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.85,
-   "version": 5
+   "version": 6
   },
   "healthScore": 35
  },
@@ -26014,7 +26014,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 87
  },
@@ -26100,7 +26100,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 25
  },
@@ -26199,7 +26199,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -26273,7 +26273,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 40
  },
@@ -26364,7 +26364,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 73
  },
@@ -26455,7 +26455,7 @@
    "fiber": 4,
    "source": "rough",
    "coverage": 0.73,
-   "version": 5
+   "version": 6
   },
   "healthScore": 84
  },
@@ -26541,7 +26541,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -26646,7 +26646,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 30
  },
@@ -26744,7 +26744,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -26845,7 +26845,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 13
  },
@@ -26955,7 +26955,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.93,
-   "version": 5
+   "version": 6
   },
   "healthScore": 51
  },
@@ -27066,7 +27066,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -27196,7 +27196,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -27288,7 +27288,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -27397,7 +27397,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 90
  },
@@ -27490,7 +27490,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 78
  },
@@ -27565,7 +27565,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -27638,7 +27638,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 23
  },
@@ -27712,7 +27712,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 25
  },
@@ -27791,7 +27791,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -27874,7 +27874,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -27957,7 +27957,7 @@
    "fiber": 11,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -28071,7 +28071,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -28153,7 +28153,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -28229,7 +28229,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 23
  },
@@ -28341,7 +28341,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -28426,7 +28426,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -28485,7 +28485,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -28572,7 +28572,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -28657,7 +28657,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 69
  },
@@ -28749,7 +28749,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 57
  },
@@ -28836,7 +28836,7 @@
    "fiber": 6,
    "source": "rough",
    "coverage": 0.7,
-   "version": 5
+   "version": 6
   },
   "healthScore": 71
  },
@@ -28904,7 +28904,7 @@
    "fiber": 6,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -29018,7 +29018,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 0.94,
-   "version": 5
+   "version": 6
   },
   "healthScore": 97
  },
@@ -29107,7 +29107,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 73
  },
@@ -29174,16 +29174,16 @@
   "easyFlag": true,
   "creator": "",
   "nutrition": {
-   "kcal": 92,
-   "protein": 3,
+   "kcal": 179,
+   "protein": 13,
    "carbs": 3,
-   "fat": 8,
+   "fat": 13,
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
-  "healthScore": 24
+  "healthScore": 34
  },
  {
   "id": "mealdb-53042",
@@ -29285,7 +29285,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.79,
-   "version": 5
+   "version": 6
   },
   "healthScore": 76
  },
@@ -29382,7 +29382,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 92
  },
@@ -29468,7 +29468,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -29580,7 +29580,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.93,
-   "version": 5
+   "version": 6
   },
   "healthScore": 96
  },
@@ -29687,7 +29687,7 @@
    "fiber": 12,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -29770,7 +29770,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 40
  },
@@ -29883,7 +29883,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.93,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -29964,7 +29964,7 @@
    "fiber": 12,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -30067,7 +30067,7 @@
    "fiber": 22,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -30189,7 +30189,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.94,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -30273,7 +30273,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 33
  },
@@ -30368,7 +30368,7 @@
    "fiber": 23,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -30457,7 +30457,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 46
  },
@@ -30557,7 +30557,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -30674,7 +30674,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -30775,7 +30775,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -30854,7 +30854,7 @@
    "fiber": 14,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 54
  },
@@ -30939,7 +30939,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 28
  },
@@ -31010,7 +31010,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -31065,14 +31065,14 @@
   "easyFlag": true,
   "creator": "",
   "nutrition": {
-   "kcal": 263,
+   "kcal": 260,
    "protein": 31,
    "carbs": 0,
    "fat": 14,
    "fiber": 0,
    "source": "rough",
    "coverage": 0.5,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -31170,7 +31170,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.85,
-   "version": 5
+   "version": 6
   },
   "healthScore": 41
  },
@@ -31258,7 +31258,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -31325,7 +31325,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -31408,7 +31408,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -31519,7 +31519,7 @@
    "fiber": 13,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 78
  },
@@ -31620,7 +31620,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -31704,7 +31704,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -31812,7 +31812,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -31920,7 +31920,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 51
  },
@@ -31997,7 +31997,7 @@
    "fiber": 1,
    "source": "rough",
    "coverage": 0.6,
-   "version": 5
+   "version": 6
   },
   "healthScore": 46
  },
@@ -32089,7 +32089,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 54
  },
@@ -32161,7 +32161,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -32229,7 +32229,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 32
  },
@@ -32285,7 +32285,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -32380,7 +32380,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -32455,7 +32455,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -32541,7 +32541,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 77
  },
@@ -32627,7 +32627,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 33
  },
@@ -32723,7 +32723,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -32788,7 +32788,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -32881,7 +32881,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -32945,7 +32945,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -33015,7 +33015,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -33113,7 +33113,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 57
  },
@@ -33177,7 +33177,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 32
  },
@@ -33250,7 +33250,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 74
  },
@@ -33338,7 +33338,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 33
  },
@@ -33426,7 +33426,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 34
  },
@@ -33508,7 +33508,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -33575,7 +33575,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -33684,7 +33684,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 71
  },
@@ -33752,7 +33752,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -33826,7 +33826,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -33915,7 +33915,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 26
  },
@@ -33999,7 +33999,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -34082,7 +34082,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.57,
-   "version": 5
+   "version": 6
   },
   "healthScore": 27
  },
@@ -34185,7 +34185,7 @@
    "fiber": 17,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 21
  },
@@ -34275,7 +34275,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.5,
-   "version": 5
+   "version": 6
   },
   "healthScore": 58
  },
@@ -34362,7 +34362,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -34443,7 +34443,7 @@
    "fiber": 13,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -34514,7 +34514,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 41
  },
@@ -34614,7 +34614,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 58
  },
@@ -34684,7 +34684,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -34754,7 +34754,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -34862,7 +34862,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 81
  },
@@ -34928,7 +34928,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -34981,7 +34981,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -35050,7 +35050,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -35160,7 +35160,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -35273,7 +35273,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -35350,7 +35350,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -35459,7 +35459,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 35
  },
@@ -35557,7 +35557,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 34
  },
@@ -35664,7 +35664,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 83
  },
@@ -35744,7 +35744,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -35862,7 +35862,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 71
  },
@@ -35951,7 +35951,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 58
  },
@@ -36049,7 +36049,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 73
  },
@@ -36125,7 +36125,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -36261,7 +36261,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.94,
-   "version": 5
+   "version": 6
   },
   "healthScore": 22
  },
@@ -36348,7 +36348,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -36446,7 +36446,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 25
  },
@@ -36564,7 +36564,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 34
  },
@@ -36678,7 +36678,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 32
  },
@@ -36749,7 +36749,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -36849,7 +36849,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 29
  },
@@ -36929,7 +36929,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 73
  },
@@ -36992,7 +36992,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -37054,7 +37054,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 57
  },
@@ -37133,7 +37133,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 30
  },
@@ -37202,7 +37202,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -37281,7 +37281,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 58
  },
@@ -37368,7 +37368,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 81
  },
@@ -37446,7 +37446,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -37544,7 +37544,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 83
  },
@@ -37610,7 +37610,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -37696,7 +37696,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 29
  },
@@ -37792,7 +37792,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 83
  },
@@ -37879,7 +37879,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 68
  },
@@ -37961,7 +37961,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -38031,7 +38031,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -38083,7 +38083,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 27
  },
@@ -38189,7 +38189,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 74
  },
@@ -38286,7 +38286,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 100
  },
@@ -38383,7 +38383,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 7
  },
@@ -38472,7 +38472,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 94
  },
@@ -38555,7 +38555,7 @@
    "fiber": 12,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 81
  },
@@ -38662,7 +38662,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.93,
-   "version": 5
+   "version": 6
   },
   "healthScore": 71
  },
@@ -38738,7 +38738,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -38815,7 +38815,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 58
  },
@@ -38886,7 +38886,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 32
  },
@@ -38982,7 +38982,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -39079,7 +39079,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -39197,7 +39197,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -39270,7 +39270,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -39344,7 +39344,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.71,
-   "version": 5
+   "version": 6
   },
   "healthScore": 77
  },
@@ -39426,7 +39426,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 40
  },
@@ -39525,7 +39525,7 @@
    "fiber": 17,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -39604,7 +39604,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -39681,7 +39681,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 57
  },
@@ -39745,7 +39745,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -39839,7 +39839,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 26
  },
@@ -39915,7 +39915,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -40003,7 +40003,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -40069,7 +40069,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -40162,7 +40162,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -40266,7 +40266,7 @@
    "fiber": 21,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -40340,7 +40340,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -40412,7 +40412,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -40487,7 +40487,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -40585,7 +40585,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -40651,7 +40651,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -40740,7 +40740,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 85
  },
@@ -40831,7 +40831,7 @@
    "fiber": 3,
    "source": "rough",
    "coverage": 0.7,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -40948,7 +40948,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.94,
-   "version": 5
+   "version": 6
   },
   "healthScore": 58
  },
@@ -41031,7 +41031,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 71
  },
@@ -41102,7 +41102,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 24
  },
@@ -41190,7 +41190,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 87
  },
@@ -41278,7 +41278,7 @@
    "fiber": 12,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 46
  },
@@ -41402,7 +41402,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.87,
-   "version": 5
+   "version": 6
   },
   "healthScore": 78
  },
@@ -41491,7 +41491,7 @@
    "fiber": 6,
    "source": "rough",
    "coverage": 0.71,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -41573,7 +41573,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -41673,7 +41673,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -41802,7 +41802,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -41893,7 +41893,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 68
  },
@@ -41998,7 +41998,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -42090,7 +42090,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -42174,7 +42174,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -42269,7 +42269,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 57
  },
@@ -42364,7 +42364,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 79
  },
@@ -42429,7 +42429,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -42540,7 +42540,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.85,
-   "version": 5
+   "version": 6
   },
   "healthScore": 51
  },
@@ -42623,7 +42623,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -42697,7 +42697,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.57,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -42806,7 +42806,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.71,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -42879,7 +42879,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -42957,7 +42957,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -43044,7 +43044,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 58
  },
@@ -43143,7 +43143,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -43239,7 +43239,7 @@
    "fiber": 4,
    "source": "rough",
    "coverage": 0.69,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -43330,7 +43330,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.73,
-   "version": 5
+   "version": 6
   },
   "healthScore": 84
  },
@@ -43421,7 +43421,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -43519,7 +43519,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -43589,7 +43589,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -43674,7 +43674,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -43779,7 +43779,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.79,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -43863,7 +43863,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 31
  },
@@ -43966,7 +43966,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -44076,7 +44076,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 77
  },
@@ -44190,7 +44190,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 92
  },
@@ -44293,7 +44293,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -44393,7 +44393,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 87
  },
@@ -44481,7 +44481,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 28
  },
@@ -44580,7 +44580,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 54
  },
@@ -44694,7 +44694,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.93,
-   "version": 5
+   "version": 6
   },
   "healthScore": 19
  },
@@ -44809,7 +44809,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.77,
-   "version": 5
+   "version": 6
   },
   "healthScore": 13
  },
@@ -44886,7 +44886,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -44965,7 +44965,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -45073,7 +45073,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.93,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -45155,7 +45155,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.44,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -45254,7 +45254,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.85,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -45339,7 +45339,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -45457,7 +45457,7 @@
    "fiber": 12,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -45555,7 +45555,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.77,
-   "version": 5
+   "version": 6
   },
   "healthScore": 83
  },
@@ -45657,7 +45657,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.79,
-   "version": 5
+   "version": 6
   },
   "healthScore": 54
  },
@@ -45743,7 +45743,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 75
  },
@@ -45834,7 +45834,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -45921,7 +45921,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -46040,7 +46040,7 @@
    "fiber": 4,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -46155,7 +46155,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 82
  },
@@ -46233,7 +46233,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -46322,7 +46322,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -46421,7 +46421,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -46509,7 +46509,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -46601,7 +46601,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.73,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -46707,7 +46707,7 @@
    "fiber": 3,
    "source": "rough",
    "coverage": 0.64,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -46805,7 +46805,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 58
  },
@@ -46888,7 +46888,7 @@
    "fiber": 5,
    "source": "rough",
    "coverage": 0.6,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -46966,7 +46966,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.71,
-   "version": 5
+   "version": 6
   },
   "healthScore": 86
  },
@@ -47040,7 +47040,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -47135,7 +47135,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -47217,7 +47217,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.5,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -47325,7 +47325,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 78
  },
@@ -47390,7 +47390,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -47491,7 +47491,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 74
  },
@@ -47587,7 +47587,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 37
  },
@@ -47686,7 +47686,7 @@
    "fiber": 15,
    "source": "estimate",
    "coverage": 0.85,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -47755,7 +47755,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 30
  },
@@ -47845,7 +47845,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -47936,7 +47936,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -47999,7 +47999,7 @@
    "fiber": 7,
    "source": "rough",
    "coverage": 0.6,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -48079,7 +48079,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 31
  },
@@ -48149,7 +48149,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 58
  },
@@ -48216,7 +48216,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -48298,7 +48298,7 @@
    "fiber": 13,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -48376,7 +48376,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -48450,7 +48450,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -48529,7 +48529,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -48605,7 +48605,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 57
  },
@@ -48700,7 +48700,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -48766,7 +48766,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -48848,7 +48848,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 68
  },
@@ -48929,7 +48929,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 35
  },
@@ -48993,7 +48993,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -49082,7 +49082,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 33
  },
@@ -49162,7 +49162,7 @@
    "fiber": 8,
    "source": "rough",
    "coverage": 0.56,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -49238,7 +49238,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -49314,7 +49314,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 26
  },
@@ -49410,7 +49410,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -49491,7 +49491,7 @@
    "fiber": 11,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -49591,7 +49591,7 @@
    "fiber": 12,
    "source": "rough",
    "coverage": 0.69,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -49678,7 +49678,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -49758,7 +49758,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 69
  },
@@ -49846,7 +49846,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -49939,7 +49939,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 58
  },
@@ -50029,7 +50029,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -50152,7 +50152,7 @@
    "fiber": 15,
    "source": "estimate",
    "coverage": 0.94,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -50255,7 +50255,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -50376,7 +50376,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 85
  },
@@ -50449,7 +50449,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -50571,7 +50571,7 @@
    "fiber": 11,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 71
  },
@@ -50650,7 +50650,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 30
  },
@@ -50752,7 +50752,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 23
  },
@@ -50852,7 +50852,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.93,
-   "version": 5
+   "version": 6
   },
   "healthScore": 35
  },
@@ -50948,7 +50948,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.85,
-   "version": 5
+   "version": 6
   },
   "healthScore": 17
  },
@@ -51052,7 +51052,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -51141,7 +51141,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -51242,7 +51242,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -51326,7 +51326,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 29
  },
@@ -51445,7 +51445,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 37
  },
@@ -51527,7 +51527,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 29
  },
@@ -51639,7 +51639,7 @@
    "fiber": 27,
    "source": "estimate",
    "coverage": 0.94,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -51735,7 +51735,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -51811,7 +51811,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -51873,7 +51873,7 @@
    "fiber": 2,
    "source": "rough",
    "coverage": 0.6,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -51950,7 +51950,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -52039,7 +52039,7 @@
    "fiber": 14,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 54
  },
@@ -52146,7 +52146,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 75
  },
@@ -52212,7 +52212,7 @@
    "fiber": 3,
    "source": "rough",
    "coverage": 0.6,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -52281,7 +52281,7 @@
    "fiber": 1,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 40
  },
@@ -52353,7 +52353,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.57,
-   "version": 5
+   "version": 6
   },
   "healthScore": 23
  },
@@ -52425,7 +52425,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -52538,7 +52538,7 @@
    "fiber": 12,
    "source": "estimate",
    "coverage": 0.87,
-   "version": 5
+   "version": 6
   },
   "healthScore": 71
  },
@@ -52622,7 +52622,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -52717,7 +52717,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 34
  },
@@ -52818,7 +52818,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -52905,7 +52905,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -52993,7 +52993,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -53117,7 +53117,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.85,
-   "version": 5
+   "version": 6
   },
   "healthScore": 70
  },
@@ -53207,7 +53207,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 54
  },
@@ -53342,7 +53342,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -53444,7 +53444,7 @@
    "fiber": 13,
    "source": "estimate",
    "coverage": 0.85,
-   "version": 5
+   "version": 6
   },
   "healthScore": 18
  },
@@ -53540,7 +53540,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -53616,7 +53616,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -53720,7 +53720,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -53812,7 +53812,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -53885,7 +53885,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -54003,7 +54003,7 @@
    "fiber": 6,
    "source": "rough",
    "coverage": 0.73,
-   "version": 5
+   "version": 6
   },
   "healthScore": 54
  },
@@ -54111,7 +54111,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -54225,7 +54225,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 87
  },
@@ -54324,7 +54324,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 69
  },
@@ -54407,7 +54407,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -54495,7 +54495,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -54593,7 +54593,7 @@
    "fiber": 4,
    "source": "rough",
    "coverage": 0.73,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -54662,7 +54662,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -54743,7 +54743,7 @@
    "fiber": 8,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -54827,7 +54827,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 91
  },
@@ -54914,7 +54914,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 73
  },
@@ -55018,7 +55018,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -55098,7 +55098,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 32
  },
@@ -55194,7 +55194,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 29
  },
@@ -55284,7 +55284,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 57
  },
@@ -55384,7 +55384,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -55469,7 +55469,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 46
  },
@@ -55580,7 +55580,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.85,
-   "version": 5
+   "version": 6
   },
   "healthScore": 51
  },
@@ -55683,7 +55683,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 40
  },
@@ -55792,7 +55792,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 81
  },
@@ -55851,7 +55851,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 41
  },
@@ -55932,7 +55932,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 41
  },
@@ -56045,7 +56045,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -56137,7 +56137,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -56230,7 +56230,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 75
  },
@@ -56305,7 +56305,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -56409,7 +56409,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 74
  },
@@ -56478,7 +56478,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 40
  },
@@ -56587,7 +56587,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 51
  },
@@ -56666,7 +56666,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 51
  },
@@ -56733,7 +56733,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 41
  },
@@ -56822,7 +56822,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -56935,7 +56935,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -57039,7 +57039,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -57089,7 +57089,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.5,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -57178,7 +57178,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -57283,7 +57283,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -57361,7 +57361,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -57457,7 +57457,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -57596,7 +57596,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -57710,7 +57710,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -57828,7 +57828,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -57964,7 +57964,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 86
  },
@@ -58033,7 +58033,7 @@
    "fiber": 3,
    "source": "rough",
    "coverage": 0.6,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -58160,7 +58160,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.93,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -58236,7 +58236,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -58329,7 +58329,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 70
  },
@@ -58440,7 +58440,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 73
  },
@@ -58556,7 +58556,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -58657,7 +58657,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -58770,7 +58770,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 73
  },
@@ -58875,7 +58875,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 28
  },
@@ -58948,7 +58948,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 31
  },
@@ -59032,7 +59032,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -59119,7 +59119,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 31
  },
@@ -59206,7 +59206,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 24
  },
@@ -59299,7 +59299,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 35
  },
@@ -59379,7 +59379,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -59458,7 +59458,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 29
  },
@@ -59545,7 +59545,7 @@
    "fiber": 12,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -59620,7 +59620,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -59709,7 +59709,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -59800,7 +59800,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 51
  },
@@ -59898,7 +59898,7 @@
    "fiber": 12,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -59968,7 +59968,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -60032,7 +60032,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -60128,7 +60128,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -60214,7 +60214,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 19
  },
@@ -60299,7 +60299,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -60376,7 +60376,7 @@
    "fiber": 6,
    "source": "rough",
    "coverage": 0.71,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -60463,7 +60463,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -60535,7 +60535,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.5,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -60635,7 +60635,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -60711,7 +60711,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 69
  },
@@ -60801,7 +60801,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -60866,7 +60866,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -60993,7 +60993,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -61099,7 +61099,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 69
  },
@@ -61170,7 +61170,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 37
  },
@@ -61247,7 +61247,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -61330,7 +61330,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 69
  },
@@ -61426,7 +61426,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 40
  },
@@ -61517,7 +61517,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 74
  },
@@ -61627,7 +61627,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 57
  },
@@ -61729,7 +61729,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 84
  },
@@ -61834,7 +61834,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 18
  },
@@ -61921,7 +61921,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -62009,7 +62009,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -62093,7 +62093,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -62160,7 +62160,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -62241,7 +62241,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.4,
-   "version": 5
+   "version": 6
   },
   "healthScore": 36
  },
@@ -62330,7 +62330,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -62396,7 +62396,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -62511,7 +62511,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 79
  },
@@ -62606,7 +62606,7 @@
    "fiber": 6,
    "source": "rough",
    "coverage": 0.5,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -62712,7 +62712,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -62769,7 +62769,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 28
  },
@@ -62847,7 +62847,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -62910,7 +62910,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -63039,7 +63039,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.79,
-   "version": 5
+   "version": 6
   },
   "healthScore": 40
  },
@@ -63115,7 +63115,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -63178,7 +63178,7 @@
    "fiber": 16,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 28
  },
@@ -63261,7 +63261,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 35
  },
@@ -63354,7 +63354,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -63463,7 +63463,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.77,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -63533,7 +63533,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -63617,7 +63617,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -63716,7 +63716,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -63783,7 +63783,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -63869,7 +63869,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 46
  },
@@ -63936,7 +63936,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -63991,7 +63991,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -64093,7 +64093,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -64153,7 +64153,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 57
  },
@@ -64234,7 +64234,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -64338,7 +64338,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 37
  },
@@ -64440,7 +64440,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -64529,7 +64529,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -64611,7 +64611,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.6,
-   "version": 5
+   "version": 6
   },
   "healthScore": 24
  },
@@ -64700,7 +64700,7 @@
    "fiber": 17,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -64780,7 +64780,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -64907,7 +64907,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -64961,7 +64961,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -65070,7 +65070,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -65148,7 +65148,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -65242,7 +65242,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 96
  },
@@ -65361,7 +65361,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -65450,7 +65450,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 70
  },
@@ -65520,7 +65520,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -65627,7 +65627,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -65729,7 +65729,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -65849,7 +65849,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 82
  },
@@ -65946,7 +65946,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 41
  },
@@ -66048,7 +66048,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 54
  },
@@ -66126,7 +66126,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 27
  },
@@ -66275,7 +66275,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.94,
-   "version": 5
+   "version": 6
   },
   "healthScore": 68
  },
@@ -66381,7 +66381,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -66461,7 +66461,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 30
  },
@@ -66574,7 +66574,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -66668,7 +66668,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -66768,7 +66768,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 59
  },
@@ -66868,7 +66868,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 80
  },
@@ -66940,7 +66940,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -67008,7 +67008,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -67082,7 +67082,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -67155,7 +67155,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 28
  },
@@ -67237,7 +67237,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 35
  },
@@ -67307,7 +67307,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 35
  },
@@ -67382,7 +67382,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -67451,7 +67451,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  },
@@ -67519,7 +67519,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -67593,7 +67593,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 28
  },
@@ -67668,7 +67668,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.71,
-   "version": 5
+   "version": 6
   },
   "healthScore": 27
  },
@@ -67767,7 +67767,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -67857,7 +67857,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -67976,7 +67976,7 @@
    "fiber": 12,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 70
  },
@@ -68042,7 +68042,7 @@
    "fiber": 1,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 28
  },
@@ -68123,7 +68123,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -68224,7 +68224,7 @@
    "fiber": 11,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -68308,7 +68308,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 30
  },
@@ -68427,7 +68427,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -68567,7 +68567,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.95,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -68641,7 +68641,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -68716,7 +68716,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 33
  },
@@ -68798,7 +68798,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 28
  },
@@ -68890,7 +68890,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 36
  },
@@ -68969,7 +68969,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 46
  },
@@ -69072,7 +69072,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -69176,7 +69176,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -69278,7 +69278,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 78
  },
@@ -69390,7 +69390,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -69490,7 +69490,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -69566,7 +69566,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -69674,7 +69674,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.92,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -69767,7 +69767,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 50
  },
@@ -69872,7 +69872,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 69
  },
@@ -69958,7 +69958,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 41
  },
@@ -70063,7 +70063,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.79,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -70132,7 +70132,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -70220,7 +70220,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -70284,7 +70284,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -70356,7 +70356,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -70452,7 +70452,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -70542,7 +70542,7 @@
    "fiber": 18,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -70651,7 +70651,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -70720,7 +70720,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 23
  },
@@ -70835,7 +70835,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 0.93,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -70892,7 +70892,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -70961,7 +70961,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 24
  },
@@ -71073,7 +71073,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -71150,7 +71150,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 57
  },
@@ -71215,7 +71215,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 65
  },
@@ -71332,7 +71332,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 81
  },
@@ -71412,7 +71412,7 @@
    "fiber": 14,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 74
  },
@@ -71492,7 +71492,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -71580,7 +71580,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -71672,7 +71672,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.9,
-   "version": 5
+   "version": 6
   },
   "healthScore": 63
  },
@@ -71754,7 +71754,7 @@
    "fiber": 9,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -71883,7 +71883,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.82,
-   "version": 5
+   "version": 6
   },
   "healthScore": 76
  },
@@ -71935,7 +71935,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.5,
-   "version": 5
+   "version": 6
   },
   "healthScore": 27
  },
@@ -72023,7 +72023,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 70
  },
@@ -72103,7 +72103,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -72200,7 +72200,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 58
  },
@@ -72296,7 +72296,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 61
  },
@@ -72384,7 +72384,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -72474,7 +72474,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 54
  },
@@ -72576,7 +72576,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -72648,7 +72648,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 34
  },
@@ -72738,7 +72738,7 @@
    "fiber": 10,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -72822,7 +72822,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 30
  },
@@ -72901,7 +72901,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -72984,7 +72984,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 84
  },
@@ -73074,7 +73074,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.91,
-   "version": 5
+   "version": 6
   },
   "healthScore": 64
  },
@@ -73158,7 +73158,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 54
  },
@@ -73238,7 +73238,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 46
  },
@@ -73326,7 +73326,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 15
  },
@@ -73405,7 +73405,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -73528,7 +73528,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 74
  },
@@ -73639,7 +73639,7 @@
    "fiber": 21,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 83
  },
@@ -73750,7 +73750,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -73833,7 +73833,7 @@
    "fiber": 3,
    "source": "rough",
    "coverage": 0.71,
-   "version": 5
+   "version": 6
   },
   "healthScore": 32
  },
@@ -73928,7 +73928,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.89,
-   "version": 5
+   "version": 6
   },
   "healthScore": 60
  },
@@ -74036,7 +74036,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 25
  },
@@ -74123,7 +74123,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 56
  },
@@ -74209,7 +74209,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 52
  },
@@ -74300,7 +74300,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -74388,7 +74388,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 0.88,
-   "version": 5
+   "version": 6
   },
   "healthScore": 38
  },
@@ -74485,7 +74485,7 @@
    "fiber": 5,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 49
  },
@@ -74572,7 +74572,7 @@
    "fiber": 3,
    "source": "rough",
    "coverage": 0.63,
-   "version": 5
+   "version": 6
   },
   "healthScore": 62
  },
@@ -74654,7 +74654,7 @@
    "fiber": 1,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 72
  },
@@ -74716,7 +74716,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.5,
-   "version": 5
+   "version": 6
   },
   "healthScore": 27
  },
@@ -74828,7 +74828,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.78,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -74911,7 +74911,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 48
  },
@@ -75003,7 +75003,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.75,
-   "version": 5
+   "version": 6
   },
   "healthScore": 53
  },
@@ -75078,7 +75078,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0,
-   "version": 5
+   "version": 6
   },
   "healthScore": null
  },
@@ -75177,7 +75177,7 @@
    "fiber": 9,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 44
  },
@@ -75241,7 +75241,7 @@
    "fiber": 1,
    "source": "rough",
    "coverage": 0.5,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -75317,7 +75317,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 67
  },
@@ -75383,7 +75383,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.5,
-   "version": 5
+   "version": 6
   },
   "healthScore": 22
  },
@@ -75463,7 +75463,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 34
  },
@@ -75590,7 +75590,7 @@
    "fiber": 4,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 45
  },
@@ -75655,7 +75655,7 @@
    "fiber": 3,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 42
  },
@@ -75758,7 +75758,7 @@
    "fiber": 0,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 29
  },
@@ -75851,7 +75851,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 0.83,
-   "version": 5
+   "version": 6
   },
   "healthScore": 36
  },
@@ -75919,7 +75919,7 @@
    "fiber": 8,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 37
  },
@@ -75999,7 +75999,7 @@
    "fiber": 2,
    "source": "estimate",
    "coverage": 0.86,
-   "version": 5
+   "version": 6
   },
   "healthScore": 43
  },
@@ -76101,7 +76101,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 41
  },
@@ -76175,7 +76175,7 @@
    "fiber": 6,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 66
  },
@@ -76265,7 +76265,7 @@
    "fiber": 7,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 55
  },
@@ -76341,7 +76341,7 @@
    "fiber": 0,
    "source": "estimate",
    "coverage": 0.8,
-   "version": 5
+   "version": 6
   },
   "healthScore": 41
  },
@@ -76420,7 +76420,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -76474,7 +76474,7 @@
    "fiber": 1,
    "source": "estimate",
    "coverage": 1,
-   "version": 5
+   "version": 6
   },
   "healthScore": 39
  },
@@ -76532,7 +76532,7 @@
    "fiber": 7,
    "source": "rough",
    "coverage": 0.67,
-   "version": 5
+   "version": 6
   },
   "healthScore": 47
  }

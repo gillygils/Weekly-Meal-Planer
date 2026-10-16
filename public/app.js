@@ -1,5 +1,5 @@
 // Weekly Meal Planner frontend. No framework, no build step.
-import { createAvoidMatcher } from './lib/recipes.js';
+import { createAvoidMatcher, recoveryGroups } from './lib/recipes.js';
 import { PANTRY_CATALOG, CATALOG_GROUPS, suggestPantry } from './lib/pantry-catalog.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -218,6 +218,7 @@ function avoidHits(r) {
 const HEALTHY = 65;
 const isHealthy = (r) => (r.healthScore ?? 0) >= HEALTHY;
 const isEasy = (r) => Boolean(r.easy ?? r.easyFlag);
+const isRecovery = (r) => Boolean(r.postpartum ?? r.recoveryFlag);
 function meetsHealthGoals(r) {
   const s = state.settings;
   const n = r.nutrition;
@@ -360,6 +361,7 @@ function chips(r) {
   out.push(`<span class="chip price ${overBudget(r) ? 'over' : ''}" title="Estimated cost per serving">${money(cost(r))}/serving</span>`);
   if (r.totalMinutes) out.push(`<span class="chip">${icon('clock')}${r.totalMinutes} min</span>`);
   if (isEasy(r)) out.push(`<span class="chip easy" title="Easy: few ingredients, little effort">${icon('bolt')}Easy</span>`);
+  if (isRecovery(r) && (state.settings.postpartumMode || state.tab === 'recipes')) out.push(`<span class="chip recovery" title="Good for postpartum recovery">${icon('sprout')}Recovery</span>`);
   const n = r.nutrition;
   if (n?.kcal) {
     const tip = `Per serving${isHealthy(r) ? ` · healthy (score ${r.healthScore}/100)` : ''}`;
@@ -1132,6 +1134,7 @@ function filteredRecipes() {
     if (f.budget && !fitsSettings(r)) return false;
     if (f.healthy && !isHealthy(r)) return false;
     if (f.easy && !isEasy(r)) return false;
+    if (f.recovery && !isRecovery(r)) return false;
     if (f.source && recipeSource(r) !== f.source) return false;
     if (q && !`${r.name} ${r.cuisine} ${r.category} ${r.tags.join(' ')} ${r.source}`.toLowerCase().includes(q)) return false;
     return true;
@@ -1195,6 +1198,7 @@ function renderRecipes() {
       </select>
       <button class="chip-toggle" data-action="filter-fav" aria-pressed="${f.favorites}">${icon(f.favorites ? 'heart-fill' : 'heart')}Favorites</button>
       <button class="chip-toggle" data-action="filter-easy" aria-pressed="${Boolean(f.easy)}">${icon('bolt')}Easy</button>
+      <button class="chip-toggle" data-action="filter-recovery" aria-pressed="${Boolean(f.recovery)}">${icon('sprout')}Postpartum recovery</button>
       <button class="chip-toggle" data-action="filter-healthy" aria-pressed="${Boolean(f.healthy)}">${icon('leaf')}Healthy</button>
       <button class="chip-toggle" data-action="filter-budget" aria-pressed="${f.budget}" title="Only recipes the randomizer is allowed to pick (price, health goals, proteins, allergies & dislikes)">${icon('check')}Fits my settings</button>
     </div>
@@ -1313,6 +1317,7 @@ function renderSettings() {
 
       <section class="panel">
         <h2>Health &amp; macros</h2>
+        <label class="switch"><span><b>Postpartum recovery</b><br><small class="subtle">Favor meals that help you recover after birth: protein, iron and B12 (beef, lentils, greens), omega-3s from low-mercury fish, choline from eggs, calcium, fiber and warm soups. Works with easy days: those get meals that are easy <i>and</i> good for recovery. ${state.recipes.filter(isRecovery).length} recipes qualify. Everyday food, not medical advice; if you're breastfeeding you need roughly 330–400 extra calories a day.</small></span><input type="checkbox" data-setting="postpartumMode" ${s.postpartumMode ? 'checked' : ''}></label>
         <label class="switch"><span><b>Healthier meals</b><br><small class="subtle">Only randomize meals with a good health score (more protein and fiber, sensible calories, less deep-fried and fat-heavy food). The healthiest come up most often.</small></span><input type="checkbox" data-setting="healthFocus" ${s.healthFocus ? 'checked' : ''}></label>
         <div class="field-row">
           <div class="field">
@@ -1578,6 +1583,7 @@ async function openRecipe(id, slotId) {
       ${nextPlan ? carryOverForm(r, fromSlot, nextPlan, nextKey) : ''}
 
       ${nutritionPanel(r)}
+      ${recoveryNote(r)}
 
       <div class="recipe-cols">
         <div>
@@ -1628,6 +1634,14 @@ function defaultSlotFor(r, slotId) {
   const suits = (s) => !r.mealTypes?.length || r.mealTypes.includes(s.meal);
   const score = (s) => (s.recipeId ? 4 : 0) + (suits(s) ? 0 : 2) + (s.day >= today ? 0 : 1);
   return [...open].sort((a, b) => score(a) - score(b) || a.day - b.day || MEALS.indexOf(a.meal) - MEALS.indexOf(b.meal))[0] || null;
+}
+
+/** Why a recipe is good for postpartum recovery. */
+function recoveryNote(r) {
+  if (!isRecovery(r)) return '';
+  const groups = recoveryGroups(r.ingredients.map((i) => i.name));
+  const text = r.benefits || (groups.length ? `Protein-rich, with ${nameList(groups)}.` : 'Protein-rich and nutrient-dense.');
+  return `<p class="recovery-note">${icon('sprout')}<span><b>Postpartum recovery:</b> ${esc(text)}</span></p>`;
 }
 
 function nutritionPanel(r) {
@@ -1959,6 +1973,7 @@ const actions = {
   more: () => { state.recipeFilters.limit += PAGE * 2; render(); },
   'filter-fav': () => { state.recipeFilters.favorites = !state.recipeFilters.favorites; state.recipeFilters.limit = PAGE; render(); },
   'filter-easy': () => { state.recipeFilters.easy = !state.recipeFilters.easy; state.recipeFilters.limit = PAGE; render(); },
+  'filter-recovery': () => { state.recipeFilters.recovery = !state.recipeFilters.recovery; state.recipeFilters.limit = PAGE; render(); },
   'filter-healthy': () => { state.recipeFilters.healthy = !state.recipeFilters.healthy; state.recipeFilters.limit = PAGE; render(); },
   'filter-budget': () => { state.recipeFilters.budget = !state.recipeFilters.budget; state.recipeFilters.limit = PAGE; render(); },
   'import-url': () => openImport(),
@@ -2239,7 +2254,8 @@ document.addEventListener('change', (e) => {
   } else if (el.dataset.setting) {
     const key = el.dataset.setting;
     const value = el.type === 'checkbox' ? el.checked : el.type === 'number' || key === 'weekStartsOn' ? Number(el.value) || 0 : el.value;
-    busy(null, () => updateSettings({ [key]: value }).then(() => toast('Saved')));
+    const saved = key === 'postpartumMode' && value ? 'Postpartum recovery is on. Tap Randomize to fill your unlocked meals with recovery recipes.' : 'Saved';
+    busy(null, () => updateSettings({ [key]: value }).then(() => toast(saved)));
   } else if (el.dataset.filter) {
     state.recipeFilters[el.dataset.filter] = el.value;
     state.recipeFilters.limit = PAGE;

@@ -196,6 +196,8 @@ export function finalizeRecipe(r) {
     servingsEstimated: Boolean(r.servingsEstimated),
     easy: r.easy ?? null,
     easyFlag: isEasyRecipe({ ...r, ingredients, instructions: r.instructions || [] }),
+    postpartum: r.postpartum ?? null,
+    benefits: r.benefits || '',
     creator: r.creator || '',
   };
 }
@@ -204,6 +206,42 @@ export function finalizeRecipe(r) {
  * Easy = low effort: tagged easy, or short (few ingredients, few steps, quick).
  * Used for "easy weekends" and the Easy filter.
  */
+// Food groups postpartum guidance leans on (protein, iron, omega-3, choline,
+// folate, calcium, fiber, healthy fats, warm broths).
+const RECOVERY_GROUPS = [
+  ['iron-rich meat', /\b(beef|steaks?|sirloin|brisket|chuck|flank|lamb|liver|bison|venison)\b(?! (broth|stock|bouillon))/],
+  ['omega-3 fish', /\b(salmon|sardines?|trout|herring|anchov(y|ies)|arctic char)\b/],
+  ['eggs', /\beggs?\b/],
+  ['leafy greens', /\b(spinach|kale|chard|collards?|bok choy|broccoli|asparagus|watercress)\b/],
+  ['beans & lentils', /\b(lentils?|chickpeas?|black beans|kidney beans|cannellini|pinto beans|white beans|edamame|split peas)\b/],
+  ['whole grains', /\b(oats|oatmeal|quinoa|brown rice|barley|whole wheat|whole grain|farro|bulgur)\b/],
+  ['nuts & seeds', /\b(avocados?|walnuts?|flax(seed)?|chia|almonds?|pumpkin seeds|pepitas|tahini|hemp seeds)\b/],
+  ['dairy', /\b(greek yogurt|yogurt|cottage cheese|milk|kefir)\b/],
+  ['broth & ginger', /\b(bone broth|ginger|miso|seaweed)\b/],
+];
+/** Which of the recovery food groups a recipe's ingredients cover (shown on the recipe). */
+export function recoveryGroups(names) {
+  const text = (names || []).map((n) => String(n || '').toLowerCase()).join(' | ');
+  return RECOVERY_GROUPS.filter(([, re]) => re.test(text)).map(([label]) => label);
+}
+
+const HIGH_MERCURY = /\b(swordfish|king mackerel|shark|tilefish|bigeye|marlin|orange roughy)\b/;
+
+/**
+ * Good for postpartum recovery: the built-in recovery meals, plus any recipe
+ * with plenty of protein and a good health score that draws on at least three
+ * of the groups above (and no high-mercury fish).
+ */
+export function isRecoveryRecipe(r) {
+  if (r.postpartum != null) return Boolean(r.postpartum);
+  const text = (r.ingredients || []).map((i) => String(i.name || i).toLowerCase()).join(' | ');
+  if (!text || HIGH_MERCURY.test(text)) return false;
+  const n = r.nutrition;
+  if (!n || (n.protein ?? 0) < 20 || n.kcal > 950 || (r.healthScore ?? 0) < 55) return false;
+  const groups = RECOVERY_GROUPS.filter(([, re]) => re.test(text)).length;
+  return groups >= 3;
+}
+
 export function isEasyRecipe(r) {
   if (r.easy != null) return Boolean(r.easy);
   if ((r.tags || []).some((t) => /^(easy|quick)$/i.test(t))) return true;
