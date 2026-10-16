@@ -244,10 +244,46 @@ function thumb(r, size = 'medium') {
   return r.image.includes('themealdb.com') ? `${r.image}/${size}` : r.image;
 }
 
+// A picture for recipes without a photo: the dish and its main ingredients as
+// emoji on a color picked from the name (so each dish keeps its own look).
+const DISH_ART = [
+  [/\b(soup|stew|chili|chilli|congee|dal|curry|broth|miyeok)\b/, '🍲'], [/\bsalad\b/, '🥗'], [/\btacos?\b/, '🌮'],
+  [/\b(burritos?|wraps?|fajitas?)\b/, '🌯'], [/\bpizza\b/, '🍕'], [/\b(burgers?|sliders?)\b/, '🍔'],
+  [/\b(sandwich(es)?|subs?|melts?|blt|toast)\b/, '🥪'], [/\bpancakes?\b/, '🥞'], [/\bsmoothie\b/, '🥤'],
+  [/\b(oats|oatmeal|parfait|porridge|granola)\b/, '🥣'], [/\b(pasta|spaghetti|mac|lasagna|penne)\b/, '🍝'],
+  [/\b(ramen|noodles?|lo mein|pho)\b/, '🍜'], [/\b(fried rice|bowls?|stir[- ]fry)\b/, '🍛'], [/\b(shakshuka|frittata|scramble|omelet(te)?|egg muffins)\b/, '🍳'],
+  [/\bquesadillas?\b/, '🧀'], [/\bnachos\b/, '🌽'],
+];
+const INGREDIENT_ART = [
+  [/\b(steak|beef|sirloin|brisket|flank)\b/, '🥩'], [/\b(salmon|cod|sardines?|fish|tuna|trout|tilapia)\b/, '🐟'], [/\b(shrimp|prawns?)\b/, '🍤'],
+  [/\b(chicken|turkey|drumsticks?)\b/, '🍗'], [/\b(bacon|ham|pork|sausage|hot dogs?|kielbasa)\b/, '🥓'], [/\blamb\b/, '🍖'],
+  [/\beggs?\b/, '🥚'], [/\b(lentils?|beans|chickpeas?)\b/, '🫘'], [/\bavocados?\b/, '🥑'], [/\bsweet potato(es)?\b/, '🍠'],
+  [/\bbroccoli\b/, '🥦'], [/\b(spinach|kale|bok choy|greens|lettuce|cabbage)\b/, '🥬'], [/\b(potato(es)?|fries)\b/, '🥔'],
+  [/\b(rice|quinoa|barley)\b/, '🍚'], [/\b(tomato(es)?|marinara)\b/, '🍅'], [/\b(bell peppers?)\b/, '🫑'], [/\bcorn\b/, '🌽'],
+  [/\bcarrots?\b/, '🥕'], [/\bmushrooms?\b/, '🍄'], [/\b(cheese|cheddar|feta|parmesan|mozzarella)\b/, '🧀'],
+  [/\b(bread|tortillas?|buns?)\b/, '🍞'], [/\b(berries|blueberries|strawberries)\b/, '🫐'], [/\bbananas?\b/, '🍌'],
+  [/\b(lemons?|limes?)\b/, '🍋'], [/\bginger\b/, '🫚'], [/\b(yogurt|milk)\b/, '🥛'], [/\basparagus\b/, '🌱'],
+];
+function dishArt(r) {
+  const name = String(r.name || '').toLowerCase();
+  const ings = (r.ingredientNames || (r.ingredients || []).map((i) => i.name)).map((n) => String(n).toLowerCase());
+  const icons = [];
+  const add = (e) => { if (e && !icons.includes(e)) icons.push(e); };
+  add(DISH_ART.find(([re]) => re.test(name))?.[1]);
+  // Main ingredients: ones named in the title first, then the rest of the list.
+  for (const [re, e] of INGREDIENT_ART) if (re.test(name)) add(e);
+  for (const [re, e] of INGREDIENT_ART) if (ings.some((n) => re.test(n))) add(e);
+  if (!icons.length) add(PROTEIN_EMOJI[r.mainProtein] || '🍽️');
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360;
+  const [big, ...small] = icons.slice(0, 3);
+  return `<span class="ph-art" style="--h:${h}" aria-hidden="true"><b>${big}</b>${small.length ? `<i>${small.join('')}</i>` : ''}</span>`;
+}
+
 function imgTag(r, size) {
   const src = thumb(r, size);
-  // The emoji sits behind the photo and shows through if it is missing or fails to load.
-  const ph = `<span class="ph-emoji" aria-hidden="true">${PROTEIN_EMOJI[r.mainProtein] || '🍽️'}</span>`;
+  // The art sits behind the photo and shows through if it is missing or fails to load.
+  const ph = dishArt(r);
   return src ? `${ph}<img src="${esc(src)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ph;
 }
 

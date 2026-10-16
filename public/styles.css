@@ -807,3 +807,14 @@ dialog[open] { animation: pop .18s ease-out; }
 .recovery-note { display: flex; gap: .55rem; align-items: flex-start; margin: 0; padding: .7rem .9rem; border-radius: .9rem;
   background: color-mix(in srgb, var(--fav) 10%, transparent); border: 1px solid color-mix(in srgb, var(--fav) 30%, transparent); font-size: .92rem; }
 .recovery-note svg { width: 1.15rem; height: 1.15rem; flex: none; color: var(--fav); margin-top: .1rem; }
+
+/* Picture for recipes without a photo */
+.ph-art { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: .2rem;
+  background: radial-gradient(120% 90% at 30% 20%, hsl(var(--h) 55% 30%), hsl(calc(var(--h) + 35) 45% 16%)); }
+.ph-art b { font-size: clamp(2.2rem, 22cqi, 3.6rem); line-height: 1; filter: drop-shadow(0 4px 8px rgb(0 0 0 / .35)); }
+.ph-art i { font-style: normal; font-size: clamp(1.1rem, 11cqi, 1.7rem); letter-spacing: .25rem; line-height: 1; opacity: .95; }
+:root[data-theme="light"] .ph-art { background: radial-gradient(120% 90% at 30% 20%, hsl(var(--h) 70% 86%), hsl(calc(var(--h) + 35) 55% 72%)); }
+.meal-img, .r-card .meal-img { container-type: inline-size; }
+@media (prefers-color-scheme: light) {
+  :root[data-theme="auto"] .ph-art { background: radial-gradient(120% 90% at 30% 20%, hsl(var(--h) 70% 86%), hsl(calc(var(--h) + 35) 55% 72%)); }
+}
