@@ -9,6 +9,7 @@ import { ensureSlots, randomizePlan, moveMeal, activeSlots, isEasy, wantsEasy } 
 import { pantryMatch, autoPlace, PLACES, STAPLES } from './lib/pantry.js';
 import { aiScanEnabled, scanPhotos, lookupBarcode, ScanError } from './lib/scan.js';
 import { freshnessPlan, localNow, addDaysIso } from './lib/freshness.js';
+import { cachedImage } from './lib/images.js';
 import { sendNotification, listNames } from './lib/notify.js';
 import { buildGroceryList, normalizeIngredientName, aisleFor } from './lib/grocery.js';
 import { fetchAllSources, importLink, normalizeUrl, pullCreatorSite, SUGGESTED_CREATORS } from './lib/sources.js';
@@ -306,6 +307,27 @@ route('POST', '/api/auth/signout-all', ({ req, res }) => {
 route('GET', '/api/meta', () => ({ stores: STORES, proteins: [...PROTEINS, 'vegetarian'], allergens: Object.fromEntries(Object.entries(ALLERGEN_GROUPS).map(([k, g]) => [k, g.label])), recipeCount: store.db.recipes.length, auth: Boolean(PASSWORD), suggestedCreators: SUGGESTED_CREATORS }));
 
 route('GET', '/api/settings', () => store.db.settings);
+
+// Recipe photos from other sites, served from the app's own address (see lib/images.js).
+const RESPONDED = Symbol('responded');
+route('GET', '/api/img', async ({ req, res }) => {
+  const u = new URL(req.url, 'http://x').searchParams.get('u') || '';
+  if (!/^https?:\/\//i.test(u) || u.length > 2000) throw new HttpError(400, 'Bad image address');
+  let img;
+  try {
+    img = await cachedImage(u, path.join(DATA_DIR, 'images'));
+  } catch {
+    throw new HttpError(502, "Couldn't load that photo");
+  }
+  res.writeHead(200, {
+    'content-type': img.type,
+    'cache-control': 'private, max-age=31536000, immutable',
+    'x-content-type-options': 'nosniff',
+    'content-security-policy': "default-src 'none'; sandbox",
+  });
+  fs.createReadStream(img.file).pipe(res);
+  return RESPONDED;
+});
 route('POST', '/api/notify/test', async () => {
   try {
     await sendNotification(store.db.settings, { title: 'Meal Planner', message: "Notifications work! You'll get freeze and thaw reminders here.", tags: ['white_check_mark'], click: appOrigin ? `${appOrigin}/#plan` : undefined });
@@ -749,7 +771,9 @@ const server = http.createServer(async (req, res) => {
       // Photo scans carry images, everything else is small.
       const limit = pathname === '/api/pantry/scan' ? 12_000_000 : 1_000_000;
       const body = ['POST', 'PUT', 'PATCH'].includes(req.method) ? await readBody(req, limit) : {};
-      return send(res, 200, await r.handler({ params, body, req, res }));
+      const out = await r.handler({ params, body, req, res });
+      if (out === RESPONDED) return undefined;
+      return send(res, 200, out);
     }
     throw new HttpError(404, 'Not found');
   } catch (e) {

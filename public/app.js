@@ -241,7 +241,11 @@ function fitsSettings(r, meal) {
 
 function thumb(r, size = 'medium') {
   if (!r.image) return '';
-  return r.image.includes('themealdb.com') ? `${r.image}/${size}` : r.image;
+  if (r.image.includes('themealdb.com')) return `${r.image}/${size}`;
+  // Photos from other sites (TikTok covers, creator blogs) come through the server, which
+  // keeps a copy: tracker blockers can't hide them and TikTok links can't expire.
+  if (/^https?:\/\//i.test(r.image) && !/^https:\/\/cdn\.dummyjson\.com\//.test(r.image) && !window.__noImageProxy) return `/api/img?u=${encodeURIComponent(r.image)}`;
+  return r.image;
 }
 
 // A picture for recipes without a photo: the dish and its main ingredients as
@@ -1598,7 +1602,7 @@ async function openRecipe(id, slotId) {
   }).join('');
   const scaleNote = r.servings !== s.householdSize ? `Recipe serves ${r.servings}; your grocery list scales it to ${s.householdSize}.` : `Serves ${r.servings}.`;
   openModal(`
-    ${r.image ? `<div class="hero"><img src="${esc(r.image)}" alt="" onerror="this.parentNode.remove()"></div>` : ''}
+    ${r.image ? `<div class="hero"><img src="${esc(thumb(r, 'large'))}" alt="" onerror="this.parentNode.remove()"></div>` : ''}
     <div class="modal-content" data-recipe="${esc(r.id)}">
       <div class="modal-head">
         <h2 id="modal-title">${esc(r.name)}</h2>

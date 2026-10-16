@@ -100,7 +100,7 @@ function isPrivateIp(ip) {
     (l.startsWith('::ffff:') && isPrivateIp(l.slice(7)));
 }
 
-async function assertPublicUrl(raw) {
+export async function assertPublicUrl(raw) {
   let url;
   try {
     url = new URL(raw);

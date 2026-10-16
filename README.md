@@ -114,6 +114,7 @@ With Docker, add `ANTHROPIC_API_KEY` under `environment:` in `docker-compose.yml
   - Estimates are good for comparing, not exact. With estimates alone one store usually wins everything; the split plan gets useful as you enter real prices.
   - Tap a price on the Groceries tab to save the real one and its aisle. You can also set your own cost per serving on any recipe (open it → *Edit price…*).
 - **Macros are estimates** unless the recipe publishes its own. They're calculated from the ingredient amounts using standard nutrition values. When TheMealDB doesn't say how many a recipe serves, servings are estimated from the total amount of food.
+- **Photos from other sites** (TikTok covers, creator blogs) are downloaded once by your server and kept in , then shown from your own address. Browser tracker blocking can't hide them, and TikTok's cover links can't expire on you.
 - **TikTok** doesn't let other apps read creators' videos or recipes, so the app uses TikTok's public embed info for a single video link (caption, creator, cover). Cover images from TikTok expire after a while; a placeholder shows instead.
 - **Creator websites** are read one page at a time with a pause between pages, following each site's robots.txt.
 - **Protein and allergen detection** reads each recipe's ingredients. Fish sauce, oyster sauce and Worcestershire don't count as fish/shellfish, but anchovies do. If you're avoiding a protein because of an **allergy**, still check the ingredients yourself.

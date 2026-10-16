@@ -455,3 +455,28 @@ test('postpartum mode favors recovery meals, and easy ones on easy days', async 
     }
   }
 });
+
+test('photo cache: saves images, refuses SVG and private-network redirects', async () => {
+  const { cachedImage } = await import('../server/lib/images.js');
+  const fs = await import('node:fs');
+  const os = await import('node:os');
+  const path = await import('node:path');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'img-'));
+  let calls = 0;
+  const reply = (status, headers, body = '') => ({ status, ok: status < 300, headers: new Headers(headers), arrayBuffer: async () => new TextEncoder().encode(body).buffer });
+  const fake = async (url) => {
+    calls++;
+    if (url.includes('/photo.jpg')) return reply(200, { 'content-type': 'image/jpeg' }, 'JPEGDATA');
+    if (url.includes('/logo.svg')) return reply(200, { 'content-type': 'image/svg+xml' }, '<svg/>');
+    if (url.includes('/sneaky')) return reply(302, { location: 'http://127.0.0.1/secret.jpg' });
+    return reply(404, {});
+  };
+  const a = await cachedImage('https://example.com/photo.jpg', dir, fake);
+  assert.equal(a.type, 'image/jpeg');
+  assert.equal(fs.readFileSync(a.file, 'utf8'), 'JPEGDATA');
+  await cachedImage('https://example.com/photo.jpg', dir, fake);
+  assert.equal(calls, 1, 'second request comes from the saved copy');
+  await assert.rejects(cachedImage('https://example.com/logo.svg', dir, fake));
+  await assert.rejects(cachedImage('https://example.com/sneaky', dir, fake), /private/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
